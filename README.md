@@ -1,62 +1,37 @@
-# builder
+## Pipeline DSL & builder POC
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+### How to use it
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
-
-## Running the application in dev mode
-
-You can run your application in dev mode that enables live coding using:
-
-```shell script
-./mvnw compile quarkus:dev
-```
-
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
-
-## Packaging and running the application
-
-The application can be packaged using:
+The application can be packaged using this command:
 
 ```shell script
 ./mvnw package
 ```
+and launched:
+```bash
+java -jar target/quarkus-app/quarkus-run.jar
+__  ____  __  _____   ___  __ ____  ______ 
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+2024-07-09 13:10:54,678 WARN  [io.qua.config] (main) Unrecognized configuration key "quarkus.application.main-class" was provided; it will be ignored; verify that the dependency extension for this configuration is set or that you did not make a typo
+2024-07-09 13:10:54,968 INFO  [io.quarkus] (main) builder 1.0-SNAPSHOT on JVM (powered by Quarkus 3.12.1) started in 0.535s. Listening on: http://0.0.0.0:8080
+2024-07-09 13:10:54,969 INFO  [io.quarkus] (main) Profile prod activated. 
+2024-07-09 13:10:54,969 INFO  [io.quarkus] (main) Installed features: [cdi, picocli, rest, smallrye-context-propagation, vertx]
+Missing required options: '--configuration=<configuration>', '--output=<output>'
+Usage: myapp [-hV] -c=<configuration> -o=<output>
+Quarkus CLI example with Picocli
+  -c, --configuration=<configuration>
+                          The configuration file
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   The output file
+  -V, --version           Print version information and exit.
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+```  
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+If there is a configuration file `conf.yaml` created at the root of this project and that you want to generate the pipelines yaml files under `out/flows`, then execute this command:
+```bash
+java -jar target/quarkus-app/quarkus-run.jar -c conf.yaml -o out/flows
 ```
+Next, check the pipeline(s) generated under `./out/flows`
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/builder-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Provided Code
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
