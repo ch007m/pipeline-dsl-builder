@@ -9,8 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static dev.snowdrop.ParamsFactories.CNB_PARAMS;
-import static dev.snowdrop.ParamsFactories.KONFLUX_PARAMS;
+import static dev.snowdrop.ParamsFactories.*;
 
 public class PipelineGenerator {
 
@@ -23,8 +22,10 @@ public class PipelineGenerator {
                    .withName("pipeline-konflux")
                 .endMetadata()
                 .withNewSpec()
-                   .withParams()
-                      .addNewParam().withName("foo").withType("string").endParam()
+                   .withWorkspaces()
+                      .addNewWorkspace("workspace","workspace",false)
+                      .addNewWorkspace("git-auth","git-auth",true)
+                   .withParams(KONFLUX_PARAMS_SPEC())
                    .withTasks()
                        // Task 0
                        .addNewTask()
