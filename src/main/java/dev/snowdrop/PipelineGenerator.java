@@ -1,6 +1,8 @@
 package dev.snowdrop;
 
 import io.fabric8.tekton.pipeline.v1.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class PipelineGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineGenerator.class);
 
     public static Pipeline generatePipeline() {
         // @formatter:off
@@ -65,9 +69,9 @@ public class PipelineGenerator {
         Path path = Paths.get(outputPath, fileName+".yaml");
         try {
             Files.write(path, yamlContent.getBytes());
-            System.out.println("YAML written to: " + outputPath);
+            logger.info("YAML written to: " + outputPath);
         } catch (IOException e) {
-            System.err.println("Failed to write YAML to file: " + e.getMessage());
+            logger.error("Failed to write YAML to file: " + e.getMessage());
         }
     }
 }

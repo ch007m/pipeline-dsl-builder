@@ -26,7 +26,6 @@ Quarkus CLI example with Picocli
   -h, --help              Show this help message and exit.
   -o, --output=<output>   The output file
   -V, --version           Print version information and exit.
-
 ```  
 
 If there is a configuration file `conf.yaml` created at the root of this project and that you want to generate the pipelines yaml files under `out/flows`, then execute this command:
