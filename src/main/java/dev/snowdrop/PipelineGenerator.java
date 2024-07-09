@@ -9,6 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static dev.snowdrop.ParamsFactories.CNB_PARAMS;
+import static dev.snowdrop.ParamsFactories.KONFLUX_PARAMS;
+
 public class PipelineGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineGenerator.class);
@@ -32,8 +35,8 @@ public class PipelineGenerator {
                        .addNewTask()
                           .withName("task-1")
                           .withRunAfter("task-0")
-                          .withParams()
-                             .addNewParam().withName("param1").withValue(new ParamValue("val1")).endParam()
+                          .withParams(KONFLUX_PARAMS())
+                          .withParams(CNB_PARAMS())
                           .withNewTaskRef()
                              .withResolver("git")
                              .withParams()
