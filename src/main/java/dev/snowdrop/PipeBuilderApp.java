@@ -35,10 +35,21 @@ public class PipeBuilderApp implements Runnable {
       // Parse and validate the configuration
       Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);
 
-      // Generate a Pipeline according to the configurator
-      Pipeline pipeline = PipelineGenerator.generatePipeline(cfg);
+      if (cfg == null) {
+         logger.error("Configuration file cannot be empty !");
+         System.exit(1);
+      }
 
-      ConfiguratorSvc.writeYaml(pipeline, outputPath);
+      Pipeline pipeline = null;
 
+      if (cfg.getBuilder() != null) {
+         pipeline = PipelineGenerator.createBuilder(cfg);
+      }
+
+      if (pipeline != null) {
+         ConfiguratorSvc.writeYaml(pipeline, outputPath);
+      } else {
+         logger.error("The pipeline has not been generated properly and is null !");
+      }
    }
 }

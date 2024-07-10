@@ -6,18 +6,13 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import static dev.snowdrop.ParamsFactories.*;
 
 public class PipelineGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineGenerator.class);
 
-    public static Pipeline generatePipeline(Configurator cfg) {
+    public static Pipeline createBuilder(Configurator cfg) {
         // @formatter:off
         Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
