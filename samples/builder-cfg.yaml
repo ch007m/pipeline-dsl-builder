@@ -1,6 +1,7 @@
 # A buildpack builder project
 builder:
+  name: # name of the pipeline to be created
   repository:
-      name: gcr.io/projectriff/builder
+      name: https://github.com/paketo-community/builder-ubi-base
       branch: main
 

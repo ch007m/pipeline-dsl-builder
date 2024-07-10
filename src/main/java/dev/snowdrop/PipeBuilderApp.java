@@ -40,6 +40,5 @@ public class PipeBuilderApp implements Runnable {
 
       ConfiguratorSvc.writeYaml(pipeline, outputPath);
 
-
    }
 }
