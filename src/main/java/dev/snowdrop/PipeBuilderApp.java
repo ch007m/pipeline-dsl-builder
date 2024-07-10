@@ -10,6 +10,8 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import static dev.snowdrop.service.CodeGenerator.generateParamsFromYAML;
+
 @TopCommand
 @Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
 public class PipeBuilderApp implements Runnable {

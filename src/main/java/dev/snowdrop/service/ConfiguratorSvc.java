@@ -1,7 +1,6 @@
 package dev.snowdrop.service;
 
 import dev.snowdrop.PipeBuilderApp;
-import dev.snowdrop.PipelineGenerator;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import io.fabric8.tekton.pipeline.v1.Pipeline;
