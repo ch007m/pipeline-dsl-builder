@@ -1,18 +1,11 @@
-package dev.snowdrop;
+package dev.snowdrop.factory.task;
 
 import io.fabric8.tekton.pipeline.v1.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParamsFactories {
-
-   public static List<ParamSpec> KONFLUX_PARAMS_SPEC() {
-      List<ParamSpec> params = new ArrayList<>();
-      params.add(new ParamSpecBuilder().withDescription("Source Repository URL").withName("git-url").withType("string").build());
-      params.add(new ParamSpecBuilder().withDescription("Revision of the Source Repository").withName("revision").withType("string").withNewDefault("").build());
-      return params;
-   }
+public class Params {
 
    public static List<Param> KONFLUX_PARAMS() {
       List<Param> params = new ArrayList<>();

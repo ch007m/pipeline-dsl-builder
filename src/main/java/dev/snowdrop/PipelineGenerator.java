@@ -6,7 +6,9 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.snowdrop.ParamsFactories.*;
+import static dev.snowdrop.factory.task.Params.*;
+import static dev.snowdrop.factory.pipeline.Labels.*;
+import static dev.snowdrop.factory.pipeline.Params.*;
 
 public class PipelineGenerator {
 
@@ -17,12 +19,13 @@ public class PipelineGenerator {
         Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
                    .withName(cfg.getBuilder().getName())
+                   .withLabels(KONFLUX_PIPELINE_LABELS())
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces()
                       .addNewWorkspace("workspace","workspace",false)
                       .addNewWorkspace("git-auth","git-auth",true)
-                   .withParams(KONFLUX_PARAMS_SPEC())
+                   .withParams(KONFLUX_PIPELINE_PARAMS())
                    .withTasks()
                        // Task 0
                        .addNewTask()
