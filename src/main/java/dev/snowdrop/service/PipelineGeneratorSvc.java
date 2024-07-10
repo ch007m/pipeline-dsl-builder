@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static dev.snowdrop.factory.task.Params.*;
+import static dev.snowdrop.factory.pipeline.Finally.*;
 import static dev.snowdrop.factory.pipeline.Labels.*;
 import static dev.snowdrop.factory.pipeline.Params.*;
 import static dev.snowdrop.factory.pipeline.Results.*;
@@ -26,31 +27,7 @@ public class PipelineGeneratorSvc {
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())
                    .withParams(KONFLUX_PIPELINE_PARAMS())
                    .withResults(KONFLUX_PIPELINE_RESULTS())
-                   .withFinally()
-                        .addNewFinally()
-                          .withName("show-sbom")
-                          .withNewTaskRef()
-                            // There is a problem here as konflux pipeline uses as fields: name + version
-                            .withName("show-sbom")
-                            .withApiVersion("0.1")
-                            .withKind("")
-                          .endTaskRef()
-                          .withParams()
-                            .addNewParam().withName("IMAGE_URL").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
-                        .endFinally()
-                        .addNewFinally()
-                          .withName("show-summary")
-                          .withNewTaskRef()
-                             .withName("summary")
-                             .withApiVersion("0.2")
-                             .withKind("")
-                          .endTaskRef()
-                          .withParams()
-                              .addNewParam().withName("pipelinerun-name").withValue(new ParamValue("$(context.pipelineRun.name)")).endParam()
-                              .addNewParam().withName("git-url").withValue(new ParamValue("$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)")).endParam()
-                              .addNewParam().withName("image-url").withValue(new ParamValue("$(params.output-image)")).endParam()
-                              .addNewParam().withName("build-task-status").withValue(new ParamValue("$(tasks.build-container.status)")).endParam()
-                        .endFinally()
+                   .withFinally(KONFLUX_PIPELINE_FINALLY())
                    .withTasks()
                        // Task 0
                        .addNewTask()
