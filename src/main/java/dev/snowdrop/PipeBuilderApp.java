@@ -1,6 +1,7 @@
 package dev.snowdrop;
 
-import io.fabric8.kubernetes.client.utils.Serialization;
+import dev.snowdrop.model.Configurator;
+import dev.snowdrop.service.ConfiguratorSvc;
 import io.fabric8.tekton.pipeline.v1.Pipeline;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import org.slf4j.Logger;
@@ -15,11 +16,11 @@ public class PipeBuilderApp implements Runnable {
 
    private static final Logger logger = LoggerFactory.getLogger(PipeBuilderApp.class);
 
-   @Option(names = {"-c", "--configuration"}, description = "The configuration file", required = true)
+   @Option(names = {"-c", "--configuration-path"}, description = "The path of the configuration file", required = true)
    String configuration;
 
-   @Option(names = {"-o", "--output"}, description = "The output file", required = true)
-   String output;
+   @Option(names = {"-o", "--output-path"}, description = "The output path", required = true)
+   String outputPath;
 
    public static void main(String[] args) {
       int exitCode = new CommandLine(new PipeBuilderApp()).execute(args);
@@ -28,15 +29,17 @@ public class PipeBuilderApp implements Runnable {
 
    @Override
    public void run() {
-      logger.info("#### Configuration: " + configuration);
-      logger.info("#### Output: " + output);
+      logger.info("#### Configuration path: " + configuration);
+      logger.info("#### Output path: " + outputPath);
 
-      Pipeline pipeline = PipelineGenerator.generatePipeline();
-      String yamlPipeline = Serialization.asYaml(pipeline);
+      // Parse and validate the configuration
+      Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);
 
-      logger.debug("Created YAML: \n{}", yamlPipeline);
+      // Generate a Pipeline according to the configurator
+      Pipeline pipeline = PipelineGenerator.generatePipeline(cfg);
 
-      // Write the YAML to the output file
-      PipelineGenerator.writeYamlToFile(output, pipeline.getMetadata().getName(), yamlPipeline);
+      ConfiguratorSvc.writeYaml(pipeline, outputPath);
+
+
    }
 }

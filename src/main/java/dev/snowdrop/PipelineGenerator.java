@@ -1,5 +1,6 @@
 package dev.snowdrop;
 
+import dev.snowdrop.model.Configurator;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ public class PipelineGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineGenerator.class);
 
-    public static Pipeline generatePipeline() {
+    public static Pipeline generatePipeline(Configurator configurator) {
         // @formatter:off
         Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
