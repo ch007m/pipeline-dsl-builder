@@ -26,7 +26,13 @@ public class PipelineGenerator {
                    .withTasks()
                        // Task 0
                        .addNewTask()
-                          .withName("task-0")
+                          .withName("task-bundle-resolver")
+                          .withNewTaskRef()
+                             .withResolver("bundles")
+                               .withParams()
+                                 .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/redhat-appstudio-tekton-catalog/task-git-clone:0.1@sha256:1f84973a21aabea38434b1f663abc4cb2d86565a9c7aae1f90decb43a8fa48eb")).endParam()
+                                 .addNewParam().withName("name").withValue(new ParamValue("git-clone")).endParam()
+                          .endTaskRef()
                        .endTask()
 
                        // Task 1
