@@ -77,14 +77,4 @@ public class PipelineGenerator {
         // @formatter:on
         return pipeline;
     }
-
-    public static void writeYamlToFile(String outputPath, String fileName, String yamlContent) {
-        Path path = Paths.get(outputPath, fileName+".yaml");
-        try {
-            Files.write(path, yamlContent.getBytes());
-            logger.info("YAML written to: " + outputPath);
-        } catch (IOException e) {
-            logger.error("Failed to write YAML to file: " + e.getMessage());
-        }
-    }
 }

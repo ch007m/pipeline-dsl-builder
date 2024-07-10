@@ -14,6 +14,9 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ConfiguratorSvc {
 
@@ -54,9 +57,19 @@ public class ConfiguratorSvc {
          logger.debug("Created YAML: \n{}", yamlPipeline);
 
          // Write the YAML to the output
-         PipelineGenerator.writeYamlToFile(outputPath, pipeline.getMetadata().getName(), yamlPipeline);
+         writeYamlToFile(outputPath, pipeline.getMetadata().getName(), yamlPipeline);
       } catch (Exception e) {
          logger.error(e.getMessage());
+      }
+   }
+
+   public static void writeYamlToFile(String outputPath, String fileName, String yamlContent) {
+      Path path = Paths.get(outputPath, fileName+".yaml");
+      try {
+         Files.write(path, yamlContent.getBytes());
+         logger.info("YAML written to: " + outputPath);
+      } catch (IOException e) {
+         logger.error("Failed to write YAML to file: " + e.getMessage());
       }
    }
 }
