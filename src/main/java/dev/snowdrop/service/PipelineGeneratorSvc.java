@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import static dev.snowdrop.factory.task.Params.*;
 import static dev.snowdrop.factory.pipeline.Labels.*;
 import static dev.snowdrop.factory.pipeline.Params.*;
+import static dev.snowdrop.factory.pipeline.Results.*;
 import static dev.snowdrop.factory.pipeline.Workspaces.*;
 
 public class PipelineGeneratorSvc {
@@ -24,6 +25,21 @@ public class PipelineGeneratorSvc {
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())
                    .withParams(KONFLUX_PIPELINE_PARAMS())
+                   .withResults(KONFLUX_PIPELINE_RESULTS())
+                   .withFinally()
+                        .addNewTask()
+                          .withName("show-sbom")
+                          .withNewTaskRef().withName("show-sbom").withApiVersion("0.1").withKind("").endTaskRef()
+                          .withParams()
+                            .addNewParam().withName("IMAGE_URL").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
+                        .endTask()
+                        .addNewTask()
+                          .withName("show-summary")
+                          .withNewTaskRef().withName("summary").withApiVersion("0.2").withKind("").endTaskRef()
+                          .withParams()
+                            .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/redhat-appstudio-tekton-catalog/task-git-clone:0.1@sha256:1f84973a21aabea38434b1f663abc4cb2d86565a9c7aae1f90decb43a8fa48eb")).endParam()
+                            .addNewParam().withName("name").withValue(new ParamValue("git-clone")).endParam()
+                        .endTask()
                    .withTasks()
                        // Task 0
                        .addNewTask()
