@@ -10,10 +10,10 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @TopCommand
-@Command(name = "myapp", mixinStandardHelpOptions = true, description = "Quarkus CLI example with Picocli")
-public class MyApp implements Runnable {
+@Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
+public class PipeBuilderApp implements Runnable {
 
-   private static final Logger logger = LoggerFactory.getLogger(MyApp.class);
+   private static final Logger logger = LoggerFactory.getLogger(PipeBuilderApp.class);
 
    @Option(names = {"-c", "--configuration"}, description = "The configuration file", required = true)
    String configuration;
@@ -22,7 +22,7 @@ public class MyApp implements Runnable {
    String output;
 
    public static void main(String[] args) {
-      int exitCode = new CommandLine(new MyApp()).execute(args);
+      int exitCode = new CommandLine(new PipeBuilderApp()).execute(args);
       System.exit(exitCode);
    }
 

@@ -58,14 +58,7 @@ public class PipelineGenerator {
                        .endTask()
                 .endSpec()
                 .build();
-
         // @formatter:on
-        Pipeline pipelineNonFormated = new PipelineBuilder()
-           .withNewMetadata()
-           .withName("pipeline-konflux")
-           .endMetadata()
-           .build();
-
         return pipeline;
     }
 

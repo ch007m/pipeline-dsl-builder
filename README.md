@@ -19,7 +19,7 @@ __  ____  __  _____   ___  __ ____  ______
 2024-07-09 13:10:54,969 INFO  [io.quarkus] (main) Profile prod activated. 
 2024-07-09 13:10:54,969 INFO  [io.quarkus] (main) Installed features: [cdi, picocli, rest, smallrye-context-propagation, vertx]
 Missing required options: '--configuration=<configuration>', '--output=<output>'
-Usage: myapp [-hV] -c=<configuration> -o=<output>
+Usage: pipelinebuilder [-hV] -c=<configuration> -o=<output>
 Quarkus CLI example with Picocli
   -c, --configuration=<configuration>
                           The configuration file
