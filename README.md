@@ -30,7 +30,7 @@ Quarkus CLI example with Picocli
 
 If there is a configuration file `conf.yaml` created at the root of this project and that you want to generate the pipelines yaml files under `out/flows`, then execute this command:
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -c conf.yaml -o out/flows
+java -jar target/quarkus-app/quarkus-run.jar -c samples/builder-cfg.yaml -o out/flows
 ```
 Next, check the pipeline(s) generated under `./out/flows`
 

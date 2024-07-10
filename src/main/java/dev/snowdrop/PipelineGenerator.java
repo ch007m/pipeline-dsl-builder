@@ -1,6 +1,7 @@
 package dev.snowdrop;
 
 import dev.snowdrop.model.Configurator;
+import dev.snowdrop.service.FileUtilSvc;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +47,23 @@ public class PipelineGenerator {
                           .endTaskRef()
                        .endTask()
 
-                       // Task 2
+                       // Embedded Task with script
                        .addNewTask()
-                          .withName("task-2")
+                          .withName("task-embedded-script")
+                          .withTaskSpec(
+                             new EmbeddedTaskBuilder()
+                                .addNewStep()
+                                    .withName("run-script")
+                                    .withImage("ubuntu")
+                                    .withScript(FileUtilSvc.loadFileAsString("echo.sh"))
+                                .endStep()
+                                .build()
+                          )
+                       .endTask()
+
+                       // Simple Task with TaskRef and When
+                       .addNewTask()
+                          .withName("task-ref")
                           .withRunAfter("task-1")
                           .withWhen()
                              .addNewWhen()
