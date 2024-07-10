@@ -1,6 +1,6 @@
 package dev.snowdrop;
 
-import static dev.snowdrop.service.CodeGenerator.generateParamsFromYAML;
+import static dev.snowdrop.service.CodeGeneratorSvc.generateParamsFromYAML;
 
 public class TektonJavaCodeGenerator {
    public static void main(String[] args) {

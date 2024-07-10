@@ -2,6 +2,7 @@ package dev.snowdrop;
 
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.service.ConfiguratorSvc;
+import dev.snowdrop.service.PipelineGeneratorSvc;
 import io.fabric8.tekton.pipeline.v1.Pipeline;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import org.slf4j.Logger;
@@ -9,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import static dev.snowdrop.service.CodeGenerator.generateParamsFromYAML;
 
 @TopCommand
 @Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
@@ -45,7 +44,7 @@ public class PipeBuilderApp implements Runnable {
       Pipeline pipeline = null;
 
       if (cfg.getBuilder() != null) {
-         pipeline = PipelineGenerator.createBuilder(cfg);
+         pipeline = PipelineGeneratorSvc.createBuilder(cfg);
       }
 
       if (pipeline != null) {

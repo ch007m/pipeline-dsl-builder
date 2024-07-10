@@ -1,7 +1,6 @@
-package dev.snowdrop;
+package dev.snowdrop.service;
 
 import dev.snowdrop.model.Configurator;
-import dev.snowdrop.service.FileUtilSvc;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,10 +8,11 @@ import org.slf4j.LoggerFactory;
 import static dev.snowdrop.factory.task.Params.*;
 import static dev.snowdrop.factory.pipeline.Labels.*;
 import static dev.snowdrop.factory.pipeline.Params.*;
+import static dev.snowdrop.factory.pipeline.Workspaces.*;
 
-public class PipelineGenerator {
+public class PipelineGeneratorSvc {
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(PipelineGeneratorSvc.class);
 
     public static Pipeline createBuilder(Configurator cfg) {
         // @formatter:off
@@ -22,9 +22,7 @@ public class PipelineGenerator {
                    .withLabels(KONFLUX_PIPELINE_LABELS())
                 .endMetadata()
                 .withNewSpec()
-                   .withWorkspaces()
-                      .addNewWorkspace("workspace","workspace",false)
-                      .addNewWorkspace("git-auth","git-auth",true)
+                   .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())
                    .withParams(KONFLUX_PIPELINE_PARAMS())
                    .withTasks()
                        // Task 0

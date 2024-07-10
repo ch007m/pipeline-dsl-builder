@@ -1,8 +1,6 @@
 package dev.snowdrop.service;
 
 import dev.snowdrop.factory.pipeline.Params;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -11,7 +9,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-public class CodeGenerator {
+public class CodeGeneratorSvc {
 
    public static void generateParamsFromYAML(String yamlPath) {
       Yaml yaml = new Yaml(new Constructor(List.class, new LoaderOptions()));
