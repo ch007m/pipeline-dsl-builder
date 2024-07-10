@@ -17,11 +17,11 @@ public class PipelineGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineGenerator.class);
 
-    public static Pipeline generatePipeline(Configurator configurator) {
+    public static Pipeline generatePipeline(Configurator cfg) {
         // @formatter:off
         Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
-                   .withName("pipeline-konflux")
+                   .withName(cfg.getBuilder().getName())
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces()

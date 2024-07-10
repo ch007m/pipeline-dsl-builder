@@ -1,6 +1,6 @@
 # A buildpack builder project
 builder:
-  name: # name of the pipeline to be created
+  name: pipeline-konflux # name of the pipeline to be created
   repository:
       name: https://github.com/paketo-community/builder-ubi-base
       branch: main
