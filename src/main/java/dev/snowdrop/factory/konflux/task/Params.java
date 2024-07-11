@@ -1,4 +1,4 @@
-package dev.snowdrop.factory.task;
+package dev.snowdrop.factory.konflux.task;
 
 import io.fabric8.tekton.pipeline.v1.*;
 

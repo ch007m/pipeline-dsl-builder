@@ -1,4 +1,4 @@
-package dev.snowdrop.factory.pipeline.konflux;
+package dev.snowdrop.factory.konflux.pipeline;
 
 import dev.snowdrop.factory.LabelsProvider;
 

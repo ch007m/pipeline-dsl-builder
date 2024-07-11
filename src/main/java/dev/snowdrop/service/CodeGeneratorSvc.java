@@ -1,6 +1,6 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.factory.pipeline.konflux.Params;
+import dev.snowdrop.factory.konflux.pipeline.Params;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;

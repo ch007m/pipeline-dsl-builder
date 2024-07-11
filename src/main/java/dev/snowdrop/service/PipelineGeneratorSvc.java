@@ -1,5 +1,6 @@
 package dev.snowdrop.service;
 
+import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.Flavor;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.model.Configurator;
@@ -7,11 +8,11 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.snowdrop.factory.task.Params.*;
-import static dev.snowdrop.factory.pipeline.konflux.Finally.*;
-import static dev.snowdrop.factory.pipeline.konflux.Params.*;
-import static dev.snowdrop.factory.pipeline.konflux.Results.*;
-import static dev.snowdrop.factory.pipeline.konflux.Workspaces.*;
+import static dev.snowdrop.factory.konflux.task.Params.*;
+import static dev.snowdrop.factory.konflux.pipeline.Finally.*;
+import static dev.snowdrop.factory.konflux.pipeline.Params.*;
+import static dev.snowdrop.factory.konflux.pipeline.Results.*;
+import static dev.snowdrop.factory.konflux.pipeline.Workspaces.*;
 
 public class PipelineGeneratorSvc {
 
@@ -24,6 +25,7 @@ public class PipelineGeneratorSvc {
                 .withNewMetadata()
                    .withName(cfg.getBuilder().getName())
                    .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations())
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())
