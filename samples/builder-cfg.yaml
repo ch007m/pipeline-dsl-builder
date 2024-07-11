@@ -1,3 +1,6 @@
+# Type or flavor of the pipeline to be generated
+flavor: konflux
+
 # A buildpack builder project
 builder:
   name: pipeline-konflux # name of the pipeline to be created

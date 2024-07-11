@@ -18,7 +18,7 @@ public class FileUtilSvc {
 
    public static String loadFileAsString(String fileName) {
       String scriptPath = SCRIPTS_PATH + fileName;
-      logger.info("Script path to embed: " + scriptPath);
+      logger.debug("#### Script path to embed in a task: " + scriptPath);
 
       // Get the input stream for the file from the class loader
       InputStream inputStream = FileUtilSvc.class.getClassLoader().getResourceAsStream( scriptPath );

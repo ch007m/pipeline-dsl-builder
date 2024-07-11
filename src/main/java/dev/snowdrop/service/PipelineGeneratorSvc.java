@@ -1,28 +1,29 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.factory.pipeline.LabelsProviderFactory;
+import dev.snowdrop.factory.Flavor;
+import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.snowdrop.factory.Flavor.KONFLUX;
 import static dev.snowdrop.factory.task.Params.*;
-import static dev.snowdrop.factory.pipeline.Finally.*;
-import static dev.snowdrop.factory.pipeline.Params.*;
-import static dev.snowdrop.factory.pipeline.Results.*;
-import static dev.snowdrop.factory.pipeline.Workspaces.*;
+import static dev.snowdrop.factory.pipeline.konflux.Finally.*;
+import static dev.snowdrop.factory.pipeline.konflux.Params.*;
+import static dev.snowdrop.factory.pipeline.konflux.Results.*;
+import static dev.snowdrop.factory.pipeline.konflux.Workspaces.*;
 
 public class PipelineGeneratorSvc {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineGeneratorSvc.class);
 
     public static Pipeline createBuilder(Configurator cfg) {
+        final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
         // @formatter:off
         Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
                    .withName(cfg.getBuilder().getName())
-                   .withLabels(LabelsProviderFactory.getProvider(KONFLUX).getPipelineLabels())
+                   .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())

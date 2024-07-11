@@ -1,4 +1,6 @@
-package dev.snowdrop.factory.pipeline;
+package dev.snowdrop.factory.pipeline.konflux;
+
+import dev.snowdrop.factory.LabelsProvider;
 
 import java.util.Map;
 

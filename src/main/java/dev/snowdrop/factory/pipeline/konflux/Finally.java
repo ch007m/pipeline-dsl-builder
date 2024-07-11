@@ -1,4 +1,4 @@
-package dev.snowdrop.factory.pipeline;
+package dev.snowdrop.factory.pipeline.konflux;
 
 import io.fabric8.tekton.pipeline.v1.ParamValue;
 import io.fabric8.tekton.pipeline.v1.PipelineTask;

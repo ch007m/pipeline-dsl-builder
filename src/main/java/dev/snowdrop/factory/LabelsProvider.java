@@ -1,4 +1,4 @@
-package dev.snowdrop.factory.pipeline;
+package dev.snowdrop.factory;
 
 import java.util.Map;
 

@@ -1,14 +1,9 @@
-package dev.snowdrop.factory.pipeline;
+package dev.snowdrop.factory.pipeline.konflux;
 
 import io.fabric8.tekton.pipeline.v1.*;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Params {
 

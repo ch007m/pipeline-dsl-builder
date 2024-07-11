@@ -66,7 +66,7 @@ public class ConfiguratorSvc {
       Path path = Paths.get(outputPath, fileName+".yaml");
       try {
          Files.write(path, yamlContent.getBytes());
-         logger.info("YAML written to: " + outputPath);
+         logger.info("### YAML generated here: " + outputPath);
       } catch (IOException e) {
          logger.error("Failed to write YAML to file: " + e.getMessage());
       }

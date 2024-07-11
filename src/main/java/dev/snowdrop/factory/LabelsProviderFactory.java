@@ -1,6 +1,6 @@
-package dev.snowdrop.factory.pipeline;
+package dev.snowdrop.factory;
 
-import dev.snowdrop.factory.Flavor;
+import dev.snowdrop.factory.pipeline.konflux.Labels;
 
 public class LabelsProviderFactory {
    public static LabelsProvider getProvider(Flavor type) {

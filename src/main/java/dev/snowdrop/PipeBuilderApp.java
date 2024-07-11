@@ -31,7 +31,7 @@ public class PipeBuilderApp implements Runnable {
    @Override
    public void run() {
       logger.info("#### Configuration path: " + configuration);
-      logger.info("#### Output path: " + outputPath);
+      logger.debug("#### Output path: " + outputPath);
 
       // Parse and validate the configuration
       Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);
@@ -39,6 +39,13 @@ public class PipeBuilderApp implements Runnable {
       if (cfg == null) {
          logger.error("Configuration file cannot be empty !");
          System.exit(1);
+      }
+
+      if (cfg.getFlavor() == null) {
+         logger.error("Flavor is missing from the configuration yaml file !");
+         System.exit(1);
+      } else {
+         logger.info("#### Flavor selected: " + cfg.getFlavor().toUpperCase());
       }
 
       Pipeline pipeline = null;
