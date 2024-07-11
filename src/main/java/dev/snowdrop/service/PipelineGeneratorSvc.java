@@ -66,8 +66,7 @@ public class PipelineGeneratorSvc {
                       INIT(),
                       CLONE_REPOSITORY(),
                       PREFETCH_DEPENDENCIES(),
-                      // TODO: Next tasks should be developed
-                      BUILDPACKS_BUILDER(),
+                      BUILDPACKS_BUILDER(), // TODO: This task should be developed
                       BUILD_SOURCE_IMAGE(),
                       DEPRECATED_BASE_IMAGE_CHECK(),
                       CLAIR_SCAN(),
