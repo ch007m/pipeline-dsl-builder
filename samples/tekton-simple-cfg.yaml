@@ -3,6 +3,6 @@ flavor: tekton
 
 pipeline:
   # The domain allows to organize the resources, tasks to be used
-  domain: simple
+  domain: demo
   name: pipeline-demo # name of the pipeline to be created
 

@@ -50,9 +50,9 @@ public class PipeBuilderApp implements Runnable {
 
       Pipeline pipeline = null;
 
-      // Flavor: Tekton and domain: simple
-      if (cfg.getPipeline().getDomain().equals("simple") && cfg.getFlavor().equals("tekton")) {
-         pipeline = PipelineGeneratorSvc.createSimple(cfg);
+      // Flavor: Tekton and domain: demo
+      if (cfg.getPipeline().getDomain().equals("demo") && cfg.getFlavor().equals("tekton")) {
+         pipeline = PipelineGeneratorSvc.createDemo(cfg);
       }
 
       // Domain: Buildpacks and type: builder image
