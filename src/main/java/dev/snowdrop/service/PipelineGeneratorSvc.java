@@ -8,6 +8,7 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static dev.snowdrop.factory.konflux.pipeline.Tasks.INIT;
 import static dev.snowdrop.factory.konflux.task.Params.*;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.*;
 import static dev.snowdrop.factory.konflux.pipeline.Params.*;
@@ -44,18 +45,8 @@ public class PipelineGeneratorSvc {
                           .endTaskRef()
                        .endTask()
 
-                       // Task 1
-                       .addNewTask()
-                          .withName("task-1")
-                          .withRunAfter("task-0")
-                          .withParams(KONFLUX_PARAMS())
-                          .withParams(CNB_PARAMS())
-                          .withNewTaskRef()
-                             .withResolver("git")
-                             .withParams()
-                             .addNewParam().withName("url").withValue(new ParamValue("https://github.com/redhat-buildpacks/catalog.git")).endParam()
-                          .endTaskRef()
-                       .endTask()
+                       // Init Task
+                       .withTasks(INIT())
 
                        // Embedded Task with script
                        .addNewTask()
