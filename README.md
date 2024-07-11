@@ -1,36 +1,40 @@
-## Pipeline DSL & builder POC
+## Tekton Pipeline YAML Generator
+
+The goal of this Quarkus Application is to simplify the life of the users when they play with Tekton or any compliant project like [Konflux](https://konflux-ci.dev/) which uses an opinionated pipeline's [template](https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml) to generate the required Tekton YAML
+resources.
+
+**Note**: This project is complementary to what Dekorate can populate today for [Tekton](https://github.com/dekorateio/dekorate/tree/main/annotations/tekton-annotations) !
+
+The application has been designed around the following principles:
+
+- Have a quarkus standalone application able to generate different Tekton resources for a specific flavor: Tekton, Konflux, etc
+- Support to provide the needed parameters or configuration using a YAML configurator file
+- Generate using the Fabric8 kubernetes Fluent API & Builder the resources using [Tekton model v1](https://github.com/fabric8io/kubernetes-client/tree/main/extensions/tekton/model-v1/)
+- Propose Java `Factories` able to generate the params, labels, workspaces, results, finally tekton objects using `defaulting` values or YAML content from the configuration file
 
 ### How to use it
 
-The application can be packaged using this command:
+Git clone the project and package the application:
 
 ```shell script
 ./mvnw package
 ```
-and launched:
+
+Create a configuration YAML file:
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar
-__  ____  __  _____   ___  __ ____  ______ 
- --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
- -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
---\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-2024-07-09 13:10:54,678 WARN  [io.qua.config] (main) Unrecognized configuration key "quarkus.application.main-class" was provided; it will be ignored; verify that the dependency extension for this configuration is set or that you did not make a typo
-2024-07-09 13:10:54,968 INFO  [io.quarkus] (main) builder 1.0-SNAPSHOT on JVM (powered by Quarkus 3.12.1) started in 0.535s. Listening on: http://0.0.0.0:8080
-2024-07-09 13:10:54,969 INFO  [io.quarkus] (main) Profile prod activated. 
-2024-07-09 13:10:54,969 INFO  [io.quarkus] (main) Installed features: [cdi, picocli, rest, smallrye-context-propagation, vertx]
-Missing required options: '--configuration=<configuration>', '--output=<output>'
-Usage: pipelinebuilder [-hV] -c=<configuration> -o=<output>
-Quarkus CLI example with Picocli
-  -c, --configuration=<configuration>
-                          The configuration file
-  -h, --help              Show this help message and exit.
-  -o, --output=<output>   The output file
-  -V, --version           Print version information and exit.
+cat <<EOF > my-config.yaml
+flavor: konflux
+builder:
+  name: ubi-buildpacks-builder-pipeline
+EOF
+
+```
+and launch it:
+```bash
+java -jar target/quarkus-app/quarkus-run.jar -c my-config.yaml -o out/flows
 ```  
 
-If there is a configuration file `conf.yaml` created at the root of this project and that you want to generate the pipelines yaml files under `out/flows`, then execute this command:
-```bash
-java -jar target/quarkus-app/quarkus-run.jar -c samples/builder-cfg.yaml -o out/flows
-```
 Next, check the pipeline(s) generated under `./out/flows`
+
+**Remark**: Use the parameter `-h` to get the help usage of the application
 
