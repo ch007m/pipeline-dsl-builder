@@ -1,13 +1,14 @@
 package dev.snowdrop.service;
 
+import dev.snowdrop.factory.pipeline.LabelsProviderFactory;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static dev.snowdrop.factory.Flavor.KONFLUX;
 import static dev.snowdrop.factory.task.Params.*;
 import static dev.snowdrop.factory.pipeline.Finally.*;
-import static dev.snowdrop.factory.pipeline.Labels.*;
 import static dev.snowdrop.factory.pipeline.Params.*;
 import static dev.snowdrop.factory.pipeline.Results.*;
 import static dev.snowdrop.factory.pipeline.Workspaces.*;
@@ -21,7 +22,7 @@ public class PipelineGeneratorSvc {
         Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
                    .withName(cfg.getBuilder().getName())
-                   .withLabels(KONFLUX_PIPELINE_LABELS())
+                   .withLabels(LabelsProviderFactory.getProvider(KONFLUX).getPipelineLabels())
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())
