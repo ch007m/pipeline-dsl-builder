@@ -2,7 +2,7 @@ package dev.snowdrop.model;
 
 public class Configurator {
    private String flavor;
-   private Builder builder;
+   private Pipeline pipeline;
 
    public String getFlavor() {
       return flavor;
@@ -12,12 +12,14 @@ public class Configurator {
       this.flavor = flavor;
    }
 
-   public Builder getBuilder() {
-      return builder;
+   public Pipeline getPipeline() {
+      return pipeline;
    }
 
-   public void setBuilder(Builder builder) {
-      this.builder = builder;
+   public void setPipeline(Pipeline pipeline) {
+      this.pipeline = pipeline;
    }
+
+
 
 }

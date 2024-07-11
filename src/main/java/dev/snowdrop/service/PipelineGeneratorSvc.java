@@ -23,7 +23,7 @@ public class PipelineGeneratorSvc {
         // @formatter:off
         Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
-                   .withName(cfg.getBuilder().getName())
+                   .withName(cfg.getPipeline().getName())
                    .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
                    .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations())
                 .endMetadata()

@@ -50,7 +50,8 @@ public class PipeBuilderApp implements Runnable {
 
       Pipeline pipeline = null;
 
-      if (cfg.getBuilder() != null) {
+      // Domain: Buildpacks and type: builder image
+      if (cfg.getPipeline().getBuilder() != null) {
          pipeline = PipelineGeneratorSvc.createBuilder(cfg);
       }
 

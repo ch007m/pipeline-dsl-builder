@@ -23,14 +23,17 @@ Git clone the project and package the application:
 
 Create a configuration YAML file where you will define the following parameters:
  - The flavor to be used: `konflux` or `tekton`
- - Select the `type` of the pipeline to be generated. This `type` corresponds to a pipeline which uses the same template/canvas 
+ - Select the `domain` such as: `buidpacks` and next the type: `builder` `stack`, `meta-buildpack`, `buildpack`, etc. The combination of the domain and the `type` will allow the tool to selec t the proper task, workspaces, finally, when, results, etc resources
 ```bash
 cat <<EOF > my-config.yaml
 flavor: konflux
 pipeline:
   domain: buildpacks
-  type: builder
   name: ubi-buildpacks-builder-pipeline
+  builder
+    repository:
+      name: https://github.com/paketo-community/builder-ubi-base
+      branch: main
 EOF
 ```
 and launch it:

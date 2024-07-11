@@ -1,10 +1,12 @@
-# The flovor will be used to render the pipeline according to a specific provider: konflux, tekton
+# The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
 flavor: konflux
 
 # A buildpack builder project
-builder:
+pipeline:
+  domain: buildpacks
   name: pipeline-konflux # name of the pipeline to be created
-  repository:
-    name: https://github.com/paketo-community/builder-ubi-base
-    branch: main
+  builder:
+    repository:
+      name: https://github.com/paketo-community/builder-ubi-base
+      branch: main
 

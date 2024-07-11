@@ -27,8 +27,6 @@ public class ConfiguratorSvc {
       // Load the YAML file
       try {
          configurator = loadYaml(configFile);
-         logger.debug("Repository Name: " + configurator.getBuilder().getRepository().getName());
-         logger.debug("Repository Branch: " + configurator.getBuilder().getRepository().getBranch());
       } catch(Exception e) {
          e.printStackTrace();
       }

@@ -1,4 +1,4 @@
-# The flovor will be used to render the pipeline according to a specific provider: konflux, tekton
+# The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
 flavor: konflux
 
 # A task to be generated
