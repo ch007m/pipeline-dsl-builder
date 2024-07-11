@@ -18,6 +18,35 @@ public class PipelineGeneratorSvc {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineGeneratorSvc.class);
 
+   public static Pipeline createSimple(Configurator cfg) {
+       final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
+       // @formatter:off
+       Pipeline pipeline = new PipelineBuilder()
+               .withNewMetadata()
+                   .withName(cfg.getPipeline().getName())
+                   .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations())
+                .endMetadata()
+                .withNewSpec()
+          .withTasks()
+             // Embedded Task with script
+             .addNewTask()
+              .withName("task-embedded-script")
+              .withTaskSpec(
+                 new EmbeddedTaskBuilder()
+                    .addNewStep()
+                       .withName("run-script")
+                       .withImage("ubuntu")
+                       .withScript(FileUtilSvc.loadFileAsString("echo.sh"))
+                    .endStep()
+                    .build()
+             )
+          .endTask()
+          .endSpec()
+          .build();
+       // @formatter:on
+       return pipeline;
+   }
     public static Pipeline createBuilder(Configurator cfg) {
         final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
         // @formatter:off
@@ -47,20 +76,6 @@ public class PipelineGeneratorSvc {
                       CLAMAV_SCAN(),
                       SBOM_JSON_CHECK()
                    )
-
-                   // Embedded Task with script
-                   .addNewTask()
-                      .withName("task-embedded-script")
-                      .withTaskSpec(
-                         new EmbeddedTaskBuilder()
-                            .addNewStep()
-                                .withName("run-script")
-                                .withImage("ubuntu")
-                                .withScript(FileUtilSvc.loadFileAsString("echo.sh"))
-                            .endStep()
-                            .build()
-                      )
-                   .endTask()
                 .endSpec()
                 .build();
         // @formatter:on
