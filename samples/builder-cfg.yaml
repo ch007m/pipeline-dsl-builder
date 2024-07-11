@@ -1,10 +1,11 @@
 # The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
 flavor: konflux
 
-# A buildpack builder project
 pipeline:
+  # The domain allows to organize the resources, tasks to be used
   domain: buildpacks
   name: pipeline-konflux # name of the pipeline to be created
+  # The builder corresponds to the followign buildpacks concept:
   builder:
     repository:
       name: https://github.com/paketo-community/builder-ubi-base
