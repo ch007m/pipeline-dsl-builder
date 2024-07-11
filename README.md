@@ -10,7 +10,8 @@ The application has been designed around the following principles:
 - Have a quarkus standalone application able to generate different Tekton resources for a specific flavor: Tekton, Konflux, etc
 - Support to provide the needed parameters or configuration using a YAML configurator file
 - Generate using the Fabric8 kubernetes Fluent API & Builder the resources using [Tekton model v1](https://github.com/fabric8io/kubernetes-client/tree/main/extensions/tekton/model-v1/)
-- Propose Java `Factories` able to generate the params, labels, workspaces, results, finally tekton objects using `defaulting` values or YAML content from the configuration file
+- Propose `Factories` able to generate the Tekton objects such as: params, labels, workspaces, results, finally using `defaulting` values or YAML content from the configuration file
+- Support different domains `buildpacks, s2i, etc` and types `ubi-builder, etc` in order to chain the proper resources within the pipeline generated. If by example you select as domain `buildpacks` and type `builder` then the application will generate a pipeline where the tasks will match the `selector`. In this case, the task(s) able to build a builder image for buildpacks will be included 
 
 ### How to use it
 
@@ -20,14 +21,17 @@ Git clone the project and package the application:
 ./mvnw package
 ```
 
-Create a configuration YAML file:
+Create a configuration YAML file where you will define the following parameters:
+ - The flavor to be used: `konflux` or `tekton`
+ - Select the `type` of the pipeline to be generated. This `type` corresponds to a pipeline which uses the same template/canvas 
 ```bash
 cat <<EOF > my-config.yaml
 flavor: konflux
-builder:
+pipeline:
+  domain: buildpacks
+  type: builder
   name: ubi-buildpacks-builder-pipeline
 EOF
-
 ```
 and launch it:
 ```bash
