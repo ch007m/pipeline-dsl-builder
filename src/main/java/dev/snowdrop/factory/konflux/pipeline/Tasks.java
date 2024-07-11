@@ -73,4 +73,60 @@ public class Tasks {
       return task;
    }
 
+   public static PipelineTask BUILD_SOURCE_IMAGE() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("build-source-image")
+         .build();
+      return task;
+   }
+
+   public static PipelineTask DEPRECATED_BASE_IMAGE_CHECK() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("deprecated-base-image-check")
+         .build();
+      return task;
+   }
+
+   public static PipelineTask CLAIR_SCAN() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("clair-scan")
+         .build();
+      return task;
+   }
+
+   public static PipelineTask ECOSYSTEM_CERT_PREFLIGHT_CHECKS() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("ecosystem-cert-preflight-checks")
+         .build();
+      return task;
+   }
+
+   public static PipelineTask SAST_SNYK_CHECK() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("sast-snyk-check")
+         .build();
+      return task;
+   }
+
+   public static PipelineTask CLAMAV_SCAN() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("clamav-scan")
+         .build();
+      return task;
+   }
+
+   public static PipelineTask SBOM_JSON_CHECK() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("sbom-json-check")
+         .build();
+      return task;
+   }
+
+   public static PipelineTask BUILDPACKS_BUILDER() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("buildpacks-builder")
+         .build();
+      return task;
+   }
+
 }

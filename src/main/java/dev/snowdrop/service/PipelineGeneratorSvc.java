@@ -47,8 +47,16 @@ public class PipelineGeneratorSvc {
                        .withTasks(
                           INIT(),
                           CLONE_REPOSITORY(),
-                          PREFETCH_DEPENDENCIES()
-                          // TODO => ADD HERE OUR UBI Builder task
+                          PREFETCH_DEPENDENCIES(),
+                          // TODO: Next tasks should be developed
+                          BUILDPACKS_BUILDER(),
+                          BUILD_SOURCE_IMAGE(),
+                          DEPRECATED_BASE_IMAGE_CHECK(),
+                          CLAIR_SCAN(),
+                          ECOSYSTEM_CERT_PREFLIGHT_CHECKS(),
+                          SAST_SNYK_CHECK(),
+                          CLAMAV_SCAN(),
+                          SBOM_JSON_CHECK()
                        )
 
                        // Embedded Task with script
