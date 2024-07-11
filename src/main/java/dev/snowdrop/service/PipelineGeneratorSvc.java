@@ -32,46 +32,35 @@ public class PipelineGeneratorSvc {
                    .withParams(KONFLUX_PIPELINE_PARAMS())
                    .withResults(KONFLUX_PIPELINE_RESULTS())
                    .withFinally(KONFLUX_PIPELINE_FINALLY())
-                   .withTasks()
-                       // Task 0
-                       .addNewTask()
-                          .withName("task-bundle-resolver")
-                          .withNewTaskRef()
-                             .withResolver("bundles")
-                               .withParams()
-                                 .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/redhat-appstudio-tekton-catalog/task-git-clone:0.1@sha256:1f84973a21aabea38434b1f663abc4cb2d86565a9c7aae1f90decb43a8fa48eb")).endParam()
-                                 .addNewParam().withName("name").withValue(new ParamValue("git-clone")).endParam()
-                          .endTaskRef()
-                       .endTask()
 
-                       .withTasks(
-                          INIT(),
-                          CLONE_REPOSITORY(),
-                          PREFETCH_DEPENDENCIES(),
-                          // TODO: Next tasks should be developed
-                          BUILDPACKS_BUILDER(),
-                          BUILD_SOURCE_IMAGE(),
-                          DEPRECATED_BASE_IMAGE_CHECK(),
-                          CLAIR_SCAN(),
-                          ECOSYSTEM_CERT_PREFLIGHT_CHECKS(),
-                          SAST_SNYK_CHECK(),
-                          CLAMAV_SCAN(),
-                          SBOM_JSON_CHECK()
-                       )
+                   .withTasks(
+                      INIT(),
+                      CLONE_REPOSITORY(),
+                      PREFETCH_DEPENDENCIES(),
+                      // TODO: Next tasks should be developed
+                      BUILDPACKS_BUILDER(),
+                      BUILD_SOURCE_IMAGE(),
+                      DEPRECATED_BASE_IMAGE_CHECK(),
+                      CLAIR_SCAN(),
+                      ECOSYSTEM_CERT_PREFLIGHT_CHECKS(),
+                      SAST_SNYK_CHECK(),
+                      CLAMAV_SCAN(),
+                      SBOM_JSON_CHECK()
+                   )
 
-                       // Embedded Task with script
-                       .addNewTask()
-                          .withName("task-embedded-script")
-                          .withTaskSpec(
-                             new EmbeddedTaskBuilder()
-                                .addNewStep()
-                                    .withName("run-script")
-                                    .withImage("ubuntu")
-                                    .withScript(FileUtilSvc.loadFileAsString("echo.sh"))
-                                .endStep()
-                                .build()
-                          )
-                       .endTask()
+                   // Embedded Task with script
+                   .addNewTask()
+                      .withName("task-embedded-script")
+                      .withTaskSpec(
+                         new EmbeddedTaskBuilder()
+                            .addNewStep()
+                                .withName("run-script")
+                                .withImage("ubuntu")
+                                .withScript(FileUtilSvc.loadFileAsString("echo.sh"))
+                            .endStep()
+                            .build()
+                      )
+                   .endTask()
                 .endSpec()
                 .build();
         // @formatter:on
