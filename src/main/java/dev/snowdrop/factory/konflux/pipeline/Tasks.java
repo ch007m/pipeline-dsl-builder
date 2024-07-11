@@ -104,6 +104,23 @@ public class Tasks {
    public static PipelineTask DEPRECATED_BASE_IMAGE_CHECK() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("deprecated-base-image-check")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(params.skip-checks)")
+           .withOperator("in")
+           .withValues("false")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("IMAGE_URL").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
+           .addNewParam().withName("IMAGE_DIGEST").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_DIGEST)")).endParam()
+           .addNewParam().withName("BASE_IMAGES_DIGESTS").withValue(new ParamValue("$(tasks.build-container.results.BASE_IMAGES_DIGESTS)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/deprecated-image-check:0.4@sha256:48f8a4da120a4dec29da6e4faacee81d024324861474e10e0a7fcfcf56677249")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("deprecated-base-image-check")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
          .build();
       return task;
    }
