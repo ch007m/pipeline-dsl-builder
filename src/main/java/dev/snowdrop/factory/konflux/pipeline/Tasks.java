@@ -47,4 +47,30 @@ public class Tasks {
       return task;
    }
 
+   public static PipelineTask PREFETCH_DEPENDENCIES() {
+      PipelineTask task = new PipelineTaskBuilder()
+         .withName("prefetch-dependencies")
+         .withRunAfter("clone-repository")
+         .addNewWhen()
+           .withInput("$(params.prefetch-input)")
+           .withOperator("notin")
+           .withValues("")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("input").withValue(new ParamValue("$(params.prefetch-input)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:03e8293e6cc7d70a5f899751c6a4c2a25c3e3a6cfa7c437f9beca69638ce6988")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("prefetch-dependencies")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
+         .withWorkspaces()
+           .addNewWorkspace().withName("source").withWorkspace("workspace").endWorkspace()
+           .addNewWorkspace().withName("netrc").withWorkspace("netrc").endWorkspace()
+           .addNewWorkspace().withName("git-basic-auth").withWorkspace("git-auth").endWorkspace()
+         .build();
+      return task;
+   }
+
 }

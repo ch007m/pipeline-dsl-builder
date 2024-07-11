@@ -8,12 +8,10 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.snowdrop.factory.konflux.pipeline.Tasks.CLONE_REPOSITORY;
-import static dev.snowdrop.factory.konflux.pipeline.Tasks.INIT;
-import static dev.snowdrop.factory.konflux.task.Params.*;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.*;
 import static dev.snowdrop.factory.konflux.pipeline.Params.*;
 import static dev.snowdrop.factory.konflux.pipeline.Results.*;
+import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.factory.konflux.pipeline.Workspaces.*;
 
 public class PipelineGeneratorSvc {
@@ -48,7 +46,9 @@ public class PipelineGeneratorSvc {
 
                        .withTasks(
                           INIT(),
-                          CLONE_REPOSITORY()
+                          CLONE_REPOSITORY(),
+                          PREFETCH_DEPENDENCIES()
+                          // TODO => ADD HERE OUR UBI Builder task
                        )
 
                        // Embedded Task with script
