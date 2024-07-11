@@ -11,7 +11,7 @@ The application has been designed around the following principles:
 - Support to provide the needed parameters or configuration using a YAML configurator file
 - Generate using the Fabric8 kubernetes Fluent API & Builder the resources using [Tekton model v1](https://github.com/fabric8io/kubernetes-client/tree/main/extensions/tekton/model-v1/)
 - Propose `Factories` able to generate the Tekton objects such as: params, labels, workspaces, results, finally using `defaulting` values or YAML content from the configuration file
-- Support different domains `buildpacks, s2i, etc` and types `ubi-builder, etc` in order to chain the proper resources within the pipeline generated. If by example you select as domain `buildpacks` and type `builder` then the application will generate a pipeline where the tasks will match the `selector`. In this case, the task(s) able to build a builder image for buildpacks will be included 
+- Support different domains: `buildpacks, s2i, etc` and types: `ubi-builder, etc` in order to chain the proper tasks and resources within the pipeline generated. If by example you select as domain: `buildpacks` and type: `builder` then the application will generate a pipeline able to `build` an  UBI builder image for buildpacks ! 
 
 ### How to use it
 
@@ -23,7 +23,7 @@ Git clone the project and package the application:
 
 Create a configuration YAML file where you will define the following parameters:
  - The flavor to be used: `konflux` or `tekton`
- - Select the `domain` such as: `buidpacks` and next the type: `builder` `stack`, `meta-buildpack`, `buildpack`, etc. The combination of the domain and the `type` will allow the tool to selec t the proper task, workspaces, finally, when, results, etc resources
+ - Select the `domain` such as: `buidpacks` and next the type: `builder` `stack`, `meta-buildpack`, `buildpack`, etc. The combination of the domain and the `type` will allow the tool to select the proper task, workspaces, finally, when, results, etc resources
 ```bash
 cat <<EOF > my-config.yaml
 flavor: konflux
