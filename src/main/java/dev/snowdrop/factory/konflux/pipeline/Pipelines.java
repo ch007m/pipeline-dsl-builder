@@ -1,9 +1,10 @@
-package dev.snowdrop.service;
+package dev.snowdrop.factory.konflux.pipeline;
 
 import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.Flavor;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.model.Configurator;
+import dev.snowdrop.service.FileUtilSvc;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,43 +15,14 @@ import static dev.snowdrop.factory.konflux.pipeline.Results.*;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.factory.konflux.pipeline.Workspaces.*;
 
-public class PipelineGeneratorSvc {
+public class Pipelines {
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineGeneratorSvc.class);
+   private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
 
-   public static Pipeline createDemo(Configurator cfg) {
-       final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
-       // @formatter:off
-       Pipeline pipeline = new PipelineBuilder()
-               .withNewMetadata()
-                   .withName(cfg.getPipeline().getName())
-                   .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations())
-                .endMetadata()
-                .withNewSpec()
-          .withTasks()
-             // Embedded Task with script
-             .addNewTask()
-              .withName("task-embedded-script")
-              .withTaskSpec(
-                 new EmbeddedTaskBuilder()
-                    .addNewStep()
-                       .withName("run-script")
-                       .withImage("ubuntu")
-                       .withScript(FileUtilSvc.loadFileAsString("echo.sh"))
-                    .endStep()
-                    .build()
-             )
-          .endTask()
-          .endSpec()
-          .build();
-       // @formatter:on
-       return pipeline;
-   }
-    public static Pipeline createBuilder(Configurator cfg) {
-        final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
-        // @formatter:off
-        Pipeline pipeline = new PipelineBuilder()
+   public static Pipeline createBuilder(Configurator cfg) {
+      final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
+      // @formatter:off
+      Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
                    .withName(cfg.getPipeline().getName())
                    .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
@@ -77,7 +49,7 @@ public class PipelineGeneratorSvc {
                    )
                 .endSpec()
                 .build();
-        // @formatter:on
-        return pipeline;
-    }
+      // @formatter:on
+      return pipeline;
+   }
 }
