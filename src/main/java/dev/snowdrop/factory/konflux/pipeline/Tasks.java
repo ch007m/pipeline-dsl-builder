@@ -173,6 +173,24 @@ public class Tasks {
    public static PipelineTask SAST_SNYK_CHECK() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("sast-snyk-check")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(params.skip-checks)")
+           .withOperator("in")
+           .withValues("true")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("image-digest").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_DIGEST)")).endParam()
+           .addNewParam().withName("image-url").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/sast-snyk-check:0.1@sha256:d501cb1ff0f999a478a7fb8811fb501300be3f158aaedee663d230624d74d2b4")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("sast-snyk-check")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
+         .withWorkspaces()
+           .addNewWorkspace().withName("workspace").withWorkspace("workspace").endWorkspace()
          .build();
       return task;
    }
