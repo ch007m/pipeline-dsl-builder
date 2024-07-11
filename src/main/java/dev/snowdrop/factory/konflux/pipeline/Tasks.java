@@ -128,6 +128,22 @@ public class Tasks {
    public static PipelineTask CLAIR_SCAN() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("clair-scan")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(params.skip-checks)")
+           .withOperator("in")
+           .withValues("false")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("image-digest").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_DIGEST)")).endParam()
+           .addNewParam().withName("image-url").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/clair-scan:0.1@sha256:07f56dc7b7d77d394c6163f2682b3a72f8bd53e0f43854d848ee0173feb2b25d")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("clair-scan")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
          .build();
       return task;
    }
