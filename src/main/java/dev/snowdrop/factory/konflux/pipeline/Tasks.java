@@ -151,6 +151,21 @@ public class Tasks {
    public static PipelineTask ECOSYSTEM_CERT_PREFLIGHT_CHECKS() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("ecosystem-cert-preflight-checks")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(params.skip-checks)")
+           .withOperator("in")
+           .withValues("false")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("image-url").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/ecosystem-cert-preflight-checks:0.1@sha256:485f3f0e980d16a8e6bb9e051966442b889a134f9e1dbecfb1c6fe06d04a0767")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("clair-scan")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
          .build();
       return task;
    }
