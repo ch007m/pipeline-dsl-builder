@@ -8,6 +8,7 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static dev.snowdrop.factory.konflux.pipeline.Tasks.CLONE_REPOSITORY;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.INIT;
 import static dev.snowdrop.factory.konflux.task.Params.*;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.*;
@@ -45,8 +46,10 @@ public class PipelineGeneratorSvc {
                           .endTaskRef()
                        .endTask()
 
-                       // Init Task
-                       .withTasks(INIT())
+                       .withTasks(
+                          INIT(),
+                          CLONE_REPOSITORY()
+                       )
 
                        // Embedded Task with script
                        .addNewTask()
@@ -60,18 +63,6 @@ public class PipelineGeneratorSvc {
                                 .endStep()
                                 .build()
                           )
-                       .endTask()
-
-                       // Simple Task with TaskRef and When
-                       .addNewTask()
-                          .withName("task-ref")
-                          .withRunAfter("task-1")
-                          .withWhen()
-                             .addNewWhen()
-                                .withInput("$(tasks.init.results.build)")
-                                .withOperator("in")
-                                .withValues("true")
-                             .endWhen()
                        .endTask()
                 .endSpec()
                 .build();
