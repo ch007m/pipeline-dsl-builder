@@ -30,7 +30,7 @@ flavor: konflux
 pipeline:
   domain: buildpacks
   name: ubi-buildpacks-builder-pipeline
-  builder
+  builder:
     repository:
       name: https://github.com/paketo-community/builder-ubi-base
       branch: main
