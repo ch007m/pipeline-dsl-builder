@@ -222,6 +222,22 @@ public class Tasks {
    public static PipelineTask SBOM_JSON_CHECK() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("sbom-json-check")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(params.skip-checks)")
+           .withOperator("in")
+           .withValues("false")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("IMAGE_URL").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
+           .addNewParam().withName("IMAGE_DIGEST").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_DIGEST)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/sbom-json-check:0.1@sha256:03322cc79854aeba2a4f6ba48b35a97701297f153398a03917d166cfeebd2c08")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("sbom-json-check")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
          .build();
       return task;
    }
