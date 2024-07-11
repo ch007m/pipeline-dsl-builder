@@ -76,6 +76,27 @@ public class Tasks {
    public static PipelineTask BUILD_SOURCE_IMAGE() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("build-source-image")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(tasks.init.results.build)")
+           .withOperator("in")
+           .withValues("true")
+           .withInput("$(params.build-source-image)")
+           .withOperator("in")
+           .withValues("true")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("BINARY_IMAGE").withValue(new ParamValue("$(params.output-image)")).endParam()
+           .addNewParam().withName("BASE_IMAGES").withValue(new ParamValue("$(tasks.build-container.results.BASE_IMAGES_DIGESTS)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/source-build:0.1@sha256:d1fe83481466a3b8ca91ba952f842689c9b9a63183b20fad6927cca10372f08a")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("source-build")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
+         .withWorkspaces()
+           .addNewWorkspace().withName("workspace").withWorkspace("workspace").endWorkspace()
          .build();
       return task;
    }

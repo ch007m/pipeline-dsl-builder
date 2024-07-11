@@ -10,4 +10,8 @@ pipeline:
     repository:
       name: https://github.com/paketo-community/builder-ubi-base
       branch: main
+    task:
+      name:
+      params:
+
 
