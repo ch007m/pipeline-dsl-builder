@@ -198,7 +198,24 @@ public class Tasks {
    public static PipelineTask CLAMAV_SCAN() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("clamav-scan")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(params.skip-checks)")
+           .withOperator("in")
+           .withValues("false")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("image-digest").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_DIGEST)")).endParam()
+           .addNewParam().withName("image-url").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue("quay.io/konflux-ci/tekton-catalog/clamav-scan:0.1@sha256:45deb2d3cc6a23166831c7471882a0c8cc8a754365e0598e3e2022cbb1866375")).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("clamav-scan")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
          .build();
+
       return task;
    }
 
