@@ -30,9 +30,9 @@ cat <<EOF > my-config.yaml
 flavor: tekton
 
 pipeline:
-  # The domain allows to organize the resources, tasks to be used
-  domain: demo
-  name: pipeline-sample # name of the pipeline to be created
+  # The domain allows to organize the resources, tasks to be used: example, buildpack
+  domain: example
+  name: pipeline-1 # name of the pipeline to be created
 EOF
 ```
 and launch it:
