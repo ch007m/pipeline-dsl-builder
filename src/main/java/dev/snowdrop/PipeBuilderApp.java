@@ -13,7 +13,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
-import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createExample;
+import static dev.snowdrop.factory.tekton.pipeline.Pipelines.*;
 
 @TopCommand
 @Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
@@ -59,23 +59,25 @@ public class PipeBuilderApp implements Runnable {
 
       Pipeline pipeline = null;
 
-      // Flavor: Tekton and domain: example
+      // Flavor: Tekton and Domain: example
       if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
-         pipeline = createExample(cfg);
+         ConfiguratorSvc.writeYaml(createExample(cfg), outputPath);
+      }
+
+      // Flavor: Tekton and Domain: buildpack
+      if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
+         cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
+
+         ConfiguratorSvc.writeYaml(createPackBuilder(cfg), outputPath);
+         ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), outputPath);
       }
 
       // Flavor: Konflux and Domain: buildpack
       if (cfg.getFlavor().toUpperCase().equals(Flavor.KONFLUX.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name()) &&
           cfg.getPipeline().getBuilder() != null) {
-         pipeline = createBuilder(cfg);
-      }
-
-      if (pipeline != null) {
-         ConfiguratorSvc.writeYaml(pipeline, outputPath);
-      } else {
-         logger.error("The pipeline has not been generated properly and is null !");
+         ConfiguratorSvc.writeYaml(createBuilder(cfg), outputPath);
       }
    }
 }

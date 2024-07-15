@@ -2,6 +2,7 @@ package dev.snowdrop.service;
 
 import dev.snowdrop.PipeBuilderApp;
 import dev.snowdrop.model.Configurator;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import io.fabric8.tekton.pipeline.v1.Pipeline;
 import org.slf4j.Logger;
@@ -47,14 +48,14 @@ public class ConfiguratorSvc {
       }
    }
 
-   public static void writeYaml(Pipeline pipeline, String outputPath) {
+   public static void writeYaml(HasMetadata resource, String outputPath) {
       try {
-         // Convert the pipeline to YAML
-         String yamlPipeline = Serialization.asYaml(pipeline);
-         logger.debug("Created YAML: \n{}", yamlPipeline);
+         // Convert the resource(run) to YAML
+         String yamlRespource = Serialization.asYaml(resource);
+         logger.debug("Created YAML: \n{}", yamlRespource);
 
          // Write the YAML to the output
-         writeYamlToFile(outputPath, pipeline.getMetadata().getName(), yamlPipeline);
+         writeYamlToFile(outputPath, resource.getMetadata().getName(), yamlRespource);
       } catch (Exception e) {
          logger.error(e.getMessage());
       }
