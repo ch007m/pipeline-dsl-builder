@@ -49,7 +49,7 @@ To, by generate a Konflux pipeline for `buildpacks`, create this cfg file
 cat <<EOF > my-konflux.yaml
 flavor: konflux
 pipeline:
-  domain: buildpacks
+  domain: buildpack
   name: ubi-buildpacks-builder-pipeline
   builder:
     repository:
@@ -57,4 +57,6 @@ pipeline:
       branch: main
 EOF
 ```
+
+The `configuration-examples` folder proposes different YAML configuration of what you can configure :-)
 
