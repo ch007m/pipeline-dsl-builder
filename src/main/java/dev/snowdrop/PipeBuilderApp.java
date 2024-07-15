@@ -1,6 +1,7 @@
 package dev.snowdrop;
 
 import dev.snowdrop.model.Configurator;
+import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
 import io.fabric8.tekton.pipeline.v1.Pipeline;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
@@ -11,7 +12,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
-import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createSample;
+import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createExample;
 
 @TopCommand
 @Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
@@ -32,8 +33,8 @@ public class PipeBuilderApp implements Runnable {
 
    @Override
    public void run() {
-      logger.info("#### Configuration path: " + configuration);
-      logger.debug("#### Output path: " + outputPath);
+      logger.info("#### Configuration path: {}", configuration);
+      logger.debug("#### Output path: {}", outputPath);
 
       // Parse and validate the configuration
       Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);
@@ -47,18 +48,23 @@ public class PipeBuilderApp implements Runnable {
          logger.error("Flavor is missing from the configuration yaml file !");
          System.exit(1);
       } else {
-         logger.info("#### Flavor selected: " + cfg.getFlavor().toUpperCase());
+         logger.info("#### Flavor selected: {}", cfg.getFlavor().toUpperCase());
       }
+
+      if (cfg.getPipeline().getDomain() == null) {
+         cfg.getPipeline().setDomain(Domain.EXAMPLE.name());
+      }
+      logger.info("#### Pipeline domain selected: {}", cfg.getPipeline().getDomain());
 
       Pipeline pipeline = null;
 
       // Flavor: Tekton and domain: demo
-      if (cfg.getPipeline().getDomain().equals("demo") && cfg.getFlavor().equals("tekton")) {
-         pipeline = createSample(cfg);
+      if (cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name()) && cfg.getFlavor().equals("tekton")) {
+         pipeline = createExample(cfg);
       }
 
       // Domain: Buildpacks and type: builder image
-      if (cfg.getPipeline().getDomain().equals("buildpacks") && cfg.getPipeline().getBuilder() != null) {
+      if (cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name()) && cfg.getPipeline().getBuilder() != null) {
          pipeline = createBuilder(cfg);
       }
 

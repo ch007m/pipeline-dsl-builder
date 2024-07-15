@@ -15,7 +15,7 @@ public class Pipelines {
 
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
 
-   public static Pipeline createSample(Configurator cfg) {
+   public static Pipeline createExample(Configurator cfg) {
       final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()

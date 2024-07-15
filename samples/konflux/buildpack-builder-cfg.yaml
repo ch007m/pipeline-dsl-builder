@@ -3,9 +3,9 @@ flavor: konflux
 
 pipeline:
   # The domain allows to organize the resources, tasks to be used
-  domain: buildpacks
+  domain: buildpack
   name: pipeline-konflux # name of the pipeline to be created
-  # The builder corresponds to the followign buildpacks concept:
+  # The builder corresponds to the following buildpacks concept:
   builder:
     repository:
       name: https://github.com/paketo-community/builder-ubi-base

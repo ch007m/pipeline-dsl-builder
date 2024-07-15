@@ -32,7 +32,8 @@ flavor: tekton
 pipeline:
   # The domain allows to organize the resources, tasks to be used
   domain: demo
-  name: pipeline-demo # name of the pipeline to be created
+  name: pipeline-sample # name of the pipeline to be created
+EOF
 ```
 and launch it:
 ```bash
