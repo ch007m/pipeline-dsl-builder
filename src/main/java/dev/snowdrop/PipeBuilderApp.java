@@ -1,5 +1,6 @@
 package dev.snowdrop;
 
+import dev.snowdrop.factory.Flavor;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
@@ -58,13 +59,16 @@ public class PipeBuilderApp implements Runnable {
 
       Pipeline pipeline = null;
 
-      // Flavor: Tekton and domain: demo
-      if (cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name()) && cfg.getFlavor().equals("tekton")) {
+      // Flavor: Tekton and domain: example
+      if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
+          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
          pipeline = createExample(cfg);
       }
 
-      // Domain: Buildpacks and type: builder image
-      if (cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name()) && cfg.getPipeline().getBuilder() != null) {
+      // Flavor: Konflux and Domain: buildpack
+      if (cfg.getFlavor().toUpperCase().equals(Flavor.KONFLUX.name()) &&
+          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name()) &&
+          cfg.getPipeline().getBuilder() != null) {
          pipeline = createBuilder(cfg);
       }
 
