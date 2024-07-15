@@ -11,7 +11,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
-import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createDemo;
+import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createSample;
 
 @TopCommand
 @Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
@@ -54,7 +54,7 @@ public class PipeBuilderApp implements Runnable {
 
       // Flavor: Tekton and domain: demo
       if (cfg.getPipeline().getDomain().equals("demo") && cfg.getFlavor().equals("tekton")) {
-         pipeline = createDemo(cfg);
+         pipeline = createSample(cfg);
       }
 
       // Domain: Buildpacks and type: builder image

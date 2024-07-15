@@ -4,7 +4,6 @@ import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.Flavor;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.model.Configurator;
-import dev.snowdrop.service.FileUtilSvc;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,7 @@ public class Pipelines {
                       CLAMAV_SCAN(),
                       SBOM_JSON_CHECK()
                    )
+
                 .endSpec()
                 .build();
       // @formatter:on

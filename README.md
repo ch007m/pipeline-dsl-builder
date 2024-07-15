@@ -26,6 +26,26 @@ Create a configuration YAML file where you will define the following parameters:
  - Select the `domain` such as: `buidpacks` and next the type: `builder` `stack`, `meta-buildpack`, `buildpack`, etc. The combination of the domain and the `type` will allow the tool to select the proper task, workspaces, finally, when, results, etc resources
 ```bash
 cat <<EOF > my-config.yaml
+# The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
+flavor: tekton
+
+pipeline:
+  # The domain allows to organize the resources, tasks to be used
+  domain: demo
+  name: pipeline-demo # name of the pipeline to be created
+```
+and launch it:
+```bash
+java -jar target/quarkus-app/quarkus-run.jar -c my-config.yaml -o out/flows
+```  
+
+Next, check the pipeline(s) generated under `./out/flows`
+
+**Remark**: Use the parameter `-h` to get the help usage of the application
+
+To, by generate a Konflux pipeline for `buildpacks`, create this cfg file
+```bash
+cat <<EOF > my-konflux.yaml
 flavor: konflux
 pipeline:
   domain: buildpacks
@@ -36,12 +56,4 @@ pipeline:
       branch: main
 EOF
 ```
-and launch it:
-```bash
-java -jar target/quarkus-app/quarkus-run.jar -c my-config.yaml -o out/flows
-```  
-
-Next, check the pipeline(s) generated under `./out/flows`
-
-**Remark**: Use the parameter `-h` to get the help usage of the application
 

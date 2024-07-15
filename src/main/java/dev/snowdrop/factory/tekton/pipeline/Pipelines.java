@@ -11,17 +11,11 @@ import io.fabric8.tekton.pipeline.v1.PipelineBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
-import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINE_PARAMS;
-import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
-import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
-import static dev.snowdrop.factory.konflux.pipeline.Workspaces.KONFLUX_PIPELINE_WORKSPACES;
-
 public class Pipelines {
 
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
 
-   public static Pipeline createDemo(Configurator cfg) {
+   public static Pipeline createSample(Configurator cfg) {
       final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
