@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static dev.snowdrop.factory.Bundles.getBundleURL;
+
 public class Pipelines {
 
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
@@ -163,11 +165,17 @@ public class Pipelines {
                 .addNewTask()
                    .withName("git-clone")
                    .withNewTaskRef()
-                      .withName("git-clone")
+                     .withResolver("bundles")
+                     .withParams()
+                       .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("task-git-clone","0.1"))).endParam()
+                       .addNewParam().withName("name").withValue(new ParamValue("git-clone")).endParam()
+                       .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
                    .endTaskRef()
-                   .withParams().addNewParam().withName("GIT_PROJECT_URL").withValue(new ParamValue("$(params.git-url)")).endParam()
+                   .withParams()
+                      .addNewParam().withName("url").withValue(new ParamValue("$(params.git-url)")).endParam()
+                      .addNewParam().withName("subdirectory").withValue(new ParamValue("source")).endParam()
                    .withWorkspaces()
-                      .addNewWorkspace().withName("source-dir").withWorkspace("source-dir").endWorkspace()
+                      .addNewWorkspace().withName("output").withWorkspace("source-dir").endWorkspace()
                 .endTask()
 
                 .addNewTask()
