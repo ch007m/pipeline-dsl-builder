@@ -1,7 +1,6 @@
 package dev.snowdrop;
 
-import static dev.snowdrop.service.CodeGeneratorSvc.generateParamsFromYAML;
-import static dev.snowdrop.service.CodeGeneratorSvc.generateTaskFromYAML;
+import static dev.snowdrop.service.CodeGeneratorSvc.*;
 
 public class TektonJavaCodeGenerator {
    public static void main(String[] args) {
@@ -20,28 +19,8 @@ public class TektonJavaCodeGenerator {
          generateTaskFromYAML(args[1]);
       }
 
-      // apiVersion: tekton.dev/v1
-      //kind: Task
-      //metadata:
-      //  name: git-clone
-      //spec:
-      //  params:
-      //    - name: GIT_PROJECT_URL
-      //      description: The git repository url (e.g. http://github.com/myorg/myrepo.git)
-      //      type: string
-      //  workspaces:
-      //    - name: source-dir
-      //      description: A workspace for the task
-      //      optional: true
-      //      mountPath: /mnt/workspace
-      //  steps:
-      //    - name: clone
-      //      image: quay.io/redhat-cop/ubi8-git:v1.0
-      //      workingDir: $(workspaces.source-dir.path)
-      //      command:
-      //        - sh
-      //        - -c
-      //      args:
-      //        - git clone $(params.GIT_PROJECT_URL) .
+      if (type.equals("workspaces")) {
+         generateWorkspacesFromYAML(args[1]);
+      }
    }
 }

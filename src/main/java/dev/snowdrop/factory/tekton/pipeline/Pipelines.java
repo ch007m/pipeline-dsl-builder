@@ -10,6 +10,7 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
@@ -173,7 +174,7 @@ public class Pipelines {
                    .endTaskRef()
                    .withParams()
                       .addNewParam().withName("url").withValue(new ParamValue("$(params.git-url)")).endParam()
-                      .addNewParam().withName("subdirectory").withValue(new ParamValue("source")).endParam()
+                      .addNewParam().withName("subdirectory").withValue(new ParamValue(".")).endParam()
                    .withWorkspaces()
                       .addNewWorkspace().withName("output").withWorkspace("source-dir").endWorkspace()
                 .endTask()
@@ -233,11 +234,27 @@ public class Pipelines {
              .withWorkspaces()
                 .addNewWorkspace()
                    .withName("source-dir")
-                   .withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder().withClaimName("ubi-builder-vol").build())
+                   .withVolumeClaimTemplate(
+                       new PersistentVolumeClaimBuilder()
+                           .editOrNewSpec().withResources(
+                               new VolumeResourceRequirementsBuilder()
+                                   .addToRequests("storage",new Quantity("1Gi"))
+                                   .build())
+                           .addToAccessModes("ReadWriteOnce").endSpec()
+                           .build()
+                   )
                 .endWorkspace()
                 .addNewWorkspace()
                    .withName("pack-workspace")
-                   .withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder().withClaimName("pack-workspace-vol").build())
+                   .withVolumeClaimTemplate(
+                       new PersistentVolumeClaimBuilder()
+                           .editOrNewSpec().withResources(
+                               new VolumeResourceRequirementsBuilder()
+                                   .addToRequests("storage",new Quantity("1Gi"))
+                                   .build())
+                           .addToAccessModes("ReadWriteOnce").endSpec()
+                           .build()
+                   )
                 .endWorkspace()
                 .addNewWorkspace()
                    .withName("data-store")
