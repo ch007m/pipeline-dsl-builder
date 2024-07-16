@@ -1,7 +1,9 @@
 package dev.snowdrop;
 
 import java.io.*;
-import java.util.Optional;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -38,8 +40,8 @@ public class OCIBundleGrabber {
             // Get the mediaType digest => json file containing the layers
             ManifestEntry manifestEntry = index.getManifests().get(0);
             String mediaType = manifestEntry.getMediaType();
-            String digest = manifestEntry.getDigest();
-            String sha256 = digest.substring(7, digest.length());
+            AtomicReference<String> digest = new AtomicReference<>(manifestEntry.getDigest());
+            String sha256 = digest.get().substring(7, digest.get().length());
 
             System.out.println("mediaType: " + mediaType);
             System.out.println("digest: " + digest);
@@ -49,15 +51,16 @@ public class OCIBundleGrabber {
             if (manifest != null) {
                 // Searching about the layer containing the json file of the Task
                 System.out.println("Manifest found within blobs folder");
-                Optional<Manifest.Layer> taskLayer = manifest.getLayers().stream()
+                List<Manifest.Layer> taskLayers = manifest.getLayers().stream()
                     .filter(layer -> "task".equals(layer.getAnnotations().get("dev.tekton.image.kind")))
-                    .findFirst();
+                    .collect(Collectors.toList());
 
-                if (taskLayer.isPresent()) {
-                    digest = taskLayer.get().getDigest();
-                    System.out.println("Found task layer: " + digest);
-                    // Process the found task layer as needed
-                    extractAndProcessBlob(new File(BLOBS_DIRECTORY + "/" + digest.substring(7, digest.length())));
+                if (!taskLayers.isEmpty()) {
+                    taskLayers.forEach(layer -> {
+                        String layerDigest = layer.getDigest();
+                        System.out.println("Found task layer: " + layerDigest + " for task: " + layer.getAnnotations().get("dev.tekton.image.name"));
+                        extractAndProcessBlob(new File(BLOBS_DIRECTORY + "/" + layerDigest.substring(7, layerDigest.length())));
+                    });
                 }
             }
         } catch (FileNotFoundException e) {
@@ -110,6 +113,7 @@ public class OCIBundleGrabber {
                             fos.write(buffer, 0, length);
                         }
                     }
+                    System.out.println("Path to file extracted: " + outputFile.getAbsolutePath() + "\n");
                 }
             }
         } catch (IOException e) {
