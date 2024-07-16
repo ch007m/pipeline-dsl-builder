@@ -50,7 +50,7 @@ public class Pipelines {
       return pipeline;
    }
 
-   public static Pipeline createPackBuilder(Configurator cfg) {
+/*   public static Pipeline createPackBuilder(Configurator cfg) {
       FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
 
       // @formatter:off
@@ -95,7 +95,7 @@ public class Pipelines {
                     .endStep()
                     .build())
                 .withWorkspaces()
-                   .addNewWorkspace().withName("source-dir").withWorkspace("source-dir").endWorkspace()
+                   .addNewWorkspace().withName("data-store").withWorkspace("data-store").endWorkspace()
                    .addNewWorkspace().withName("pack-workspace").withWorkspace("pack-workspace").endWorkspace()
              .endTask()
 
@@ -141,7 +141,7 @@ public class Pipelines {
       // @formatter:on
 
       return pipeline;
-   }
+   }*/
 
    public static PipelineRun createPackBuilderRun(Configurator cfg) {
       FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
@@ -168,7 +168,7 @@ public class Pipelines {
                    .withNewTaskRef()
                      .withResolver("bundles")
                      .withParams()
-                       .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("task-git-clone","0.1"))).endParam()
+                       .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/konflux-ci/tekton-catalog", "task-git-clone","0.1"))).endParam()
                        .addNewParam().withName("name").withValue(new ParamValue("git-clone")).endParam()
                        .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
                    .endTaskRef()
@@ -182,28 +182,28 @@ public class Pipelines {
                 .addNewTask()
                    .withName("fetch-packconfig-registrysecret")
                    .withRunAfter("git-clone")
-                   .withTaskSpec(
-                       new EmbeddedTaskBuilder()
-                       .addNewStep()
-                          .withImage("quay.io/centos/centos:latest")
-                          .withScript(FileUtilSvc.loadFileAsString("copy-packconfig-registrysecret.sh"))
-                       .endStep()
-                       .build())
+                   .withNewTaskRef()
+                     .withResolver("bundles")
+                     .withParams()
+                       .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/ch007m", "tekton-bundle","latest"))).endParam()
+                       .addNewParam().withName("name").withValue(new ParamValue("fetch-packconfig-registrysecret")).endParam()
+                       .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+                   .endTaskRef()
                    .withWorkspaces()
-                      .addNewWorkspace().withName("source-dir").withWorkspace("source-dir").endWorkspace()
+                      .addNewWorkspace().withName("data-store").withWorkspace("data-store").endWorkspace()
                       .addNewWorkspace().withName("pack-workspace").withWorkspace("pack-workspace").endWorkspace()
                 .endTask()
 
                 .addNewTask()
                    .withName("list-source-workspace")
                    .withRunAfter("fetch-packconfig-registrysecret")
-                   .withTaskSpec(
-                       new EmbeddedTaskBuilder()
-                       .addNewStep()
-                          .withImage("quay.io/centos/centos:latest")
-                          .withScript(FileUtilSvc.loadFileAsString("list-source-workspace.sh"))
-                       .endStep()
-                       .build())
+                   .withNewTaskRef()
+                     .withResolver("bundles")
+                     .withParams()
+                       .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/ch007m", "tekton-bundle","latest"))).endParam()
+                       .addNewParam().withName("name").withValue(new ParamValue("list-source-workspace")).endParam()
+                       .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+                   .endTaskRef()
                    .withWorkspaces()
                       .addNewWorkspace().withName("source-dir").withWorkspace("source-dir").endWorkspace()
                       .addNewWorkspace().withName("pack-workspace").withWorkspace("pack-workspace").endWorkspace()
@@ -213,11 +213,11 @@ public class Pipelines {
                    .withName("pack-builder")
                    .withRunAfter("fetch-packconfig-registrysecret")
                    .withNewTaskRef()
-                      .withResolver("git")
-                      .withParams()
-                        .addNewParam().withName("url").withValue(new ParamValue("https://github.com/redhat-buildpacks/catalog.git")).endParam()
-                        .addNewParam().withName("revision").withValue(new ParamValue("main")).endParam()
-                        .addNewParam().withName("pathInRepo").withValue(new ParamValue("/tekton/task/pack-builder/0.1/pack-builder.yml")).endParam()
+                     .withResolver("bundles")
+                     .withParams()
+                       .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/ch007m", "tekton-bundle","latest"))).endParam()
+                       .addNewParam().withName("name").withValue(new ParamValue("pack-builder")).endParam()
+                       .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
                    .endTaskRef()
                    .withParams()
                       .addNewParam().withName("PACK_SOURCE_DIR").withValue(new ParamValue("$(params.source-dir)")).endParam()

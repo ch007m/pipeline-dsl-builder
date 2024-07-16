@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: list-source-workspace
+spec:
+  steps:
+    - image: "quay.io/centos/centos:latest"
+      script: |-
+        #!/usr/bin/env bash
+        
+        set -e
+        
+        echo "List files under: $(workspaces.pack-workspace.path)"
+        ls -la $(workspaces.pack-workspace.path)/
+        
+        ls -la $(workspaces.pack-workspace.path)/.docker/
+        cat $(workspaces.pack-workspace.path)/.docker/config.json
+        
+        echo "List files under: $(workspaces.source-dir.path)"
+        ls -la $(workspaces.source-dir.path)/
+  workspaces:
+    - name: "source-dir"
+    - name: "pack-workspace"

@@ -60,7 +60,23 @@ EOF
 
 The `configuration-examples` folder proposes different YAML configuration of what you can configure :-)
 
-### Trusted Konfliux Tekton tasks
+### Bundles packaged
+
+```bash
+tkn bundle push quay.io/ch007m/tekton-bundle:latest \
+  -f task.yaml \
+  -f fetch-packconfig-registrysecret.yaml \
+  -f list-source-workspace.yaml \
+  -f pack-builder.yaml
+  
+tkn bundle list quay.io/ch007m/tekton-bundle:latest     
+task.tekton.dev/demo-task
+task.tekton.dev/list-source-workspace
+task.tekton.dev/fetch-packconfig-registrysecret
+task.tekton.dev/pack-builder
+```
+
+### Trusted Konflux Tekton tasks
 
 To get the list of the konflux tekton bundles (oci or git) supported/trusted:
 ```bash

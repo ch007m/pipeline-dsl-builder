@@ -1,0 +1,64 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.50.0"
+    tekton.dev/categories: Image build
+    tekton.dev/tags: image-build
+    tekton.dev/displayName: "pack builder"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: '0.1'
+  name: pack-builder
+spec:
+  description: >-
+    pack client building the builder image - https://buildpacks.io/docs/tools/pack/cli/pack_builder/
+  params:
+    - name: PACK_EXPERIMENTAL
+      default: "false"
+      description: Enable experimental features
+      type: string
+    - name: PACK_CLI_IMAGE
+      default: buildpacksio/pack
+      description: The image to use for the pack client.
+      type: string
+    - name: PACK_CLI_IMAGE_VERSION
+      default: latest
+      description: Pack client version
+      type: string
+    - name: BUILDER_IMAGE_NAME
+      description: The name of the builder image to create.
+      type: string
+    - name: PACK_BUILDER_TOML
+      default: builder.toml
+      description: The builder toml file to use for the pack builder create command.
+      type: string
+    - name: PACK_CMD_FLAGS
+      default: []
+      description: The Arguments to be passed to the pack command.
+      type: array
+    - name: PACK_SOURCE_DIR
+      default: .
+      description: Directory containing the source files to build.
+      type: string
+  workspaces:
+    - name: source-dir
+    - name: pack-workspace
+      mountPath: /workspace
+  steps:
+    - name: pack
+      image: $(params.PACK_CLI_IMAGE):$(params.PACK_CLI_IMAGE_VERSION)
+      workingDir: $(workspaces.source-dir.path)/$(params.PACK_SOURCE_DIR)
+      env:
+        - name: DOCKER_CONFIG
+          value: $(workspaces.pack-workspace.path)/.docker
+        - name: PACK_HOME
+          value: $(workspaces.pack-workspace.path)
+      args:
+        - builder
+        - create
+        - "$(params.BUILDER_IMAGE_NAME)"
+        - --config
+        - "$(params.PACK_BUILDER_TOML)"
+        - "$(params.PACK_CMD_FLAGS[*])"

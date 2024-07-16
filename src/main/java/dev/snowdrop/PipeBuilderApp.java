@@ -69,7 +69,7 @@ public class PipeBuilderApp implements Runnable {
       if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
 
-         ConfiguratorSvc.writeYaml(createPackBuilder(cfg), outputPath);
+         // ConfiguratorSvc.writeYaml(createPackBuilder(cfg), outputPath);
          ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), outputPath);
       }
 
