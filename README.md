@@ -64,13 +64,11 @@ The `configuration-examples` folder proposes different YAML configuration of wha
 
 ```bash
 tkn bundle push quay.io/ch007m/tekton-bundle:latest \
-  -f task.yaml \
-  -f fetch-packconfig-registrysecret.yaml \
-  -f list-source-workspace.yaml \
-  -f pack-builder.yaml
+  -f bundles/fetch-packconfig-registrysecret.yaml \
+  -f bundles/list-source-workspace.yaml \
+  -f bundles/pack-builder.yaml
   
 tkn bundle list quay.io/ch007m/tekton-bundle:latest     
-task.tekton.dev/demo-task
 task.tekton.dev/list-source-workspace
 task.tekton.dev/fetch-packconfig-registrysecret
 task.tekton.dev/pack-builder

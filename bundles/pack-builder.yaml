@@ -44,7 +44,9 @@ spec:
       type: string
   workspaces:
     - name: source-dir
+      optional: false
     - name: pack-workspace
+      optional: false
       mountPath: /workspace
   steps:
     - name: pack

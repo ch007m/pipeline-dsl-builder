@@ -23,7 +23,8 @@ task:
   params: ""
 
   # To be investigated to find a proper way to manage the wks as they should be created properly as declared in several places: https://github.com/redhat-buildpacks/catalog/blob/main/tekton/pipeline/rhtap/01/pipeline-buildpacks.yaml#L386-L388, https://github.com/redhat-buildpacks/catalog/blob/main/tekton/pipeline/rhtap/01/pipeline-buildpacks.yaml#L7 & https://github.com/redhat-buildpacks/catalog/blob/main/tekton/pipelinerun/rhtap/pipelinerun-buildpacks-template.yaml#L480-L496 etc
-  workspaces: ""
+  workspaces:
+    - <name>:<volume-name>
 
   # run after task x, y or z identified with their "id"
   runAfter: "task-0"

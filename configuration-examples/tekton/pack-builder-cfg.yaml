@@ -2,5 +2,5 @@ flavor: tekton
 
 pipeline:
   domain: buildpack
-  name: pack-build-builder-push
-  description: "This Pipeline builds a buildpacks builder image using pack client."
+  name: pack-builder-push
+  description: "This Pipeline builds a Buildpack builder image using the pack CLI."

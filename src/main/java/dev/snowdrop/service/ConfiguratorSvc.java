@@ -4,7 +4,6 @@ import dev.snowdrop.PipeBuilderApp;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.Serialization;
-import io.fabric8.tekton.pipeline.v1.Pipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.LoaderOptions;
