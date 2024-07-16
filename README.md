@@ -67,9 +67,9 @@ To get the list of the konflux tekton bundles (oci or git) supported/trusted:
 ## https://www.conftest.dev/
 brew install conftest
 mkdir temp && cd temp
-conftest pull --policy '.' oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
-cat data/data/trusted_tekton_tasks.yml | yq -o=json | jq -r '.trusted_tasks | keys[]' > bundles_list.txt
-cat bundles_list.txt
+conftest pull --policy './temp' oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
+cat temp/data/data/trusted_tekton_tasks.yml | yq -o=json | jq -r '.trusted_tasks | keys[]' > temp/bundles_list.txt
+cat temp/bundles_list.txt
 ```
 To extract the task resource from the bundle, you can use the tekton client with the following command:
 ```bash

@@ -25,7 +25,7 @@ public class Pipelines {
                 .withNewMetadata()
                    .withName(cfg.getPipeline().getName())
                    .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations())
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations(cfg))
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())
