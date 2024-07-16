@@ -16,3 +16,4 @@ target/
 # Plugin directory
 /.quarkus/cli/plugins/
 /my-config.yaml
+/temp/

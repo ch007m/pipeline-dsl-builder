@@ -60,3 +60,33 @@ EOF
 
 The `configuration-examples` folder proposes different YAML configuration of what you can configure :-)
 
+### Trusted Konfliux Tekton tasks
+
+To get the list of the konflux tekton bundles (oci or git) supported/trusted:
+```bash
+## https://www.conftest.dev/
+brew install conftest
+mkdir temp && cd temp
+conftest pull --policy '.' oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
+cat data/data/trusted_tekton_tasks.yml | yq -o=json | jq -r '.trusted_tasks | keys[]' > bundles_list.txt
+cat bundles_list.txt
+```
+To extract the task resource from the bundle, you can use the tekton client with the following command:
+```bash
+REGISTRY_NAME=quay.io/konflux-ci/tekton-catalog
+BUNDLE_NAME=task-git-clone
+BUNDLE_VERSION=0.1
+BUNDLE_URL=$REGISTRY_NAME/$BUNDLE_NAME:$BUNDLE_VERSION
+tkn bundle list $BUNDLE_URL task -o json > git-clone.json
+tkn bundle list $BUNDLE_URL task -o yaml > git-clone.yaml
+
+BUNDLE_NAME=task-git-clone-oci-ta
+BUNDLE_VERSION=0.1
+BUNDLE_URL=$REGISTRY_NAME/$BUNDLE_NAME:$BUNDLE_VERSION
+tkn bundle list $BUNDLE_URL task -o json > git-clone-oci-ta.json
+tkn bundle list $BUNDLE_URL task -o yaml > git-clone-oci-ta.yaml
+```
+
+
+
+
