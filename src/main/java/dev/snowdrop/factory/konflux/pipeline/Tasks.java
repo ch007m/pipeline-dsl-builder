@@ -12,6 +12,8 @@ public class Tasks {
       initBundles();
    }
 
+   // TODO: Find a way to generate such a Map using the content published within this oci
+   // conftest pull --policy './temp' oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
    private static void initBundles() {
       addBundle(new Bundle("task-init","0.2","ceed8b7d5a3583cd21e7eea32498992824272a5436f17ce24c56c75919839e42"));
       addBundle(new Bundle("task-git-clone","0.1","f8b2f37c67c77909e8f0288f38d468d76cc0e5130f8f917c85fe2f0c06dbdcdb"));
