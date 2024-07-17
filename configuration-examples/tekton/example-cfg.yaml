@@ -5,4 +5,5 @@ pipeline:
   # The domain allows to organize the resources, tasks to be used
   domain: example
   name: pipeline-1 # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline echoing a message
 
