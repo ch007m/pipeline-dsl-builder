@@ -1,5 +1,6 @@
 flavor: tekton
 name: "pack builder"
+namespace:
 
 pipeline:
   domain: buildpack

@@ -50,11 +50,12 @@ public class ConfiguratorSvc {
    public static void writeYaml(HasMetadata resource, String outputPath) {
       try {
          // Convert the resource(run) to YAML
-         String yamlRespource = Serialization.asYaml(resource);
-         logger.debug("Created YAML: \n{}", yamlRespource);
+         String yamlResource = Serialization.asYaml(resource);
+         logger.debug("Created YAML: \n{}", yamlResource);
 
          // Write the YAML to the output
-         writeYamlToFile(outputPath, resource.getMetadata().getName(), yamlRespource);
+         String fileName = resource.getKind().toLowerCase() + "-" + resource.getMetadata().getName();
+         writeYamlToFile(outputPath, fileName, yamlResource);
       } catch (Exception e) {
          logger.error(e.getMessage());
       }
@@ -64,7 +65,7 @@ public class ConfiguratorSvc {
       Path path = Paths.get(outputPath, fileName+".yaml");
       try {
          Files.write(path, yamlContent.getBytes());
-         logger.info("### YAML generated here: " + outputPath);
+         logger.info("### YAML file generated: " + path);
       } catch (IOException e) {
          logger.error("Failed to write YAML to file: " + e.getMessage());
       }

@@ -1,5 +1,6 @@
 # The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
 flavor: konflux
+namespace:
 
 # A task to be generated
 task:

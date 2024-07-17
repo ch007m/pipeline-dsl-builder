@@ -23,7 +23,7 @@ public class Pipelines {
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
-                   .withName(cfg.getPipeline().getName())
+                   .withName(cfg.getName())
                    .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
                    .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations(cfg))
                 .endMetadata()

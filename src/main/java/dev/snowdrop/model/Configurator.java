@@ -3,7 +3,16 @@ package dev.snowdrop.model;
 public class Configurator {
    private String flavor;
    private String name;
+   private String namespace;
    private Pipeline pipeline;
+
+   public String getNamespace() {
+      return namespace;
+   }
+
+   public void setNamespace(String namespace) {
+      this.namespace = namespace;
+   }
 
    public String getFlavor() {
       return flavor;
