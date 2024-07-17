@@ -1,5 +1,6 @@
 # The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
 flavor: konflux
+name: application-buildpack-builder
 
 pipeline:
   # The domain allows to organize the resources, tasks to be used

@@ -14,6 +14,7 @@ import picocli.CommandLine.Option;
 
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
 import static dev.snowdrop.factory.tekton.pipeline.Pipelines.*;
+import static dev.snowdrop.service.ApplicationComponentBuilder.createApplication;
 
 @TopCommand
 @Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
@@ -79,5 +80,8 @@ public class PipeBuilderApp implements Runnable {
           cfg.getPipeline().getBuilder() != null) {
          ConfiguratorSvc.writeYaml(createBuilder(cfg), outputPath);
       }
+
+      // Generate the Application and Component CR
+      ConfiguratorSvc.writeYaml(createApplication(cfg),outputPath);
    }
 }
