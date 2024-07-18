@@ -27,4 +27,15 @@ public class Params {
       params.add(new ParamSpecBuilder().withDescription("Image tag expiration time, time values could be something like 1h, 2d, 3w for hours, days, and weeks, respectively.").withName("image-expires-after").withType("null").withNewDefault("").build());
       return params;
    }
+
+   public static List<Param> KONFLUX_PIPELINERUN_PARAMS() {
+      List<Param> params = new ArrayList<>();
+      // Code generated using TektonJavaCodeGenerator and files/params.yaml
+      params.add(new ParamBuilder().withName("git-url").withValue(new ParamValue("{{source_url}}")).build());
+      params.add(new ParamBuilder().withName("revision").withValue(new ParamValue("{{revision}}")).build());
+      params.add(new ParamBuilder().withName("dockerfile").withValue(new ParamValue("src/main/docker/Dockerfile.jvm")).build());
+      params.add(new ParamBuilder().withName("output-image").withValue(new ParamValue("quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}")).build());
+      params.add(new ParamBuilder().withName("path-context").withValue(new ParamValue(".")).build());
+      return params;
+   }
 }

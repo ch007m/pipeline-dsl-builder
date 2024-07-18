@@ -51,10 +51,12 @@ public class ConfiguratorSvc {
       try {
          // Convert the resource(run) to YAML
          String yamlResource = Serialization.asYaml(resource);
+         // TODO : find a better way to escape double quotes
+         // yamlResource = yamlResource.replaceAll("\\\\\"", "\"");
          logger.debug("Created YAML: \n{}", yamlResource);
 
-         // Write the YAML to the output
-         String fileName = resource.getKind().toLowerCase() + "-" + resource.getMetadata().getName();
+         // Use the kubernetes kind as filename
+         String fileName = resource.getKind().toLowerCase();
          writeYamlToFile(outputPath, fileName, yamlResource);
       } catch (Exception e) {
          logger.error(e.getMessage());
@@ -62,10 +64,12 @@ public class ConfiguratorSvc {
    }
 
    public static void writeYamlToFile(String outputPath, String fileName, String yamlContent) {
-      Path path = Paths.get(outputPath, fileName+".yaml");
+      Path folderPath = Paths.get(outputPath);
+      Path filePath = Paths.get(outputPath, fileName+".yaml");
       try {
-         Files.write(path, yamlContent.getBytes());
-         logger.info("### YAML file generated: " + path);
+         Files.createDirectories(folderPath);
+         Files.write(filePath, yamlContent.getBytes());
+         logger.info("### YAML file generated: " + filePath);
       } catch (IOException e) {
          logger.error("Failed to write YAML to file: " + e.getMessage());
       }

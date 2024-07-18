@@ -244,6 +244,13 @@ public class Tasks {
       return task;
    }
 
+   public static PipelineTask BUILD_CONTAINER() {
+      PipelineTask task = new PipelineTaskBuilder()
+          .withName("build-container")
+          .build();
+      return task;
+   }
+
    public static PipelineTask BUILDPACKS_BUILDER() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("buildpacks-builder")

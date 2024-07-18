@@ -12,6 +12,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuildRun;
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
 import static dev.snowdrop.factory.tekton.pipeline.Pipelines.*;
 import static dev.snowdrop.service.ApplicationComponentBuilder.createApplication;
@@ -60,30 +61,34 @@ public class PipeBuilderApp implements Runnable {
       logger.info("#### Pipeline domain selected: {}", cfg.getPipeline().getDomain());
 
       Pipeline pipeline = null;
+      String resourcesPath = outputPath + "/" + cfg.getPipeline().getDomain() + "/" + cfg.getName();
 
       // Flavor: Tekton and Domain: example
       if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
-         ConfiguratorSvc.writeYaml(createExample(cfg), outputPath);
+         ConfiguratorSvc.writeYaml(createExample(cfg), resourcesPath);
       }
 
       // Flavor: Tekton and Domain: buildpack
       if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
-
-         // ConfiguratorSvc.writeYaml(createPackBuilder(cfg), outputPath);
-         ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), outputPath);
+         ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), resourcesPath);
       }
 
       // Flavor: Konflux and Domain: buildpack
       if (cfg.getFlavor().toUpperCase().equals(Flavor.KONFLUX.name()) &&
-          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name()) &&
-          cfg.getPipeline().getBuilder() != null) {
-         ConfiguratorSvc.writeYaml(createBuilder(cfg), outputPath);
+          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
+         ConfiguratorSvc.writeYaml(createBuilder(cfg), resourcesPath);
+      }
+
+      // Flavor: Konflux and Domain: build
+      if (cfg.getFlavor().toUpperCase().equals(Flavor.KONFLUX.name()) &&
+          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILD.name())) {
+         ConfiguratorSvc.writeYaml(createBuildRun(cfg), resourcesPath);
       }
 
       // Generate the Application, Component CR
-      ConfiguratorSvc.writeYaml(createApplication(cfg),outputPath);
-      ConfiguratorSvc.writeYaml(createComponent(cfg),outputPath);
+      ConfiguratorSvc.writeYaml(createApplication(cfg),resourcesPath);
+      ConfiguratorSvc.writeYaml(createComponent(cfg),resourcesPath);
    }
 }

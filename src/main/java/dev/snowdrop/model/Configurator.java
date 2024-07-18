@@ -5,6 +5,15 @@ public class Configurator {
    private String name;
    private String namespace;
    private Pipeline pipeline;
+   private Repository repository;
+
+   public Repository getRepository() {
+      return repository;
+   }
+
+   public void setRepository(Repository repository) {
+      this.repository = repository;
+   }
 
    public String getNamespace() {
       return namespace;
@@ -37,7 +46,5 @@ public class Configurator {
    public void setPipeline(Pipeline pipeline) {
       this.pipeline = pipeline;
    }
-
-
 
 }

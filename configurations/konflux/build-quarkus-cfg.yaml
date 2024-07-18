@@ -1,13 +1,12 @@
 # The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
 flavor: konflux
-name: buildpack-builder
+name: my-quarkus-1
 namespace: user1
 
 repository:
-  name: https://github.com/paketo-community/builder-ubi-base
+  name: https://github.com/ch007m/new-quarkus-app-1.git
   branch: main
 
 pipeline:
-  # The domain allows to organize the resources, tasks to be used
-  domain: buildpack
+  domain: build
 
