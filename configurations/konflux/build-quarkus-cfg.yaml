@@ -4,7 +4,7 @@ name: my-quarkus-1
 namespace: user1
 
 repository:
-  name: https://github.com/ch007m/new-quarkus-app-1.git
+  name: https://github.com/ch007m/new-quarkus-app-1
   branch: main
 
 pipeline:
