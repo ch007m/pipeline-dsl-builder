@@ -2,6 +2,8 @@ package dev.snowdrop.factory.konflux.pipeline;
 
 import io.fabric8.tekton.pipeline.v1.*;
 
+import java.util.List;
+
 import static dev.snowdrop.factory.Bundles.getBundleURL;
 
 public class Tasks {
@@ -245,9 +247,39 @@ public class Tasks {
    }
 
    public static PipelineTask BUILD_CONTAINER() {
+      // @formatter:off
       PipelineTask task = new PipelineTaskBuilder()
           .withName("build-container")
+          .withRunAfter("prefetch-dependencies")
+          .addNewWhen()
+             .withInput("tasks.init.results.build")
+             .withOperator("in")
+             .withValues("true")
+          .endWhen()
+          .withParams()
+             .addNewParam().withName("IMAGE").withValue(new ParamValue("$(params.output-image)")).endParam()
+             .addNewParam().withName("DOCKERFILE").withValue(new ParamValue("$(params.dockerfile)")).endParam()
+             .addNewParam().withName("CONTEXT").withValue(new ParamValue("$(params.context-path)")).endParam()
+             .addNewParam().withName("HERMETIC").withValue(new ParamValue("$(params.hermetic)")).endParam()
+             .addNewParam().withName("PREFETCH_INPUT").withValue(new ParamValue("$(params.prefetch-input)")).endParam()
+             .addNewParam().withName("IMAGE_EXPIRES_AFTER").withValue(new ParamValue("$(params.image-expires-after)")).endParam()
+             .addNewParam().withName("COMMIT_SHA").withValue(new ParamValue("$(tasks.clone-repository.results.commit)")).endParam()
+             .addNewParam().withName("BUILD_ARGS_FILE").withValue(new ParamValue(List.of("$(params.build-args[*])"))).endParam()
+             .addNewParam().withName("BUILD_ARGS_FILE").withValue(new ParamValue("$(params.build-args-file)")).endParam()
+          .withNewTaskRef()
+             .withResolver("bundles")
+             .withParams()
+                .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/konflux-ci/tekton-catalog","task-buildah","0.1"))).endParam()
+                .addNewParam().withName("name").withValue(new ParamValue("buildah")).endParam()
+                .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+          .endTaskRef()
+          .withWorkspaces()
+             .addNewWorkspace()
+                .withName("source")
+                .withWorkspace("workspace")
+             .endWorkspace()
           .build();
+      // @formatter:on
       return task;
    }
 
