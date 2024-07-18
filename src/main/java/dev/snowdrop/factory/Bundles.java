@@ -25,7 +25,9 @@ public class Bundles {
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-clair-scan","0.1","07f56dc7b7d77d394c6163f2682b3a72f8bd53e0f43854d848ee0173feb2b25d"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-sast-snyk-check","0.1","d501cb1ff0f999a478a7fb8811fb501300be3f158aaedee663d230624d74d2b4"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-clamav-scan","0.1","45deb2d3cc6a23166831c7471882a0c8cc8a754365e0598e3e2022cbb1866375"));
+        addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-show-bom","0.1","69edfd6862a1837e21325146c1c52acda29838d8eead837a74ed40e91d54cb97"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-sbom-json-check","0.1","03322cc79854aeba2a4f6ba48b35a97701297f153398a03917d166cfeebd2c08"));
+        addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-summary","0.2","4b0563bcb5a070b9f7a783bfb831941d4fe5fa42bbb732a63c63f8f7936d4467"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-ecosystem-cert-preflight-checks","0.1","8838d3e1628dbe61f4851b3640d2e3a9a3079d3ff3da955f4a3e4c2c95a013df"));
 
         // TODO: Create for each task a quay.io repo instead of packaging them in one repository

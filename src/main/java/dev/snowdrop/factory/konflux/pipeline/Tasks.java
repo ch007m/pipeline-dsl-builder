@@ -36,7 +36,7 @@ public class Tasks {
            .withValues("true")
          .endWhen()
          .withParams()
-           .addNewParam().withName("url").withValue(new ParamValue("$(params.git-url")).endParam()
+           .addNewParam().withName("url").withValue(new ParamValue("$(params.git-url)")).endParam()
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()

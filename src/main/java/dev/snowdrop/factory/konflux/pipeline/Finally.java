@@ -7,6 +7,8 @@ import io.fabric8.tekton.pipeline.v1.PipelineTaskBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.snowdrop.factory.Bundles.getBundleURL;
+
 public class Finally {
 
    public static List<PipelineTask> KONFLUX_PIPELINE_FINALLY() {
@@ -14,10 +16,11 @@ public class Finally {
       finallyTasks.add(new PipelineTaskBuilder()
          .withName("show-sbom")
          .withNewTaskRef()
-           // There is a problem here as konflux pipeline uses as fields: name + version
-           .withName("show-sbom")
-           .withApiVersion("0.1")
-           .withKind("")
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/konflux-ci/tekton-catalog","task-show-sbom","0.1"))).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("show-sbom")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
          .withParams()
            .addNewParam().withName("IMAGE_URL").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).endParam()
@@ -26,9 +29,11 @@ public class Finally {
       finallyTasks.add(new PipelineTaskBuilder()
          .withName("show-summary")
          .withNewTaskRef()
-            .withName("summary")
-            .withApiVersion("0.2")
-            .withKind("")
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/konflux-ci/tekton-catalog","task-summary","0.2"))).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("summary")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
          .withParams()
             .addNewParam().withName("pipelinerun-name").withValue(new ParamValue("$(context.pipelineRun.name)")).endParam()
