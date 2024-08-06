@@ -29,9 +29,12 @@ cat <<EOF > my-config.yaml
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: tekton
 
-pipeline:
+# A job represents a collection of kubernetes resources able to perform different tasks, steps
+job:
   # The domain allows to organize the resources, tasks to be generated: example, buildpack
   domain: example
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  type: PipelineRun
   name: pipeline-1 # name of the pipeline to be created
 EOF
 ```
@@ -48,7 +51,7 @@ To, by generate a Konflux pipeline for `buildpacks`, create this cfg file
 ```bash
 cat <<EOF > my-konflux.yaml
 type: konflux
-pipeline:
+job:
   domain: buildpack
   name: ubi-buildpacks-builder-pipeline
   builder:

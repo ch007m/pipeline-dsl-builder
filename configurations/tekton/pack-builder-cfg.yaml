@@ -2,7 +2,9 @@ type: tekton
 name: "pack builder"
 namespace:
 
-pipeline:
+job:
   domain: buildpack
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  resourceType: PipelineRun
   name: pack-builder-push
   description: "This Pipeline builds a Buildpack builder image using the pack CLI."

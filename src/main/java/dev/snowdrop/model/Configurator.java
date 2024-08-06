@@ -4,7 +4,7 @@ public class Configurator {
    private String type;
    private String name;
    private String namespace;
-   private Pipeline pipeline;
+   private Job job;
    private Repository repository;
 
    public Repository getRepository() {
@@ -39,12 +39,12 @@ public class Configurator {
       this.name = name;
    }
 
-   public Pipeline getPipeline() {
-      return pipeline;
+   public Job getJob() {
+      return job;
    }
 
-   public void setPipeline(Pipeline pipeline) {
-      this.pipeline = pipeline;
+   public void setJob(Job job) {
+      this.job = job;
    }
 
 }

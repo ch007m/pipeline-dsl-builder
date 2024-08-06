@@ -10,7 +10,7 @@ public class Annotations implements AnnotationsProvider {
    public Map<String, String> getPipelineAnnotations(Configurator cfg) {
       return Map.of(
       "tekton.dev/pipelines.minVersion", "0.40.0",
-      "tekton.dev/displayName", cfg.getPipeline().getDescription(),
+      "tekton.dev/displayName", cfg.getJob().getDescription(),
       "tekton.dev/platforms", "linux/amd64"
       );
    }

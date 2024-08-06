@@ -7,7 +7,9 @@ repository:
   name: https://github.com/paketo-community/builder-ubi-base
   branch: main
 
-pipeline:
+job:
   # The domain allows to organize the resources, tasks to be generated
   domain: buildpack
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  resourceType: PipelineRun
 

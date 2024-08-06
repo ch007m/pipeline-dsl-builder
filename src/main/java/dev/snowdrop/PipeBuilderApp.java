@@ -55,35 +55,38 @@ public class PipeBuilderApp implements Runnable {
          logger.info("#### Type selected: {}", cfg.getType().toUpperCase());
       }
 
-      if (cfg.getPipeline().getDomain() == null) {
-         cfg.getPipeline().setDomain(Domain.EXAMPLE.name());
+      if (cfg.getJob().getDomain() == null) {
+         cfg.getJob().setDomain(Domain.EXAMPLE.name());
       }
-      logger.info("#### Pipeline domain selected: {}", cfg.getPipeline().getDomain());
+      logger.info("#### Pipeline domain selected: {}", cfg.getJob().getDomain());
 
       Pipeline pipeline = null;
-      String resourcesPath = outputPath + "/" + cfg.getPipeline().getDomain() + "/" + cfg.getName();
+      String resourcesPath = outputPath + "/" + cfg.getJob().getDomain() + "/" + cfg.getName();
 
       // Type: Tekton and Domain: example
       if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
-          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
+          cfg.getJob().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
+         // TODO: Enhance the factory to be able to generate the reource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createExample(cfg), resourcesPath);
       }
 
       // Type: Tekton and Domain: buildpack
       if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
-         cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
+         cfg.getJob().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
+         // TODO: Enhance the factory to be able to generate the reource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), resourcesPath);
       }
 
       // Type: Konflux and Domain: buildpack
       if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name()) &&
-          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
+          cfg.getJob().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
+         // TODO: Enhance the factory to be able to generate the reource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createBuilder(cfg), resourcesPath);
       }
 
       // Type: Konflux and Domain: build
       if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name()) &&
-          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILD.name())) {
+          cfg.getJob().getDomain().toUpperCase().equals(Domain.BUILD.name())) {
          ConfiguratorSvc.writeYaml(createBuildRun(cfg), resourcesPath);
       }
 
