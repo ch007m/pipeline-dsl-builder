@@ -1,7 +1,7 @@
 package dev.snowdrop.model;
 
 public class Configurator {
-   private String flavor;
+   private String type;
    private String name;
    private String namespace;
    private Pipeline pipeline;
@@ -23,12 +23,12 @@ public class Configurator {
       this.namespace = namespace;
    }
 
-   public String getFlavor() {
-      return flavor;
+   public String getType() {
+      return type;
    }
 
-   public void setFlavor(String flavor) {
-      this.flavor = flavor;
+   public void setType(String type) {
+      this.type = type;
    }
 
    public String getName() {

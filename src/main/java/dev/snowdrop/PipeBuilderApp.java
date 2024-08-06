@@ -48,11 +48,11 @@ public class PipeBuilderApp implements Runnable {
          System.exit(1);
       }
 
-      if (cfg.getFlavor() == null) {
-         logger.error("Flavor is missing from the configuration yaml file !");
+      if (cfg.getType() == null) {
+         logger.error("Type is missing from the configuration yaml file !");
          System.exit(1);
       } else {
-         logger.info("#### Flavor selected: {}", cfg.getFlavor().toUpperCase());
+         logger.info("#### Type selected: {}", cfg.getType().toUpperCase());
       }
 
       if (cfg.getPipeline().getDomain() == null) {
@@ -64,25 +64,25 @@ public class PipeBuilderApp implements Runnable {
       String resourcesPath = outputPath + "/" + cfg.getPipeline().getDomain() + "/" + cfg.getName();
 
       // Type: Tekton and Domain: example
-      if (cfg.getFlavor().toUpperCase().equals(Type.TEKTON.name()) &&
+      if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
          ConfiguratorSvc.writeYaml(createExample(cfg), resourcesPath);
       }
 
       // Type: Tekton and Domain: buildpack
-      if (cfg.getFlavor().toUpperCase().equals(Type.TEKTON.name()) &&
+      if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
          ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), resourcesPath);
       }
 
       // Type: Konflux and Domain: buildpack
-      if (cfg.getFlavor().toUpperCase().equals(Type.KONFLUX.name()) &&
+      if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
          ConfiguratorSvc.writeYaml(createBuilder(cfg), resourcesPath);
       }
 
       // Type: Konflux and Domain: build
-      if (cfg.getFlavor().toUpperCase().equals(Type.KONFLUX.name()) &&
+      if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILD.name())) {
          ConfiguratorSvc.writeYaml(createBuildRun(cfg), resourcesPath);
       }

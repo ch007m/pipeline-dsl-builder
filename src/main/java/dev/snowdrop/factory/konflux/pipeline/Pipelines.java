@@ -19,13 +19,13 @@ public class Pipelines {
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
 
    public static PipelineRun createBuildRun(Configurator cfg) {
-      final Type Type = Type.valueOf(cfg.getFlavor().toUpperCase());
+      final Type TYPE = Type.valueOf(cfg.getType().toUpperCase());
       // @formatter:off
       PipelineRun pipeline = new PipelineRunBuilder()
           .withNewMetadata()
              .withName(cfg.getName())
-             .withLabels(LabelsProviderFactory.getProvider(Type).getPipelineLabels(cfg))
-             .withAnnotations(AnnotationsProviderFactory.getProvider(Type).getPipelineAnnotations(cfg))
+             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
           .endMetadata()
           .withNewSpec()
              .withWorkspaces(KONFLUX_PIPELINERUN_WORKSPACES())
@@ -54,13 +54,13 @@ public class Pipelines {
    }
 
    public static Pipeline createBuilder(Configurator cfg) {
-      final Type Type = Type.valueOf(cfg.getFlavor().toUpperCase());
+      final Type TYPE = Type.valueOf(cfg.getType().toUpperCase());
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
                    .withName(cfg.getName())
-                   .withLabels(LabelsProviderFactory.getProvider(Type).getPipelineLabels(cfg))
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(Type).getPipelineAnnotations(cfg))
+                   .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())

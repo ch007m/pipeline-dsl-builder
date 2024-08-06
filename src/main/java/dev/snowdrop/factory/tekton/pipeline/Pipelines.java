@@ -20,7 +20,7 @@ public class Pipelines {
    private static Type Type;
 
    public static Pipeline createExample(Configurator cfg) {
-      Type = Type.valueOf(cfg.getFlavor().toUpperCase());
+      Type = Type.valueOf(cfg.getType().toUpperCase());
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
           .withNewMetadata()
@@ -50,14 +50,14 @@ public class Pipelines {
    }
 
 /*   public static Pipeline createPackBuilder(Configurator cfg) {
-      FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
+      TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
           .withNewMetadata()
              .withName(cfg.getPipeline().getName())
-             .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels())
-             .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations(cfg))
+             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels())
+             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
           .endMetadata()
           .withNewSpec()
              .withDescription(cfg.getPipeline().getDescription())
@@ -143,7 +143,7 @@ public class Pipelines {
    }*/
 
    public static PipelineRun createPackBuilderRun(Configurator cfg) {
-      Type = Type.valueOf(cfg.getFlavor().toUpperCase());
+      Type = Type.valueOf(cfg.getType().toUpperCase());
 
       // @formatter:off
       PipelineRun pr = new PipelineRunBuilder()
