@@ -119,7 +119,7 @@ spec:
           set -e
           echo "Say Hello"
 ```
-#### PipelineRun to run the pack CLI and create a builder image
+##### PipelineRun to run the pack CLI and create a builder image
 
 ```bash
 cat <<EOF > cfg.yml
