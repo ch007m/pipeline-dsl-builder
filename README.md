@@ -286,6 +286,8 @@ spec:
 ```
 #### Konflux
 
+##### PipelineRun to build a Quarkus Application using Buildpack
+
 ```bash
 cat <<EOF > cfg.yml
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
