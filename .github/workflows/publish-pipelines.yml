@@ -43,7 +43,9 @@ jobs:
           java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
 
       - name: Check Pipeline generated
-        run: cat out/flows/example/pipeline.yaml
+        run: |
+          cat out/flows/example/pipeline.yaml
+          mv out/flows/example/pipeline.yaml out/flows/example/simple-example-pipeline.yaml
 
       - name: Release
         uses: softprops/action-gh-release@v2
