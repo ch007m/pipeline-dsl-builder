@@ -12,8 +12,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuildRun;
-import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
+import static dev.snowdrop.factory.konflux.pipeline.Pipelines.*;
 import static dev.snowdrop.factory.tekton.pipeline.Pipelines.*;
 import static dev.snowdrop.service.ApplicationComponentBuilder.createApplication;
 import static dev.snowdrop.service.ApplicationComponentBuilder.createComponent;
@@ -66,21 +65,23 @@ public class PipeBuilderApp implements Runnable {
       // Type: Tekton and Domain: example
       if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
           cfg.getJob().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
-         // TODO: Enhance the factory to be able to generate the reource according to the resourceType: Pipeline, PipelineRun, Task
+         // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createExample(cfg), resourcesPath);
       }
 
       // Type: Tekton and Domain: buildpack
+      /*
       if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
          cfg.getJob().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
-         // TODO: Enhance the factory to be able to generate the reource according to the resourceType: Pipeline, PipelineRun, Task
+         // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), resourcesPath);
       }
+      */
 
       // Type: Konflux and Domain: buildpack
       if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name()) &&
           cfg.getJob().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
-         // TODO: Enhance the factory to be able to generate the reource according to the resourceType: Pipeline, PipelineRun, Task
+         // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createBuilder(cfg), resourcesPath);
       }
 
