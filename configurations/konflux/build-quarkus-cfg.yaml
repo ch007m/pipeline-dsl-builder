@@ -8,7 +8,17 @@ repository:
   branch: main
 
 job:
-  domain: build
   # One of the supported resources: PipelineRun, Pipeline, Task
   resourceType: PipelineRun
+  # The domain allows to specify for Konflux the type of the build-container - https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml#L112
+  # to be executed.
+  # Such a type matches a corresponding Task which is either:
+  # - pack: to build an image using the Pack CLI
+  # - build: to build an application using a builder image
+  # - builder: to create a builder image
+  # - stack: to create a base stack image build or run
+  # - meta/composite: to package the buildpacks of a "meta/composite" buildpack project
+  # - buildpack: to package a "buildpack" project
+  # - extension: to package an "extension" project
+  domain: build
 

@@ -31,7 +31,17 @@ type: tekton
 
 # A job represents a collection of kubernetes resources able to perform different tasks, steps
 job:
-  # The domain allows to organize the resources, tasks to be generated: example, buildpack
+  # The domain allows to organize the resources to be generated BUT also to select the type of the build - https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml#L112
+  # to be executed.
+  # Such a type matches a corresponding Task which is either:
+  # - example: dummy task to echo a message
+  # - pack: to build an image using the Pack CLI
+  # - build: to build an application using a builder image
+  # - builder: to create a builder image
+  # - stack: to create a base stack image build or run
+  # - meta/composite: to package the buildpacks of a "meta/composite" buildpack project
+  # - buildpack: to package a "buildpack" project
+  # - extension: to package an "extension" project
   domain: example
   # One of the supported resources: PipelineRun, Pipeline, Task
   type: PipelineRun
@@ -62,6 +72,28 @@ EOF
 ```
 
 The `configuration-examples` folder proposes different YAML configuration of what you can configure :-)
+
+### Scenarios available
+
+#### Tekton
+
+```bash
+// Domain: example
+CFG=tekton/example-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/$CFG
+
+// Domain: pack
+CFG=tekton/pack-builder-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/$CFG
+```
+
+#### Konflux
+
+```bash
+// Domain: build
+CFG=konflux/build-quarkus-cfg.yaml
+./mvnw package;java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/$CFG
+```
 
 ### Bundles packaged
 

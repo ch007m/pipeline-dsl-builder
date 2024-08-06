@@ -8,8 +8,8 @@ repository:
   branch: main
 
 job:
-  # The domain allows to organize the resources, tasks to be generated
-  domain: buildpack
   # One of the supported resources: PipelineRun, Pipeline, Task
   resourceType: PipelineRun
+  # The domain allows to organize the resources, tasks to be generated
+  domain: buildpack
 
