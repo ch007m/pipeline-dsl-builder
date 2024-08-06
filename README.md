@@ -92,6 +92,8 @@ job:
   name: pipeline-1 # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
 EOF
+
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
 ```
 Resource generated:
 ```yaml
@@ -137,6 +139,7 @@ job:
   name: pack-builder-push
   description: "This Pipeline builds a builder image using the pack CLI."
 EOF
+
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
 ```
 Resource generated:

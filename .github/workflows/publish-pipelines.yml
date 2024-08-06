@@ -1,0 +1,53 @@
+# Publish Pipelines generated when project is tagged
+name: Publish Pipelines generated
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # release changes require contents write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B clean package
+
+      - name: Run the builder
+        run: |
+          cat <<EOF > cfg.yml
+          type: tekton
+          name: example
+          namespace:
+          
+          job:
+            domain: example
+            resourceType: Pipeline
+            name: pipeline-1 # name of the pipeline to be created
+            description: Simple example of a Tekton pipeline echoing a message
+          EOF
+          
+          java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
+
+      - name: Check Pipeline generated
+        run: cat out/flows/example/pipeline.yaml
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            **/*.yaml
