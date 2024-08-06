@@ -1,7 +1,7 @@
 package dev.snowdrop.factory;
 
 public class AnnotationsProviderFactory {
-   public static AnnotationsProvider getProvider(Flavor type) {
+   public static AnnotationsProvider getProvider(Type type) {
       switch (type) {
          case KONFLUX:
             return new dev.snowdrop.factory.konflux.pipeline.Annotations();

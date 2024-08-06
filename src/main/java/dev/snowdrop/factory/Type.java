@@ -1,6 +1,6 @@
 package dev.snowdrop.factory;
 
-public enum Flavor {
+public enum Type {
      KONFLUX,
      TEKTON;
 }

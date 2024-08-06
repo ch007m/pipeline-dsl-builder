@@ -1,5 +1,5 @@
-# The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
-flavor: konflux
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: konflux
 name: buildpack-builder
 namespace: user1
 
@@ -8,6 +8,6 @@ repository:
   branch: main
 
 pipeline:
-  # The domain allows to organize the resources, tasks to be used
+  # The domain allows to organize the resources, tasks to be generated
   domain: buildpack
 

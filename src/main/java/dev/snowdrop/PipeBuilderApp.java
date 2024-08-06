@@ -1,6 +1,6 @@
 package dev.snowdrop;
 
-import dev.snowdrop.factory.Flavor;
+import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
@@ -63,26 +63,26 @@ public class PipeBuilderApp implements Runnable {
       Pipeline pipeline = null;
       String resourcesPath = outputPath + "/" + cfg.getPipeline().getDomain() + "/" + cfg.getName();
 
-      // Flavor: Tekton and Domain: example
-      if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
+      // Type: Tekton and Domain: example
+      if (cfg.getFlavor().toUpperCase().equals(Type.TEKTON.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
          ConfiguratorSvc.writeYaml(createExample(cfg), resourcesPath);
       }
 
-      // Flavor: Tekton and Domain: buildpack
-      if (cfg.getFlavor().toUpperCase().equals(Flavor.TEKTON.name()) &&
+      // Type: Tekton and Domain: buildpack
+      if (cfg.getFlavor().toUpperCase().equals(Type.TEKTON.name()) &&
          cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
          ConfiguratorSvc.writeYaml(createPackBuilderRun(cfg), resourcesPath);
       }
 
-      // Flavor: Konflux and Domain: buildpack
-      if (cfg.getFlavor().toUpperCase().equals(Flavor.KONFLUX.name()) &&
+      // Type: Konflux and Domain: buildpack
+      if (cfg.getFlavor().toUpperCase().equals(Type.KONFLUX.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
          ConfiguratorSvc.writeYaml(createBuilder(cfg), resourcesPath);
       }
 
-      // Flavor: Konflux and Domain: build
-      if (cfg.getFlavor().toUpperCase().equals(Flavor.KONFLUX.name()) &&
+      // Type: Konflux and Domain: build
+      if (cfg.getFlavor().toUpperCase().equals(Type.KONFLUX.name()) &&
           cfg.getPipeline().getDomain().toUpperCase().equals(Domain.BUILD.name())) {
          ConfiguratorSvc.writeYaml(createBuildRun(cfg), resourcesPath);
       }

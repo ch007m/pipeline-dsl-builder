@@ -1,7 +1,7 @@
 package dev.snowdrop.factory.tekton.pipeline;
 
 import dev.snowdrop.factory.AnnotationsProviderFactory;
-import dev.snowdrop.factory.Flavor;
+import dev.snowdrop.factory.Type;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.service.FileUtilSvc;
@@ -10,7 +10,6 @@ import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
@@ -18,16 +17,16 @@ import static dev.snowdrop.factory.Bundles.getBundleURL;
 public class Pipelines {
 
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
-   private static Flavor FLAVOR;
+   private static Type Type;
 
    public static Pipeline createExample(Configurator cfg) {
-      FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
+      Type = Type.valueOf(cfg.getFlavor().toUpperCase());
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
           .withNewMetadata()
                    .withName(cfg.getPipeline().getName())
-                   .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels(cfg))
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations(cfg))
+                   .withLabels(LabelsProviderFactory.getProvider(Type).getPipelineLabels(cfg))
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(Type).getPipelineAnnotations(cfg))
           .endMetadata()
           .withNewSpec()
              .withTasks()
@@ -144,14 +143,14 @@ public class Pipelines {
    }*/
 
    public static PipelineRun createPackBuilderRun(Configurator cfg) {
-      FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
+      Type = Type.valueOf(cfg.getFlavor().toUpperCase());
 
       // @formatter:off
       PipelineRun pr = new PipelineRunBuilder()
           .withNewMetadata()
              .withName(cfg.getPipeline().getName() + "-run")
-             .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels(cfg))
-             .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations(cfg))
+             .withLabels(LabelsProviderFactory.getProvider(Type).getPipelineLabels(cfg))
+             .withAnnotations(AnnotationsProviderFactory.getProvider(Type).getPipelineAnnotations(cfg))
           .endMetadata()
           .withNewSpec()
              .withParams()

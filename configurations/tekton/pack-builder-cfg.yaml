@@ -1,4 +1,4 @@
-flavor: tekton
+type: tekton
 name: "pack builder"
 namespace:
 

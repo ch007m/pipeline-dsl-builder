@@ -7,7 +7,7 @@ resources.
 
 The application has been designed around the following principles:
 
-- Have a quarkus standalone application able to generate different Tekton resources for a specific flavor: Tekton, Konflux, etc
+- Have a quarkus standalone application able to generate different Tekton resources for a specific provider: Tekton, Konflux, etc
 - Support to provide the needed parameters or configuration using a YAML configurator file
 - Generate using the Fabric8 kubernetes Fluent API & Builder the resources using [Tekton model v1](https://github.com/fabric8io/kubernetes-client/tree/main/extensions/tekton/model-v1/)
 - Propose `Factories` able to generate the Tekton objects such as: params, labels, workspaces, results, finally using `defaulting` values or YAML content from the configuration file
@@ -22,15 +22,15 @@ Git clone the project and package the application:
 ```
 
 Create a configuration YAML file where you will define the following parameters:
- - The flavor to be used: `konflux` or `tekton`
+ - The type to be used: `konflux` or `tekton`
  - Select the `domain` such as: `buidpacks` and next the type: `builder` `stack`, `meta-buildpack`, `buildpack`, etc. The combination of the domain and the `type` will allow the tool to select the proper task, workspaces, finally, when, results, etc resources
 ```bash
 cat <<EOF > my-config.yaml
-# The flavor will be used to render the pipeline according to a specific provider: konflux, tekton
-flavor: tekton
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: tekton
 
 pipeline:
-  # The domain allows to organize the resources, tasks to be used: example, buildpack
+  # The domain allows to organize the resources, tasks to be generated: example, buildpack
   domain: example
   name: pipeline-1 # name of the pipeline to be created
 EOF
@@ -47,7 +47,7 @@ Next, check the pipeline(s) generated under `./out/flows`
 To, by generate a Konflux pipeline for `buildpacks`, create this cfg file
 ```bash
 cat <<EOF > my-konflux.yaml
-flavor: konflux
+type: konflux
 pipeline:
   domain: buildpack
   name: ubi-buildpacks-builder-pipeline

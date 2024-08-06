@@ -1,7 +1,7 @@
 package dev.snowdrop.factory.konflux.pipeline;
 
 import dev.snowdrop.factory.AnnotationsProviderFactory;
-import dev.snowdrop.factory.Flavor;
+import dev.snowdrop.factory.Type;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.tekton.pipeline.v1.*;
@@ -19,13 +19,13 @@ public class Pipelines {
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
 
    public static PipelineRun createBuildRun(Configurator cfg) {
-      final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
+      final Type Type = Type.valueOf(cfg.getFlavor().toUpperCase());
       // @formatter:off
       PipelineRun pipeline = new PipelineRunBuilder()
           .withNewMetadata()
              .withName(cfg.getName())
-             .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels(cfg))
-             .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations(cfg))
+             .withLabels(LabelsProviderFactory.getProvider(Type).getPipelineLabels(cfg))
+             .withAnnotations(AnnotationsProviderFactory.getProvider(Type).getPipelineAnnotations(cfg))
           .endMetadata()
           .withNewSpec()
              .withWorkspaces(KONFLUX_PIPELINERUN_WORKSPACES())
@@ -54,13 +54,13 @@ public class Pipelines {
    }
 
    public static Pipeline createBuilder(Configurator cfg) {
-      final Flavor FLAVOR = Flavor.valueOf(cfg.getFlavor().toUpperCase());
+      final Type Type = Type.valueOf(cfg.getFlavor().toUpperCase());
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
                    .withName(cfg.getName())
-                   .withLabels(LabelsProviderFactory.getProvider(FLAVOR).getPipelineLabels(cfg))
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(FLAVOR).getPipelineAnnotations(cfg))
+                   .withLabels(LabelsProviderFactory.getProvider(Type).getPipelineLabels(cfg))
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(Type).getPipelineAnnotations(cfg))
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINE_WORKSPACES())
