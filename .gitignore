@@ -17,3 +17,4 @@ target/
 /.quarkus/cli/plugins/
 /my-config.yaml
 /temp/
+/cfg.yml

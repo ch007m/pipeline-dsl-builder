@@ -77,21 +77,47 @@ The `configuration-examples` folder proposes different YAML configuration of wha
 
 #### Tekton
 
+#### Simple pipeline with script embedded
 ```bash
-// Domain: example
-CFG=tekton/example-cfg.yaml
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/$CFG
+cat <<EOF > cfg.yml
+type: tekton
+name: example
+namespace:
 
-// Domain: pack
-CFG=tekton/pack-builder-cfg.yaml
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/$CFG
+job:
+  # The domain allows to organize the resources, tasks to be generated
+  domain: example
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  resourceType: Pipeline
+  name: pipeline-1 # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline echoing a message
+EOF
+```
+#### PipelineRun to run the pack CLI and create a builder image
+
+```bash
+cat <<EOF > cfg.yml
+type: tekton
+name: "pack builder"
+namespace:
+
+job:
+  # The domain allows to specify the type of the build to be executed.
+  # Such a type matches a corresponding Task which is either:
+  # - pack: to build an image using the Pack CLI
+  domain: pack
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  resourceType: PipelineRun
+  name: pack-builder-push
+  description: "This Pipeline builds a builder image using the pack CLI."
+EOF
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
 ```
 
 #### Konflux
 
 ```bash
-// Domain: build
-CFG=konflux/build-quarkus-cfg.yaml
+ CFG=konflux/build-quarkus-cfg.yaml
 ./mvnw package;java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/$CFG
 ```
 
