@@ -60,7 +60,7 @@ jobs:
 
       - name: Get current date
         id: date
-        if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
       - name: Markdown Code Embed
