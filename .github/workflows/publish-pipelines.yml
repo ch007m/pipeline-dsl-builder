@@ -71,6 +71,7 @@ jobs:
 
   upload-repo:
     needs: [generate]
+    runs-on: ubuntu-latest
     steps:
       - name: Upload repository as artifact
         uses: actions/upload-artifact@v3
