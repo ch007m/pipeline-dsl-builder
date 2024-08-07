@@ -16,7 +16,7 @@ jobs:
       - name: Markdown Code Embed
         uses: ippie52/markdown_code_embed_action@2.0.1
         with:
-          args: '-q'
+          args: '-b'
 
       - name: Push the README file with snippet
         run: |
