@@ -15,9 +15,5 @@ jobs:
           fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
           ref: refs/heads/${{ github.head_ref }}
 
-      - uses: likp/markdown-embed-code@main
-        with:
-          markdown: "README.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          message: "synchronizing Readme"
-          silent: true
+      - name: Markdown Code Embed
+        uses: ippie52/markdown_code_embed_action@latest
