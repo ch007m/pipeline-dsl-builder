@@ -17,7 +17,7 @@ The application has been designed around the following principles:
 
 Git clone the project and compile the code:
 
-```shell script
+```bash
 ./mvnw package
 ```
 
@@ -54,7 +54,9 @@ The `configurations` folder proposes different YAML configurations of what you c
 
 ##### Simple pipeline with script embedded
 
-https://github.com/ch007m/pipeline-dsl-builder/blob/4f21266fd3c5240bcd9f2d09746e1151babb1afe/configurations/tekton/simple-job-embedded-script-cfg.yaml#L1-L18
+```yaml
+// configurations/tekton/simple-job-embedded-script-cfg.yaml
+```
 
 ```bash
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
@@ -663,7 +665,7 @@ task.tekton.dev/pack-builder
 
 To get the list of the konflux tekton bundles (oci or git) supported/trusted:
 ```bash
-## https://www.conftest.dev/
+## See tool doc: https://www.conftest.dev/
 brew install conftest
 mkdir temp && cd temp
 conftest pull --policy './temp' oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
