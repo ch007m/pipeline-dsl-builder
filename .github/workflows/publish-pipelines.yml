@@ -38,14 +38,62 @@ jobs:
 
       - name: Check Pipeline generated
         run: |
-          ls -la generated/
+          ls -la generated/example
+
+      #- name: Push the README file with snippet
+      #  run: |
+      #    git config user.name "${{ github.actor }}"
+      #    git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+      #
+      #    set +e
+      #    git add generated/*
+      #    git commit -m "New \"pipelines\" yaml file(s) generated"
+      #    git push
+
+      #- name: Get doc files that have changed
+      #  id: changed-files-yaml
+      #  uses: tj-actions/changed-files@v44
+      #  with:
+      #    files_yaml: |
+      #      doc:
+      #        - '**.md'
+
+      - name: Get current date
+        id: date
+        if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Markdown Code Embed
+        continue-on-error: true
+        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        run: |
+          #!/usr/bin/env bash
+          set -e
+
+          git clone https://github.com/ippie52/markdown_code_embed.git
+
+          python markdown_code_embed/mdce.py -b -f README.md
 
       - name: Push the README file with snippet
+        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
 
           set +e
-          git add generated/*
-          git commit -m "New \"pipelines\" yaml file(s) generated"
-          git push
+          git add README.md
+          git add generated
+
+      - name: Create pull request for the updated README file
+        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.date.outputs.date }}
+          title: "New resources generated and README changed - ${{ steps.date.outputs.date }}"
+          body: |
+            Pull request for New resources generated and README changed.
+
+          base: main
+          labels: |
+            documentation
