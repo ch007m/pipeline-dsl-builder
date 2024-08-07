@@ -91,6 +91,29 @@ java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekt
 ```
 Resource generated:
 ```yaml:generated/example/pipeline.yaml
+---
+apiVersion: "tekton.dev/v1"
+kind: "Pipeline"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
+  labels:
+    app.kubernetes.io/version: "0.2"
+  name: "pipeline-1"
+spec:
+  tasks:
+  - name: "pipeline-1"
+    taskSpec:
+      steps:
+      - image: "ubuntu"
+        name: "run-script"
+        script: |
+          #!/usr/bin/env bash
+
+          set -e
+          echo "Say Hello"
 ```
 
 ##### Simple pipeline with script fetched from a github repository
@@ -119,10 +142,7 @@ job:
     ref:
 
     # The url of the script file to be executed using a linux container
-    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```
-
-Command to generate the resource
-```bash
+    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```bash
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-fetch-script-cfg.yaml
 ```
 Resource generated:
