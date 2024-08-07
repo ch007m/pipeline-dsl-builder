@@ -26,7 +26,7 @@ jobs:
 
           git clone https://github.com/ippie52/markdown_code_embed.git
           
-          python markdown_code_embed/mdce.py -b -f README.md < /dev/null > /dev/null
+          python markdown_code_embed/mdce.py -b -f README.md > /dev/null
 
       - name: Push the README file with snippet
         run: |
