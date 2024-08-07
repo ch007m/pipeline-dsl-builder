@@ -34,7 +34,7 @@ public class Pipelines {
             return generatePipeline(cfg, createTaskUsingRef(cfg.getJob().getName(), action));
         }
 
-        if (action.getScript() != null) {
+        if (action.getScript() != null || action.getScriptFileUrl() != null) {
             return generatePipeline(cfg, createTaskWithEmbeddedScript(cfg.getJob().getName(), action));
         }
 
