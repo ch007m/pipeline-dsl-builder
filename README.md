@@ -1,4 +1,4 @@
-## Tekton Pipeline YAML Generator
+# Tekton Pipeline YAML Generator
 
 The goal of this Quarkus Application is to simplify the life of the users when they play with Tekton or any compliant project like [Konflux](https://konflux-ci.dev/) which uses an opinionated pipeline's [template](https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml) to generate the required Tekton YAML
 resources.
@@ -13,7 +13,7 @@ The application has been designed around the following principles:
 
 **Note**: This project is complementary to what Dekorate can populate today for [Tekton](https://github.com/dekorateio/dekorate/tree/main/annotations/tekton-annotations) !
 
-### How to use it
+## How to use it
 
 Git clone the project and compile the code:
 
@@ -48,11 +48,11 @@ Next, check the pipeline(s) generated under `./out/flows/<domain>`
 
 The `configurations` folder proposes different YAML configurations of what you can do :-)
 
-### Scenarios available
+## Some scenario ideas
 
-#### Tekton
+### Using Tekton provider
 
-##### Simple pipeline with script embedded
+#### Simple pipeline with script embedded
 
 Configuration used:
 ```yaml:configurations/tekton/simple-job-embedded-script-cfg.yaml
@@ -314,9 +314,9 @@ spec:
           name: "quay-creds"
 ```
 
-#### Konflux
+### Using Konflux provider
 
-##### PipelineRun to build a Quarkus Application using Buildpack
+#### PipelineRun to build a Quarkus Application using Buildpack
 
 ```bash
 cat <<EOF > cfg.yml
@@ -708,7 +708,7 @@ spec:
       secretName: "{{ git_auth_secret }}"
 ```
 
-### Bundles packaged
+### To be parked
 
 ```bash
 tkn bundle push quay.io/ch007m/tekton-bundle:latest \
@@ -721,8 +721,6 @@ task.tekton.dev/list-source-workspace
 task.tekton.dev/fetch-packconfig-registrysecret
 task.tekton.dev/pack-builder
 ```
-
-### Trusted Konflux Tekton tasks
 
 To get the list of the konflux tekton bundles (oci or git) supported/trusted:
 ```bash
