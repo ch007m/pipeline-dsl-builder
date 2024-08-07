@@ -84,7 +84,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: new-generated-pipelines-${{ steps.date.outputs.date }}"
+          branch: new-generated-pipelines-${{ steps.date.outputs.date }}
           title: "New resources generated and README changed - ${{ steps.date.outputs.date }}"
           body: |
             Pull request for New resources generated and README changed.
