@@ -1,5 +1,8 @@
 # Project
 out/
+/my-config.yaml
+/temp/
+/cfg.yml
 
 # IntelliJ
 .idea
@@ -15,6 +18,3 @@ target/
 
 # Plugin directory
 /.quarkus/cli/plugins/
-/my-config.yaml
-/temp/
-/cfg.yml

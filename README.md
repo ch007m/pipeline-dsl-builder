@@ -54,8 +54,7 @@ The `configurations` folder proposes different YAML configurations of what you c
 
 ##### Simple pipeline with script embedded
 
-```yaml
-// configurations/tekton/simple-job-embedded-script-cfg.yaml
+```yaml:configurations/tekton/simple-job-embedded-script-cfg.yaml
 ```
 
 ```bash
