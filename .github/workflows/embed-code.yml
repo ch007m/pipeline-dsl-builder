@@ -16,4 +16,4 @@ jobs:
           ref: refs/heads/${{ github.head_ref }}
 
       - name: Markdown Code Embed
-        uses: ippie52/markdown_code_embed_action@latest
+        uses: ippie52/markdown_code_embed_action@2.0.1
