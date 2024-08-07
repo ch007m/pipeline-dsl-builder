@@ -13,10 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      #- name: Markdown Code Embed
+      #  uses: ippie52/markdown_code_embed_action@2.0.1
+      #  with:
+      #    args: '-b'
+
       - name: Markdown Code Embed
-        uses: ippie52/markdown_code_embed_action@2.0.1
-        with:
-          args: '-b'
+        run: |
+          git clone https://github.com/ippie52/markdown_code_embed.git
+          ./markdown_code_embed/mdce.py README.md
 
       - name: Push the README file with snippet
         run: |
