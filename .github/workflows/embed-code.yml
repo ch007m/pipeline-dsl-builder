@@ -20,9 +20,14 @@ jobs:
 
       - name: Markdown Code Embed
         run: |
+          #!/usr/bin/env bash
+          set -e
+          python -V
+
           git clone https://github.com/ippie52/markdown_code_embed.git
-          set -x
-          ./markdown_code_embed/mdce.py -f README.md
+          
+          ./markdown_code_embed/mdce.py -b -f README.md
+          
           cat README.md
 
       - name: Push the README file with snippet
