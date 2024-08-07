@@ -51,7 +51,6 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ steps.date.outputs.date }}
           title: "Documentation update - ${{ steps.date.outputs.date }}"
           body: |
             Pull request for docs update.
