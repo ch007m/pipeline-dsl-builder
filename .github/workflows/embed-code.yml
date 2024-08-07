@@ -8,12 +8,10 @@ on:
 jobs:
   embed-code:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # release changes require contents write
     steps:
       - uses: actions/checkout@v2
-        with:
-          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
-          fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
-          ref: refs/heads/${{ github.head_ref }}
 
       - name: Markdown Code Embed
         uses: ippie52/markdown_code_embed_action@2.0.1
