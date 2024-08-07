@@ -19,10 +19,10 @@ jobs:
       #    args: '-b'
 
       - name: Markdown Code Embed
+        continue-on-error: true
         run: |
           #!/usr/bin/env bash
           set -e
-          # python -V
 
           git clone https://github.com/ippie52/markdown_code_embed.git
           
