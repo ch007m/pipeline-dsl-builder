@@ -3,6 +3,7 @@ out/
 /my-config.yaml
 /temp/
 /cfg.yml
+markdown_code_embed/
 
 # IntelliJ
 .idea
