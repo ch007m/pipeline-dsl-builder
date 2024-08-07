@@ -22,11 +22,11 @@ jobs:
         run: |
           #!/usr/bin/env bash
           set -e
-          python -V
+          # python -V
 
           git clone https://github.com/ippie52/markdown_code_embed.git
           
-          ./markdown_code_embed/mdce.py -b -f README.md
+          ./markdown_code_embed/mdce.py -b -r -f README.md
           
           cat README.md
 
