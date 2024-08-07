@@ -142,9 +142,7 @@ job:
     ref:
 
     # The url of the script file to be executed using a linux container
-    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```bash
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-fetch-script-cfg.yaml
-```
+    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```
 Resource generated:
 
 ##### PipelineRun to run the pack CLI and create a builder image
