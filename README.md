@@ -53,12 +53,12 @@ The `configurations` folder proposes different YAML configurations of what you c
 #### Tekton
 
 ##### Simple pipeline with script embedded
-```bash
-cat <<EOF > cfg.yml
+```yaml
 # configurations/tekton/example-cfg.yaml
-EOF
+```
 
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
+```bash
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/example-cfg.yaml
 ```
 Resource generated:
 ```yaml
