@@ -69,12 +69,27 @@ jobs:
 
           python markdown_code_embed/mdce.py -b -f README.md
 
-  create-pr:
+  upload-repo:
     needs: [generate]
+    steps:
+      - name: Upload repository as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: repo-artifact
+          path: .
+
+  create-pr:
+    needs: [upload-repo]
     runs-on: ubuntu-latest
     permissions:
       contents: write # release changes require contents write
     steps:
+      - name: Download repository artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: repo-artifact
+          path: .
+
       - name: Get current date
         id: date
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
