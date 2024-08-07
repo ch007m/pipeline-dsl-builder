@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
     permissions:
       contents: write # release changes require contents write
@@ -58,11 +58,6 @@ jobs:
       #      doc:
       #        - '**.md'
 
-      - name: Get current date
-        id: date
-        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
       - name: Markdown Code Embed
         continue-on-error: true
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
@@ -74,16 +69,16 @@ jobs:
 
           python markdown_code_embed/mdce.py -b -f README.md
 
-      #- name: Push the README file with snippet
-      #  #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-      #  run: |
-      #    git config user.name "${{ github.actor }}"
-      #    git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-      #
-      #    set +e
-      #    git add README.md
-      #    git add generated
-
+  create-pr:
+    needs: [generate]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # release changes require contents write
+    steps:
+      - name: Get current date
+        id: date
+        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Create pull request for the updated README file
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         uses: peter-evans/create-pull-request@v6
@@ -96,4 +91,4 @@ jobs:
 
           base: main
           labels: |
-            documentation
+            documentation  
