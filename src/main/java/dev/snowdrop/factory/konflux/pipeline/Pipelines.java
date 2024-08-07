@@ -27,7 +27,7 @@ public class Pipelines {
       // @formatter:off
       PipelineRun pipeline = new PipelineRunBuilder()
           .withNewMetadata()
-             .withName(cfg.getName())
+             .withName(cfg.getJob().getName())
              .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
              .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
           .endMetadata()
@@ -62,7 +62,7 @@ public class Pipelines {
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
                 .withNewMetadata()
-                   .withName(cfg.getName())
+                   .withName(cfg.getJob().getName())
                    .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
                    .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
                 .endMetadata()

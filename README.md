@@ -22,30 +22,19 @@ Git clone the project and compile the code:
 ```
 
 Create a configuration YAML file where you will define the following parameters:
- - The type to be used: `konflux` or `tekton`
- - Select the `domain` such as: `buidpacks` and next the type: `builder` `stack`, `meta-buildpack`, `buildpack`, etc. The combination of the domain and the `type` will allow the tool to select the proper task, workspaces, finally, when, results, etc resources
+ - The `pipeline` provider to be used: `konflux` or `tekton`
+ - The `domain` to group the generated files under the output path
+ - A job with their parameters
 ```bash
 cat <<EOF > my-config.yaml
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: tekton
+domain: example
 
 # A job represents a collection of kubernetes resources able to perform different tasks, steps
 job:
-  # The domain allows to organize the resources to be generated BUT also to select the type of the build - https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml#L112
-  # to be executed.
-  # Such a type matches a corresponding Task which is either:
-  # - example: dummy task to echo a message
-  # - pack: to build an image using the Pack CLI
-  # - build: to build an application using a builder image
-  # - builder: to create a builder image
-  # - stack: to create a base stack image build or run
-  # - meta/composite: to package the buildpacks of a "meta/composite" buildpack project
-  # - buildpack: to package a "buildpack" project
-  # - extension: to package an "extension" project
-  domain: example
   # One of the supported resources: PipelineRun, Pipeline, Task
-  type: PipelineRun
-  name: pipeline-1 # name of the pipeline to be created
+  resourceType: PipelineRun
+  name: pipeline-1
 EOF
 ```
 and launch it:
@@ -53,25 +42,11 @@ and launch it:
 java -jar target/quarkus-app/quarkus-run.jar -c my-config.yaml -o out/flows
 ```  
 
-Next, check the pipeline(s) generated under `./out/flows`
+Next, check the pipeline(s) generated under `./out/flows/<domain>`
 
 **Remark**: Use the parameter `-h` to get the help usage of the application
 
-To, by generate a Konflux pipeline for `buildpacks`, create this cfg file
-```bash
-cat <<EOF > my-konflux.yaml
-type: konflux
-job:
-  domain: buildpack
-  name: ubi-buildpacks-builder-pipeline
-  builder:
-    repository:
-      name: https://github.com/paketo-community/builder-ubi-base
-      branch: main
-EOF
-```
-
-The `configuration-examples` folder proposes different YAML configuration of what you can configure :-)
+The `configurations` folder proposes different YAML configurations of what you can do :-)
 
 ### Scenarios available
 
@@ -80,17 +55,7 @@ The `configuration-examples` folder proposes different YAML configuration of wha
 ##### Simple pipeline with script embedded
 ```bash
 cat <<EOF > cfg.yml
-type: tekton
-name: example
-namespace:
-
-job:
-  # The domain allows to organize the resources, tasks to be generated
-  domain: example
-  # One of the supported resources: PipelineRun, Pipeline, Task
-  resourceType: Pipeline
-  name: pipeline-1 # name of the pipeline to be created
-  description: Simple example of a Tekton pipeline echoing a message
+# configurations/tekton/example-cfg.yaml
 EOF
 
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml

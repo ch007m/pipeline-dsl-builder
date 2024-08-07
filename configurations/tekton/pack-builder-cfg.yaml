@@ -1,13 +1,14 @@
 type: tekton
-name: "pack builder"
+domain: pack
 namespace:
 
 job:
-  # The domain allows to specify the type of the build to be executed.
-  # Such a type matches a corresponding Task which is either:
-  # - pack: to build an image using the Pack CLI
-  domain: pack
   # One of the supported resources: PipelineRun, Pipeline, Task
   resourceType: PipelineRun
   name: pack-builder-push
   description: "This Pipeline builds a builder image using the pack CLI."
+  # What the job should perform as task. the action can refer to either a Task or define it
+  action:
+    # TaskReference expressed using uri://<task-name>:<url>
+    # and where uri is: bundle
+    taskRef: bundle://pack-builder:quay.io/ch007m/tekton-bundle:latest

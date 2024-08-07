@@ -2,7 +2,8 @@ package dev.snowdrop.model;
 
 public class Configurator {
    private String type;
-   private String name;
+   //private String name;
+   private String domain;
    private String namespace;
    private Job job;
    private Repository repository;
@@ -30,14 +31,14 @@ public class Configurator {
    public void setType(String type) {
       this.type = type;
    }
-
+/*
    public String getName() {
       return name;
    }
 
    public void setName(String name) {
       this.name = name;
-   }
+   }*/
 
    public Job getJob() {
       return job;
@@ -45,6 +46,25 @@ public class Configurator {
 
    public void setJob(Job job) {
       this.job = job;
+   }
+
+
+   /**
+    * Gets domain.
+    *
+    * @return the domain
+    */
+   public String getDomain() {
+      return domain;
+   }
+
+   /**
+    * Sets domain.
+    *
+    * @param domain the domain
+    */
+   public void setDomain(String domain) {
+      this.domain = domain;
    }
 
 }

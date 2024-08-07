@@ -20,7 +20,7 @@ public class Labels implements LabelsProvider {
       return Map.of(
          "pipelines.openshift.io/used-by", "build-cloud",
          "pipelines.openshift.io/runtime", "java",
-         "pipelines.openshift.io/strategy", cfg.getJob().getDomain()
+         "pipelines.openshift.io/strategy", cfg.getDomain()
       );
    }
 }

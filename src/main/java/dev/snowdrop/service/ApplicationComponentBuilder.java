@@ -54,12 +54,12 @@ public class ApplicationComponentBuilder {
         Application application = new ApplicationBuilder()
             // @formatter:off
             .withNewMetadata()
-               .withName(cfg.getName())
+               .withName(cfg.getJob().getName())
                .withAnnotations(Map.of("application.thumbnail","10"))
                .withNamespace(cfg.getNamespace())
             .endMetadata()
             .withNewSpec()
-               .withDisplayName(cfg.getName())
+               .withDisplayName(cfg.getJob().getName())
             .endSpec()
             // @formatter:on
             .build();
@@ -70,7 +70,7 @@ public class ApplicationComponentBuilder {
         Component component = new ComponentBuilder()
             // @formatter:off
             .withNewMetadata()
-                .withName(cfg.getName())
+                .withName(cfg.getJob().getName())
                 .withNamespace(cfg.getNamespace())
                 .withAnnotations(Map.of(
                     "build.appstudio.openshift.io/request","configure-pac",
@@ -78,8 +78,8 @@ public class ApplicationComponentBuilder {
                 ))
             .endMetadata()
             .withNewSpec()
-               .withApplication(cfg.getName())
-               .withComponentName(cfg.getName())
+               .withApplication(cfg.getJob().getName())
+               .withComponentName(cfg.getJob().getName())
                .withNewSource()
                   .withNewGit()
                      .withUrl("TODO")
