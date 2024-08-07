@@ -25,7 +25,7 @@ jobs:
 
           git clone https://github.com/ippie52/markdown_code_embed.git
           
-          python markdown_code_embed/mdce.py -b -f README.md
+          python markdown_code_embed/mdce.py -f README.md
 
       - name: Get doc files that have changed
         id: changed-files-yaml
@@ -35,22 +35,23 @@ jobs:
             doc:
               - '**.md'
 
-      - name: Push the README file with snippet
-        if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-          
-          set +e
-          git add README.md
-          # git commit -m "README.md file augmented with snippet codes"
-          # git push
+      #- name: Push the README file with snippet
+      #  if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+      #  run: |
+      #    git config user.name "${{ github.actor }}"
+      #    git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+      #
+      #    set +e
+      #    git add README.md
+      #    # git commit -m "README.md file augmented with snippet codes"
+      #    # git push
 
       - name: Create pull request for the updated  docs
         if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          branch: new-generated-pipelines-${{ steps.date.outputs.date }}"
           title: "Documentation update - ${{ steps.date.outputs.date }}"
           body: |
             Pull request for docs update.
