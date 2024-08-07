@@ -28,12 +28,11 @@ jobs:
 
       - name: Run the builder application
         run: |
-          java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
+          java -jar target/quarkus-app/quarkus-run.jar -o generated -c configurations/tekton/simple-job-embedded-script-cfg.yaml
 
       - name: Check Pipeline generated
         run: |
-          cp --parents out/flows/**/*.yaml generated
-          ls -la generated
+          ls -la generated/
 
       - name: Push the README file with snippet
         run: |
