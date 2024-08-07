@@ -3,25 +3,102 @@ package dev.snowdrop.factory.tekton.pipeline;
 import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
+import dev.snowdrop.model.Action;
+import dev.snowdrop.model.Bundle;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.service.FileUtilSvc;
+import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
 
 public class Pipelines {
 
-   private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
-   private static Type TYPE;
+    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
+    private static Type TYPE;
 
-   public static Pipeline createResource(Configurator cfg) {
-      TYPE = Type.valueOf(cfg.getType().toUpperCase());
-      // @formatter:off
+    public static Pipeline createResource(Configurator cfg) {
+        Action action = cfg.getJob().getAction();
+
+        if (action == null) {
+            logger.error("No action configured");
+        }
+
+        if (action.getRef() != null) {
+            return generatePipeline(cfg, createTaskUsingRef(cfg.getJob().getName(), action));
+        }
+
+        if (action.getScript() != null) {
+            return generatePipeline(cfg, createTaskWithEmbeddedScript(cfg.getJob().getName(), action));
+        }
+
+        // TODO
+        return null;
+    }
+
+    private static PipelineTask createTaskWithEmbeddedScript(String name, Action action) {
+        String embeddedScript;
+
+        if (action.getScript() != null) {
+            embeddedScript = action.getScript();
+        } else if (action.getScriptFileUrl() != null) {
+            try {
+                embeddedScript = FileUtilSvc.fetchScriptFileContent(action.getScriptFileUrl());
+            } catch (IOException e) {
+                throw new RuntimeException("Cannot fetch the script file: " + action.getScriptFileUrl(), e);
+            }
+        } else {
+            throw new RuntimeException("No embedded script configured");
+        };
+
+        PipelineTask pipelineTask = new PipelineTaskBuilder()
+            // @formatter:off
+            .withName(name)
+            .withTaskSpec(
+               new EmbeddedTaskBuilder()
+                .addNewStep()
+                   .withName("run-script")
+                   .withImage("ubuntu")
+                   .withScript(embeddedScript)
+                .endStep()
+                .build())
+            .build();
+            // @formatter:on
+        return pipelineTask;
+    }
+
+    // TODO: To be coded
+    private static PipelineTask createTaskUsingRef(String name, Action action) {
+        Bundle b = UriParserSvc.extract(action.getRef());
+        if (b == null) {
+            //logger.error("Bundle reference ws not parsed properly");
+            throw new RuntimeException("Bundle reference was not parsed properly");
+        } else {
+            PipelineTask pipelineTask = new PipelineTaskBuilder()
+                // @formatter:off
+            .withName(name)
+            .withNewTaskRef()
+               .withResolver("bundles")
+               .withParams()
+                 .addNewParam().withName("bundle").withValue(new ParamValue(b.getUri())).endParam()
+                 .addNewParam().withName("name").withValue(new ParamValue(b.getName())).endParam()
+                 .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+            .endTaskRef()
+            .build();
+            // @formatter:on
+            return pipelineTask;
+        }
+    }
+
+    public static Pipeline generatePipeline(Configurator cfg, PipelineTask aTask) {
+        TYPE = Type.valueOf(cfg.getType().toUpperCase());
+        // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
           .withNewMetadata()
                    .withName(cfg.getJob().getName())
@@ -31,18 +108,7 @@ public class Pipelines {
           .withNewSpec()
              .withTasks()
                  // TODO: Enhance the code to iterate within the list of the actions = tasks
-                .addNewTask()
-                   .withName("task-1")
-                   .withTaskSpec(
-                      new EmbeddedTaskBuilder()
-                       .addNewStep()
-                          .withName("run-script")
-                          .withImage("ubuntu")
-                          .withScript(cfg.getJob().getAction().getTaskSpec())
-                       .endStep()
-                       .build()
-                   )
-                .endTask()
+                 .withTasks(aTask)
                 // Embedded Task with script
 /*                .addNewTask()
                    .withName("task-embedded-script")
@@ -59,13 +125,13 @@ public class Pipelines {
           .endSpec()
           .build();
       // @formatter:on
-      return pipeline;
-   }
+        return pipeline;
+    }
 
-   public static PipelineRun createPackBuilder(Configurator cfg) {
-      TYPE = Type.valueOf(cfg.getType().toUpperCase());
+    public static PipelineRun createPackBuilder(Configurator cfg) {
+        TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
-      // @formatter:off
+        // @formatter:off
       PipelineRun pr = new PipelineRunBuilder()
           .withNewMetadata()
              .withName(cfg.getJob().getName() + "-run")
@@ -189,8 +255,8 @@ public class Pipelines {
           .build();
 
       // @formatter:on
-      return pr;
-   }
+        return pr;
+    }
 
 /*   public static Pipeline createPackBuilder(Configurator cfg) {
       TYPE = Type.valueOf(cfg.getType().toUpperCase());

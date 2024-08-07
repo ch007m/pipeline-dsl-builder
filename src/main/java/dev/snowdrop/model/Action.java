@@ -1,22 +1,31 @@
 package dev.snowdrop.model;
 
 public class Action {
-    private String taskRef;
-    private String taskSpec;
+    private String ref;
+    private String script;
+    private String scriptFileUrl;
 
-    public String getTaskRef() {
-        return taskRef;
+    public String getScriptFileUrl() {
+        return scriptFileUrl;
     }
 
-    public void setTaskRef(String taskRef) {
-        this.taskRef = taskRef;
+    public void setScriptFileUrl(String scriptFileUrl) {
+        this.scriptFileUrl = scriptFileUrl;
     }
 
-    public String getTaskSpec() {
-        return taskSpec;
+    public String getRef() {
+        return ref;
     }
 
-    public void setTaskSpec(String taskSpec) {
-        this.taskSpec = taskSpec;
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 }

@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,25 @@ public class FileUtilSvc {
          e.printStackTrace();
          throw new RuntimeException("Failed to read file: " + fileName, e);
       }
+   }
+
+   public static String fetchScriptFileContent(String fileUrl) throws IOException {
+      StringBuilder content = new StringBuilder();
+      URL url = new URL(fileUrl);
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+      connection.setRequestMethod("GET");
+
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+         String inputLine;
+         while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine).append("\n");
+         }
+      } finally {
+         connection.disconnect();
+      }
+
+      return content.toString();
    }
 
 }

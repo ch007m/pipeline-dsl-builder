@@ -5,12 +5,26 @@ public class Bundle {
    private String version;
    private String sha256;
    private String registry;
+   private String uri;
 
    public Bundle(String registry, String name, String version, String sha256) {
       this.name = name;
       this.version = version;
       this.sha256 = sha256;
       this.registry = registry;
+   }
+
+   public Bundle(String uri, String name) {
+      this.uri = uri;
+      this.name = name;
+   }
+
+   public String getUri() {
+      return uri;
+   }
+
+   public void setUri(String uri) {
+      this.uri = uri;
    }
 
    public String getRegistry() {
