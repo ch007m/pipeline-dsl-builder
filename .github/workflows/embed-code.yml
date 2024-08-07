@@ -10,8 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # release changes require contents write
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
       - name: Markdown Code Embed
         continue-on-error: true
@@ -23,7 +29,7 @@ jobs:
           
           python markdown_code_embed/mdce.py -b -f README.md
 
-      - name: Get all test, doc and src files that have changed
+      - name: Get doc files that have changed
         id: changed-files-yaml
         uses: tj-actions/changed-files@v44
         with:
@@ -39,5 +45,21 @@ jobs:
           
           set +e
           git add README.md
-          git commit -m "README.md file augmented with snippet codes"
-          git push
+          # git commit -m "README.md file augmented with snippet codes"
+          # git push
+
+      - name: Create pull request for the updated  docs
+        if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.date.outputs.date }}
+          title: "Documentation update - ${{ steps.date.outputs.date }}"
+          body: |
+            Pull request for docs update.
+
+            This pull request contains the generated documentation.
+
+          base: main
+          labels: |
+            documentation
