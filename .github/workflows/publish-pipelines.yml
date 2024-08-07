@@ -12,6 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # release changes require contents write
+    strategy:
+      matrix:
+        config:
+          - tekton/simple-job-embedded-script-cfg.yaml
+          - tekton/simple-job-fetch-script-cfg.yaml
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,7 +34,7 @@ jobs:
 
       - name: Run the builder application
         run: |
-          java -jar target/quarkus-app/quarkus-run.jar -o generated -c configurations/tekton/simple-job-embedded-script-cfg.yaml
+          java -jar target/quarkus-app/quarkus-run.jar -o generated -c configurations/${{ matrix.config }}
 
       - name: Check Pipeline generated
         run: |
