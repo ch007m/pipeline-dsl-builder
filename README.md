@@ -54,10 +54,10 @@ The `configurations` folder proposes different YAML configurations of what you c
 
 ##### Simple pipeline with script embedded
 
-https://github.com/ch007m/pipeline-dsl-builder/blob/0fc09cfe3e5d67221987bccb1deed5f83579fa46/configurations/tekton/example-cfg.yaml#L1-L18
+https://github.com/ch007m/pipeline-dsl-builder/blob/4f21266fd3c5240bcd9f2d09746e1151babb1afe/configurations/tekton/simple-job-embedded-script-cfg.yaml#L1-L18
 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/example-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
 ```
 Resource generated:
 ```yaml
