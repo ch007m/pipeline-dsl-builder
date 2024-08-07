@@ -7,7 +7,7 @@ domain: example
 namespace:
 
 job:
-  name: pipeline-1 # name of the pipeline to be created
+  name: simple-job-embedded-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
 
   # One of the supported resources: PipelineRun, Pipeline, Task

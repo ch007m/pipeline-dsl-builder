@@ -90,7 +90,7 @@ Command to generate the resource
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
 ```
 Resource generated:
-```yaml:generated/example/pipeline.yaml
+```yaml:generated/example/pipeline-simple-job-embedded-script.yaml
 ---
 apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
@@ -116,7 +116,7 @@ spec:
           echo "Say Hello"
 ```
 
-##### Simple pipeline with script fetched from a github repository
+#### Simple pipeline with script fetched from a github repository
 
 Configuration used:
 ```yaml:configurations/tekton/simple-job-fetch-script-cfg.yaml
@@ -142,8 +142,21 @@ job:
     ref:
 
     # The url of the script file to be executed using a linux container
+<<<<<<< HEAD
     scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```
+=======
+    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```bash
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-fetch-script-cfg.yaml
+```
+
+Command to generate the resource
+```bash
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-fetch-script-cfg.yaml
+```
+
 Resource generated:
+```yaml:generated/example/pipeline-simple-job-fetch-script.yaml
+```
 
 ##### PipelineRun to run the pack CLI and create a builder image
 

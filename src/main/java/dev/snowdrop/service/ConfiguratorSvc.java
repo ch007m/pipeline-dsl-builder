@@ -56,7 +56,7 @@ public class ConfiguratorSvc {
          logger.debug("Created YAML: \n{}", yamlResource);
 
          // Use the kubernetes kind as filename
-         String fileName = resource.getKind().toLowerCase();
+         String fileName = resource.getKind().toLowerCase() + "-" + resource.getMetadata().getName();
          writeYamlToFile(outputPath, fileName, yamlResource);
       } catch (Exception e) {
          logger.error(e.getMessage());
