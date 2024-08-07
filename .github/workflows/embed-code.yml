@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: write # release changes require contents write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       #- name: Markdown Code Embed
       #  uses: ippie52/markdown_code_embed_action@2.0.1
@@ -26,9 +26,7 @@ jobs:
 
           git clone https://github.com/ippie52/markdown_code_embed.git
           
-          ./markdown_code_embed/mdce.py -b -f README.md
-          
-          cat README.md
+          python markdown_code_embed/mdce.py -b -f README.md
 
       - name: Push the README file with snippet
         run: |
