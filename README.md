@@ -90,30 +90,7 @@ Command to generate the resource
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
 ```
 Resource generated:
-```yaml
----
-apiVersion: "tekton.dev/v1"
-kind: "Pipeline"
-metadata:
-  annotations:
-    tekton.dev/pipelines.minVersion: "0.40.0"
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
-    tekton.dev/platforms: "linux/amd64"
-  labels:
-    app.kubernetes.io/version: "0.2"
-  name: "pipeline-1"
-spec:
-  tasks:
-  - name: "task-embedded-script"
-    taskSpec:
-      steps:
-      - image: "ubuntu"
-        name: "run-script"
-        script: |-
-          #!/usr/bin/env bash
-
-          set -e
-          echo "Say Hello"
+```yaml:generated/example/pipeline.yaml
 ```
 
 ##### Simple pipeline with script fetched from a github repository
