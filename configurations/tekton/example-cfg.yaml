@@ -15,5 +15,9 @@ job:
 
   # What the job should perform as task. the action can refer to either a Task or define it
   action:
-    taskSpec: "echo Hello !"
+    taskSpec: |
+      #!/usr/bin/env bash
+      
+      set -e
+      echo "Say Hello"
 

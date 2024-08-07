@@ -19,7 +19,7 @@ public class Pipelines {
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
    private static Type TYPE;
 
-   public static Pipeline createExample(Configurator cfg) {
+   public static Pipeline createResource(Configurator cfg) {
       TYPE = Type.valueOf(cfg.getType().toUpperCase());
       // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
@@ -30,8 +30,21 @@ public class Pipelines {
           .endMetadata()
           .withNewSpec()
              .withTasks()
-                // Embedded Task with script
+                 // TODO: Enhance the code to iterate within the list of the actions = tasks
                 .addNewTask()
+                   .withName("task-1")
+                   .withTaskSpec(
+                      new EmbeddedTaskBuilder()
+                       .addNewStep()
+                          .withName("run-script")
+                          .withImage("ubuntu")
+                          .withScript(cfg.getJob().getAction().getTaskSpec())
+                       .endStep()
+                       .build()
+                   )
+                .endTask()
+                // Embedded Task with script
+/*                .addNewTask()
                    .withName("task-embedded-script")
                    .withTaskSpec(
                       new EmbeddedTaskBuilder()
@@ -42,7 +55,7 @@ public class Pipelines {
                        .endStep()
                        .build()
                    )
-                .endTask()
+                .endTask()*/
           .endSpec()
           .build();
       // @formatter:on

@@ -62,11 +62,12 @@ public class PipeBuilderApp implements Runnable {
       Pipeline pipeline = null;
       String resourcesPath = outputPath + "/" + cfg.getDomain();
 
-      // Type: Tekton and Domain: example
-      if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
-          cfg.getDomain().toUpperCase().equals(Domain.EXAMPLE.name())) {
+      // Type: Tekton
+      // Domain: example
+      // Resource generated: Pipeline
+      if (cfg.getType().toUpperCase().equals(Type.TEKTON.name())) {
          // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
-         ConfiguratorSvc.writeYaml(createExample(cfg), resourcesPath);
+         ConfiguratorSvc.writeYaml(createResource(cfg), resourcesPath);
       }
 
       // Type: Tekton
