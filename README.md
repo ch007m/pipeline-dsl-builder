@@ -120,7 +120,29 @@ spec:
 
 Configuration used:
 ```yaml:configurations/tekton/simple-job-fetch-script-cfg.yaml
-```
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: tekton
+# The domain allows to organize the resources, tasks to be generated
+domain: example
+
+# Kubernetes namespace
+namespace:
+
+job:
+  name: pipeline-1 # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline echoing a message
+
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  resourceType: Pipeline
+
+  # What the job should perform as task. the action can refer to either a Task or define it
+  action:
+    # The ref or reference expressed using the uri://<task-name>:<url>
+    # will fetch the code of the action to be executed
+    ref:
+
+    # The url of the script file to be executed using a linux container
+    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```
 
 Command to generate the resource
 ```bash
