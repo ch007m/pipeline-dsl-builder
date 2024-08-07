@@ -21,6 +21,7 @@ jobs:
       - name: Markdown Code Embed
         run: |
           git clone https://github.com/ippie52/markdown_code_embed.git
+          set -x
           ./markdown_code_embed/mdce.py -f README.md
           cat README.md
 
