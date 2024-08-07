@@ -22,6 +22,7 @@ jobs:
         run: |
           git clone https://github.com/ippie52/markdown_code_embed.git
           ./markdown_code_embed/mdce.py -f README.md
+          cat README.md
 
       - name: Push the README file with snippet
         run: |
