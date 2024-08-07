@@ -15,3 +15,13 @@ jobs:
 
       - name: Markdown Code Embed
         uses: ippie52/markdown_code_embed_action@2.0.1
+
+      - name: Push the README file with snippet
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          
+          set +e
+          git add README.md
+          git commit -m "README.md file augmented with snippet codes"
+          git push
