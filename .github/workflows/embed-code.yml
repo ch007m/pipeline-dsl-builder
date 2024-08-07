@@ -13,11 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      #- name: Markdown Code Embed
-      #  uses: ippie52/markdown_code_embed_action@2.0.1
-      #  with:
-      #    args: '-b'
-
       - name: Markdown Code Embed
         continue-on-error: true
         run: |
@@ -28,7 +23,16 @@ jobs:
           
           python markdown_code_embed/mdce.py -b -f README.md
 
+      - name: Get all test, doc and src files that have changed
+        id: changed-files-yaml
+        uses: tj-actions/changed-files@v44
+        with:
+          files_yaml: |
+            doc:
+              - '**.md'
+
       - name: Push the README file with snippet
+        if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"

@@ -54,6 +54,7 @@ The `configurations` folder proposes different YAML configurations of what you c
 
 ##### Simple pipeline with script embedded
 
+Configuration used:
 ```yaml:configurations/tekton/simple-job-embedded-script-cfg.yaml
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: tekton
@@ -84,7 +85,7 @@ job:
       echo "Say Hello"
 
 ```
-
+Command to generate the resource
 ```bash
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
 ```
@@ -114,6 +115,19 @@ spec:
           set -e
           echo "Say Hello"
 ```
+
+##### Simple pipeline with script fetched from a github repository
+
+Configuration used:
+```yaml:configurations/tekton/simple-job-fetch-script-cfg.yaml
+```
+
+Command to generate the resource
+```bash
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-fetch-script-cfg.yaml
+```
+Resource generated:
+
 ##### PipelineRun to run the pack CLI and create a builder image
 
 ```bash
@@ -280,6 +294,7 @@ spec:
       - secret:
           name: "quay-creds"
 ```
+
 #### Konflux
 
 ##### PipelineRun to build a Quarkus Application using Buildpack

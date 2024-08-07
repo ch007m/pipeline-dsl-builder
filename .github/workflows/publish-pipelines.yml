@@ -4,8 +4,8 @@ name: Publish Pipelines generated
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - main
 
 jobs:
   build:
@@ -26,30 +26,21 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean package
 
-      - name: Run the builder
+      - name: Run the builder application
         run: |
-          cat <<EOF > cfg.yml
-          type: tekton
-          name: example
-          namespace:
-          
-          job:
-            domain: example
-            resourceType: Pipeline
-            name: pipeline-1 # name of the pipeline to be created
-            description: Simple example of a Tekton pipeline echoing a message
-          EOF
-          
-          java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
+          java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
 
       - name: Check Pipeline generated
         run: |
-          cat out/flows/example/pipeline.yaml
-          mv out/flows/example/pipeline.yaml out/flows/example/simple-example-pipeline.yaml
+          cp --parents out/flows/**/*.yaml generated
+          ls -la generated
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            out/flows/**/*.yaml
+      - name: Push the README file with snippet
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+          set +e
+          git add generated/*
+          git commit -m "New \"pipelines\" yaml file(s) generated"
+          git push
