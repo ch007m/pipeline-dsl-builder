@@ -162,7 +162,7 @@ public class Pipelines {
         // @formatter:off
       PipelineRun pr = new PipelineRunBuilder()
           .withNewMetadata()
-             .withName(cfg.getJob().getName() + "-run")
+             .withName(cfg.getJob().getName())
              .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
              .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
           .endMetadata()

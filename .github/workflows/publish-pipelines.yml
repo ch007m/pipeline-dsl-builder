@@ -61,8 +61,9 @@ jobs:
 
       - name: Generate the content of the SCENARIO.md file
         run: |
-          fence="\`\`\`"
           cfg_files=(configurations/**/*)
+          
+          CMD="java -jar target/quarkus-app/quarkus-run.jar"
           
           printf '%s\n\n' "# Scenario" > SCENARIO.md
           

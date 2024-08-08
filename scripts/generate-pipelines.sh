@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 CMD="java -jar target/quarkus-app/quarkus-run.jar"
-OUTPUT_PATH=out/flows
+#OUTPUT_PATH=out/flows
+OUTPUT_PATH=generated
 
 rm -rf $OUTPUT_PATH
 cfg_files=(configurations/**/*)
