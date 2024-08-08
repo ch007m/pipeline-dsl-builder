@@ -1,5 +1,7 @@
 package dev.snowdrop.model;
 
+import java.util.List;
+
 /**
  * The type Job.
  */
@@ -7,25 +9,14 @@ public class Job {
    private String resourceType;
    private String name;
    private String description;
-   private Action action;
+   private List<Action> actions;
    private Builder builder;
-
-   /**
-    * Gets action.
-    *
-    * @return the action
-    */
-   public Action getAction() {
-      return action;
+   public List<Action> getActions() {
+      return actions;
    }
 
-   /**
-    * Sets action.
-    *
-    * @param action the action
-    */
-   public void setAction(Action action) {
-      this.action = action;
+   public void setActions(List<Action> actions) {
+      this.actions = actions;
    }
 
    /**

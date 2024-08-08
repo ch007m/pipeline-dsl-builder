@@ -28,44 +28,44 @@ public class Pipelines {
     public static <T> T createResource(Configurator cfg) {
         // TODO: Enhance the method to be able to generate the resource according to the resourceType: Pipeline, PipelineRun
         Class<T> type;
-        Action action = cfg.getJob().getAction();
+        List<Action> actions = cfg.getJob().getActions();
 
-        String domain = cfg.getDomain().toUpperCase();
-        String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
+        for (Action action : actions) {
+            String domain = cfg.getDomain().toUpperCase();
+            String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
 
+            if (tektonResourceType == null) {
+                throw new RuntimeException("Missing tekton resource type");
+            }
 
-        if (tektonResourceType == null) {
-            throw new RuntimeException("Missing tekton resource type");
+            switch (tektonResourceType) {
+                case "pipelinerun":
+                    type = (Class<T>) PipelineRun.class;
+                    break;
+                case "pipeline":
+                    type = (Class<T>) Pipeline.class;
+                    break;
+                default:
+                    throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
+            }
+
+            // TODO Temporary hack to be changed
+            if (domain.equals(Domain.BUILDPACK.name())) {
+                return type.cast(createPackBuilder(cfg));
+            }
+
+            if (action == null) {
+                logger.error("No action configured");
+            }
+
+            if (action.getRef() != null) {
+                return type.cast(generatePipeline(cfg, createTaskUsingRef(cfg.getJob().getName(), action)));
+            }
+
+            if (action.getScript() != null || action.getScriptFileUrl() != null) {
+                return type.cast(generatePipeline(cfg, createTaskWithEmbeddedScript(cfg.getJob().getName(), action)));
+            }
         }
-
-        switch (tektonResourceType) {
-            case "pipelinerun":
-                type = (Class<T>) PipelineRun.class;
-                break;
-            case "pipeline":
-                type = (Class<T>) Pipeline.class;
-                break;
-            default:
-                throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
-        }
-
-        // TODO Temporary hack to be changed
-        if (domain.equals(Domain.BUILDPACK.name())) {
-            return type.cast(createPackBuilder(cfg));
-        }
-
-        if (action == null) {
-            logger.error("No action configured");
-        }
-
-        if (action.getRef() != null) {
-            return type.cast(generatePipeline(cfg, createTaskUsingRef(cfg.getJob().getName(), action)));
-        }
-
-        if (action.getScript() != null || action.getScriptFileUrl() != null) {
-            return type.cast(generatePipeline(cfg, createTaskWithEmbeddedScript(cfg.getJob().getName(), action)));
-        }
-
         // TODO
         return null;
     }

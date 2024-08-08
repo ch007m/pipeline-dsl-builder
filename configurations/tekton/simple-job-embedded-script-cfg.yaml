@@ -14,14 +14,13 @@ job:
   resourceType: Pipeline
 
   # What the job should perform as task. the action can refer to either a Task or define it
-  action:
-    # The ref or reference expressed using the uri://<task-name>:<url>
-    # will fetch the code of the action to be executed
-    ref:
-
-    # The script to be executed using a linux container
-    script: |
-      #!/usr/bin/env bash
-      
-      set -e
-      echo "Say Hello"
+  actions:
+    - # The ref or reference expressed using the uri://<task-name>:<url>
+      # will fetch the code of the action to be executed
+      ref:
+      # The script to be executed using a linux container
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "Say Hello"
