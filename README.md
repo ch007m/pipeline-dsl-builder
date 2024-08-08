@@ -200,7 +200,7 @@ java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekt
 ```
 Resource generated:
 ```yaml
-# generated/buildpack/pipelinerun-pack-builder-push.yaml
+# generated/buildpack/pipelinerun-pack-builder-push-run.yaml
 ```
 
 ### Using Konflux provider
