@@ -74,7 +74,7 @@ jobs:
       - name: Get current date
         id: date
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-        run: echo "CURRENT_DATE=date::$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Create pull request for the updated README file
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
