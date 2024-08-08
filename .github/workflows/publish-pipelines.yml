@@ -8,15 +8,21 @@ on:
       - main
 
 jobs:
+  simple:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run the builder application
+        env:
+          config:
+            - tekton/simple-job-embedded-script-cfg.yaml
+            - tekton/simple-job-fetch-script-cfg.yaml
+        run: |
+          echo $config
+
   generate:
     runs-on: ubuntu-latest
     permissions:
       contents: write # release changes require contents write
-    strategy:
-      matrix:
-        config:
-          - tekton/simple-job-embedded-script-cfg.yaml
-          - tekton/simple-job-fetch-script-cfg.yaml
 
     steps:
       - name: Checkout
@@ -33,6 +39,10 @@ jobs:
         run: mvn -B clean package
 
       - name: Run the builder application
+        env:
+          config:
+            - tekton/simple-job-embedded-script-cfg.yaml
+            - tekton/simple-job-fetch-script-cfg.yaml
         run: |
           java -jar target/quarkus-app/quarkus-run.jar -o generated -c configurations/${{ matrix.config }}
 
