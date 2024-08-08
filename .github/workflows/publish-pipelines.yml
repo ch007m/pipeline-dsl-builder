@@ -118,4 +118,4 @@ jobs:
           labels: |
             documentation
           body: |
-            Pull request for New resources generated and README changed.
+            Pull request for New resources generated and SCENARIO.md changed.
