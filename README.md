@@ -52,7 +52,7 @@ The `configurations` folder proposes different YAML configurations of what you c
 
 See some idea of scenario [here](SCENARIO.md)
 
-### To be parked
+## To be parked
 
 ```bash
 tkn bundle push quay.io/ch007m/tekton-bundle:latest \
