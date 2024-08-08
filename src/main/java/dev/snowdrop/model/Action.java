@@ -1,19 +1,19 @@
 package dev.snowdrop.model;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Action {
     private String ref;
     private String script;
     private String scriptFileUrl;
-    private HashMap<String,Object> params;
+    private List<Map<String, Object>> params;
 
-    public HashMap<String, ?> getParams() {
+    public List<Map<String, Object>> getParams() {
         return params;
     }
 
-    public void setParams(HashMap<String, Object> params) {
+    public void setParams(List<Map<String, Object>> params) {
         this.params = params;
     }
 
