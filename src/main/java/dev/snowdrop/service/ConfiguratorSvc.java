@@ -10,6 +10,7 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,13 +65,16 @@ public class ConfiguratorSvc {
    }
 
    public static void writeYamlToFile(String outputPath, String fileName, String yamlContent) {
-      Path folderPath = Paths.get(outputPath);
       Path filePath = Paths.get(outputPath, fileName+".yaml");
       try {
-         Files.createDirectories(folderPath);
-         Files.write(filePath, yamlContent.getBytes());
+         File dir = new File(outputPath);
+         dir.mkdirs();
+
+         File f = new File(String.valueOf(filePath));
+         Files.write(f.toPath(), yamlContent.getBytes());
          logger.info("### YAML file generated: " + filePath);
-      } catch (IOException e) {
+
+      } catch (Exception e) {
          logger.error("Failed to write YAML to file: " + e.getMessage());
       }
    }
