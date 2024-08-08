@@ -17,6 +17,9 @@ do
   type=$(cat "$f" | yq -r ".type")
   domain=$(cat "$f" | yq -r ".domain")
   title=$(cat "$f" | yq -r ".job.description")
+  fileName=$(cat "$f" | yq -r ".job.name")
+  resourceType=$(cat "$f" | yq -r ".job.resourceType")
+
   printf '%s\n\n' "## Provider: $type" >> TEMP.md
   printf '%s\n\n' "### $title" >> TEMP.md
   printf '%s\n' "Command to be executed: " >> TEMP.md
@@ -31,7 +34,7 @@ do
 
   printf '%s\n' "Generated file: " >> TEMP.md
   printf '%s\n' "\`\`\`yaml" >> TEMP.md
-  generate_path="generated/$type/$domain/$(basename $f)"
+  generate_path="generated/$type/$domain/$(echo $resourceType | awk '{print tolower($0)}')-$fileName.yaml"
   printf '%s\n' "# $generate_path" >> TEMP.md
   printf '%s\n' "\`\`\`"  >> TEMP.md
 done

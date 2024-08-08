@@ -71,6 +71,9 @@ jobs:
             type=$(cat "$f" | yq -r ".type")
             domain=$(cat "$f" | yq -r ".domain")
             title=$(cat "$f" | yq -r ".job.description")
+            fileName=$(cat "$f" | yq -r ".job.name")
+            resourceType=$(cat "$f" | yq -r ".job.resourceType")
+  
             printf '%s\n\n' "## Provider: $type" >> SCENARIO.md
             printf '%s\n\n' "### $title" >> SCENARIO.md
             printf '%s\n' "Command to be executed: " >> SCENARIO.md
@@ -85,7 +88,7 @@ jobs:
           
             printf '%s\n' "Generated file: " >> SCENARIO.md
             printf '%s\n' "\`\`\`yaml" >> SCENARIO.md
-            generate_path="generated/$type/$domain/$(basename $f)"
+            generate_path="generated/$type/$domain/$(echo $resourceType | awk '{print tolower($0)}')-$fileName.yaml"
             printf '%s\n' "# $generate_path" >> SCENARIO.md
             printf '%s\n' "\`\`\`"  >> SCENARIO.md
           done
