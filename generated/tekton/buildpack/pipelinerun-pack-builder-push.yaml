@@ -3,9 +3,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
-    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "pack-builder-push"
