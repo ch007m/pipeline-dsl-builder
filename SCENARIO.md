@@ -48,16 +48,16 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
   labels:
-    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "build"
+    pipelines.openshift.io/used-by: "build-cloud"
   name: "my-quarkus-1"
 spec:
   params:
@@ -441,16 +441,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
   labels:
+    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
     pipelines.openshift.io/used-by: "build-cloud"
-    pipelines.openshift.io/runtime: "java"
   name: "buildpack-builder"
 spec:
   finally:
@@ -831,13 +831,12 @@ job:
   name: pack-builder-push
   description: "This Pipeline builds a builder image using the pack CLI."
   # What the job should perform as task. the action can refer to either a Task or define it
-  action:
-    # The ref or reference expressed using the uri://<task-name>:<url>
-    # will fetch the code of the action to be executed
-    ref: bundles://pack-builder:quay.io/ch007m/tekton-bundle:latest
-
-    # The script to be executed using a linux container
-    script:
+  actions:
+    - # The ref or reference expressed using the uri://<task-name>:<url>
+      # will fetch the code of the action to be executed
+      ref: bundles://pack-builder:quay.io/ch007m/tekton-bundle:latest
+      # The script to be executed using a linux container
+      script:
 
 ```
 Generated file: 
@@ -849,9 +848,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
+    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "pack-builder-push"
@@ -1016,17 +1015,16 @@ job:
   resourceType: Pipeline
 
   # What the job should perform as task. the action can refer to either a Task or define it
-  action:
-    # The ref or reference expressed using the uri://<task-name>:<url>
-    # will fetch the code of the action to be executed
-    ref:
-
-    # The script to be executed using a linux container
-    script: |
-      #!/usr/bin/env bash
-      
-      set -e
-      echo "Say Hello"
+  actions:
+    - # The ref or reference expressed using the uri://<task-name>:<url>
+      # will fetch the code of the action to be executed
+      ref:
+      # The script to be executed using a linux container
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "Say Hello"
 ```
 Generated file: 
 ```yaml
@@ -1037,9 +1035,9 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
     tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-embedded-script"
@@ -1086,13 +1084,12 @@ job:
   resourceType: Pipeline
 
   # What the job should perform as task. the action can refer to either a Task or define it
-  action:
-    # The ref or reference expressed using the uri://<task-name>:<url>
-    # will fetch the code of the action to be executed
-    ref:
-
-    # The url of the script file to be executed using a linux container
-    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh
+  actions:
+    - # The ref or reference expressed using the uri://<task-name>:<url>
+      # will fetch the code of the action to be executed
+      ref:
+      # The url of the script file to be executed using a linux container
+      scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh
 ```
 Generated file: 
 ```yaml
@@ -1103,8 +1100,8 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
