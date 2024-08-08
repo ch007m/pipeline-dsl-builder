@@ -1,5 +1,5 @@
 type: tekton
-domain: pack
+domain: buildpack
 namespace:
 
 job:

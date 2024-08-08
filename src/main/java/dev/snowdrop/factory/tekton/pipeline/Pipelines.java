@@ -6,6 +6,8 @@ import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Bundle;
 import dev.snowdrop.model.Configurator;
+import dev.snowdrop.model.Domain;
+import dev.snowdrop.service.ConfiguratorSvc;
 import dev.snowdrop.service.FileUtilSvc;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.*;
@@ -23,19 +25,45 @@ public class Pipelines {
     private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
     private static Type TYPE;
 
-    public static Pipeline createResource(Configurator cfg) {
+    public static <T> T createResource(Configurator cfg) {
+        // TODO: Enhance the method to be able to generate the resource according to the resourceType: Pipeline, PipelineRun
+        Class<T> type;
         Action action = cfg.getJob().getAction();
+
+        String domain = cfg.getDomain().toUpperCase();
+        String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
+
+
+        if (tektonResourceType == null) {
+            throw new RuntimeException("Missing tekton resource type");
+        }
+
+        switch (tektonResourceType) {
+            case "pipelinerun":
+                type = (Class<T>) PipelineRun.class;
+                break;
+            case "pipeline":
+                type = (Class<T>) Pipeline.class;
+                break;
+            default:
+                throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
+        }
+
+        // TODO Temporary hack to be changed
+        if (domain.equals(Domain.BUILDPACK.name())) {
+            return type.cast(createPackBuilder(cfg));
+        }
 
         if (action == null) {
             logger.error("No action configured");
         }
 
         if (action.getRef() != null) {
-            return generatePipeline(cfg, createTaskUsingRef(cfg.getJob().getName(), action));
+            return type.cast(generatePipeline(cfg, createTaskUsingRef(cfg.getJob().getName(), action)));
         }
 
         if (action.getScript() != null || action.getScriptFileUrl() != null) {
-            return generatePipeline(cfg, createTaskWithEmbeddedScript(cfg.getJob().getName(), action));
+            return type.cast(generatePipeline(cfg, createTaskWithEmbeddedScript(cfg.getJob().getName(), action)));
         }
 
         // TODO
@@ -73,7 +101,6 @@ public class Pipelines {
         return pipelineTask;
     }
 
-    // TODO: To be coded
     private static PipelineTask createTaskUsingRef(String name, Action action) {
         Bundle b = UriParserSvc.extract(action.getRef());
         if (b == null) {

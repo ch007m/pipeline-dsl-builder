@@ -33,6 +33,7 @@ jobs:
           config=(
             tekton/simple-job-embedded-script-cfg.yaml
             tekton/simple-job-fetch-script-cfg.yaml
+            tekton/pack-builder-cfg.yaml
           )
           for i in "${array[@]}"
           do

@@ -186,171 +186,21 @@ spec:
 
 ```
 
-##### PipelineRun to run the pack CLI and create a builder image
+#### PipelineRun to run the pack CLI and create a builder image
 
+
+Configuration used:
+```yaml
+# configurations/tekton/pack-builder-cfg.yaml
+```
+
+Command to generate the resource: 
 ```bash
-cat <<EOF > cfg.yml
-type: tekton
-name: "pack builder"
-namespace:
-
-job:
-  # The domain allows to specify the type of the build to be executed.
-  # Such a type matches a corresponding Task which is either:
-  # - pack: to build an image using the Pack CLI
-  domain: pack
-  # One of the supported resources: PipelineRun, Pipeline, Task
-  resourceType: PipelineRun
-  name: pack-builder-push
-  description: "This Pipeline builds a builder image using the pack CLI."
-EOF
-
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c cfg.yml
+java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/pack-builder-cfg.yaml
 ```
 Resource generated:
 ```yaml
----
-apiVersion: "tekton.dev/v1"
-kind: "PipelineRun"
-metadata:
-  annotations:
-    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
-    tekton.dev/pipelines.minVersion: "0.40.0"
-    tekton.dev/platforms: "linux/amd64"
-  labels:
-    app.kubernetes.io/version: "0.2"
-  name: "pack-builder-push-run"
-spec:
-  params:
-  - name: "debug"
-    value: "true"
-  - name: "git-url"
-    value: "https://github.com/redhat-buildpacks/ubi-image-builder.git"
-  - name: "source-dir"
-    value: "."
-  - name: "output-image"
-    value: "quay.io/snowdrop/ubi-builder"
-  - name: "imageUrl"
-    value: "buildpacksio/pack"
-  - name: "imageTag"
-    value: "latest"
-  - name: "packCmdBuilderFlags"
-    value:
-    - "-v"
-    - "--publish"
-  pipelineSpec:
-    tasks:
-    - name: "git-clone"
-      params:
-      - name: "url"
-        value: "$(params.git-url)"
-      - name: "subdirectory"
-        value: "."
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3"
-        - name: "name"
-          value: "git-clone"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "output"
-        workspace: "source-dir"
-    - name: "fetch-packconfig-registrysecret"
-      runAfter:
-      - "git-clone"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
-        - name: "name"
-          value: "fetch-packconfig-registrysecret"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "data-store"
-        workspace: "data-store"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
-    - name: "list-source-workspace"
-      runAfter:
-      - "fetch-packconfig-registrysecret"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
-        - name: "name"
-          value: "list-source-workspace"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "source-dir"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
-    - name: "pack-builder"
-      params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
-      - name: "PACK_CLI_IMAGE"
-        value: "$(params.imageUrl)"
-      - name: "PACK_CLI_IMAGE_VERSION"
-        value: "$(params.imageTag)"
-      - name: "BUILDER_IMAGE_NAME"
-        value: "$(params.output-image)"
-      - name: "PACK_BUILDER_TOML"
-        value: "ubi-builder.toml"
-      - name: "PACK_CMD_FLAGS"
-        value:
-        - "$(params.packCmdBuilderFlags)"
-      runAfter:
-      - "fetch-packconfig-registrysecret"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
-        - name: "name"
-          value: "pack-builder"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "source-dir"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
-  workspaces:
-  - name: "source-dir"
-    volumeClaimTemplate:
-      apiVersion: "v1"
-      kind: "PersistentVolumeClaim"
-      spec:
-        accessModes:
-        - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "1Gi"
-  - name: "pack-workspace"
-    volumeClaimTemplate:
-      apiVersion: "v1"
-      kind: "PersistentVolumeClaim"
-      spec:
-        accessModes:
-        - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "1Gi"
-  - name: "data-store"
-    projected:
-      sources:
-      - secret:
-          name: "pack-config-toml"
-      - secret:
-          name: "quay-creds"
+# generated/buildpack/pipelinerun-pack-builder-push.yaml
 ```
 
 ### Using Konflux provider

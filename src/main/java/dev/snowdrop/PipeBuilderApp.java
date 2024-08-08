@@ -59,32 +59,21 @@ public class PipeBuilderApp implements Runnable {
       }
       logger.info("#### Pipeline domain selected: {}", cfg.getDomain());
 
-      Pipeline pipeline = null;
       String resourcesPath = outputPath + "/" + cfg.getDomain();
+      String providerType = cfg.getType().toUpperCase();
+      String domain = cfg.getDomain().toUpperCase();
 
       // Type: Tekton
-      // Domain: example
-      // Resource generated: Pipeline
-      if (cfg.getType().toUpperCase().equals(Type.TEKTON.name())) {
-         // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
+      if (providerType == Type.TEKTON.name()) {
          ConfiguratorSvc.writeYaml(createResource(cfg), resourcesPath);
       }
 
-      // Type: Tekton
-      // Domain: pack
-      // Resource generated: PipelineRun
-      if (cfg.getType().toUpperCase().equals(Type.TEKTON.name()) &&
-         cfg.getDomain().toUpperCase().equals(Domain.PACK.name())) {
-         // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
-         ConfiguratorSvc.writeYaml(createPackBuilder(cfg), resourcesPath);
-      }
 
       // Type: Konflux
       // Domain: build
       // Resource generated: PipelineRun
       // TODO: To be reviewed as not complete
-      if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name()) &&
-          cfg.getDomain().toUpperCase().equals(Domain.BUILD.name())) {
+      if (providerType == Type.KONFLUX.name() && domain == Domain.BUILD.name()) {
          // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createBuild(cfg), resourcesPath);
       }
@@ -93,14 +82,13 @@ public class PipeBuilderApp implements Runnable {
       // Domain: buildpack
       // Resource generated: Pipeline
       // TODO: To be reviewed as not complete
-      if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name()) &&
-          cfg.getDomain().toUpperCase().equals(Domain.BUILDPACK.name())) {
+      if (providerType == Type.KONFLUX.name() && domain == Domain.BUILDPACK.name()) {
          // TODO: Enhance the factory to be able to generate the resource according to the resourceType: Pipeline, PipelineRun, Task
          ConfiguratorSvc.writeYaml(createBuilder(cfg), resourcesPath);
       }
 
       // TODO: Add a boolean to enable to generate the following resources
-      if (cfg.getType().toUpperCase().equals(Type.KONFLUX.name())) {
+      if (providerType == Type.KONFLUX.name()) {
          // Generate the Application, Component CR
          ConfiguratorSvc.writeYaml(createApplication(cfg), resourcesPath);
          ConfiguratorSvc.writeYaml(createComponent(cfg), resourcesPath);
