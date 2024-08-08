@@ -11,7 +11,8 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # release changes require contents write
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout
