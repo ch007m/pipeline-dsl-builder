@@ -32,7 +32,7 @@ repository:
   branch: main
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
   name: my-quarkus-1
   description: PipelineRun performing a pack build
@@ -425,7 +425,7 @@ repository:
   branch: main
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
   name: buildpack-builder
   description: PipelineRun using the pack client to build a builder image
@@ -826,7 +826,7 @@ domain: buildpack
 namespace:
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
   name: pack-builder-push
   description: "This Pipeline builds a builder image using the pack CLI."
@@ -1011,7 +1011,7 @@ job:
   name: simple-job-embedded-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
 
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
 
   # What the job should perform as task. the action can refer to either a Task or define it
@@ -1080,7 +1080,7 @@ job:
   name: simple-job-fetch-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
 
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
 
   # What the job should perform as task. the action can refer to either a Task or define it

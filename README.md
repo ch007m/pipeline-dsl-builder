@@ -32,7 +32,7 @@ domain: example
 
 # A job represents a collection of kubernetes resources able to perform different tasks, steps
 job:
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
   name: pipeline-1
 EOF

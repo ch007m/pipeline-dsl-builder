@@ -10,7 +10,7 @@ job:
   name: simple-job-embedded-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
 
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
 
   # What the job should perform as task. the action can refer to either a Task or define it

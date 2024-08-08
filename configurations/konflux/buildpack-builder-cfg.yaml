@@ -9,7 +9,7 @@ repository:
   branch: main
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
   name: buildpack-builder
   description: PipelineRun using the pack client to build a builder image

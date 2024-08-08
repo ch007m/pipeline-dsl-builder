@@ -18,7 +18,7 @@ repository:
   branch: main
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline, Task
+  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
   name: my-quarkus-1
   description: PipelineRun performing a pack build

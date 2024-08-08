@@ -37,7 +37,7 @@ public class Pipelines {
             throw new RuntimeException("Missing actions");
         }
 
-        return generatePipeline(cfg, actions);
+        return createJob(cfg, actions);
     }
 
     private static PipelineTask createTaskWithEmbeddedScript(String name, Action action) {
@@ -93,7 +93,7 @@ public class Pipelines {
         }
     }
 
-    public static <T> T generatePipeline(Configurator cfg, List<Action> actions) {
+    public static <T> T createJob(Configurator cfg, List<Action> actions) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
         Class<T> type;
@@ -120,44 +120,51 @@ public class Pipelines {
         switch (tektonResourceType) {
             case "pipelinerun":
                 type = (Class<T>) PipelineRun.class;
-
-                // @formatter:off
-                PipelineRun pipelineRun = new PipelineRunBuilder()
-                  .withNewMetadata()
-                     .withName(cfg.getJob().getName())
-                     .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-                     .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
-                     .withNamespace(cfg.getNamespace())
-                  .endMetadata()
-                  .withNewSpec()
-                     .withNewPipelineSpec()
-                        .withTasks(tasks)
-                     .endPipelineSpec()
-                  .endSpec()
-                  .build();
-                // @formatter:on
-                return type.cast(pipelineRun);
+                return type.cast(generatePipelineRun(cfg, tasks));
 
             case "pipeline":
                 type = (Class<T>) Pipeline.class;
+                return type.cast(generatePipeline(cfg, tasks));
 
-                // @formatter:off
-                Pipeline pipeline = new PipelineBuilder()
-                  .withNewMetadata()
-                     .withName(cfg.getJob().getName())
-                     .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-                     .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
-                     .withNamespace(cfg.getNamespace())
-                  .endMetadata()
-                  .withNewSpec()
-                     .withTasks(tasks)
-                  .endSpec()
-                  .build();
-                // @formatter:on
-                return type.cast(pipeline);
             default:
                 throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
         }
+    }
+
+    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks) {
+        // @formatter:off
+        PipelineRun pipelineRun = new PipelineRunBuilder()
+          .withNewMetadata()
+             .withName(cfg.getJob().getName())
+             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+             .withNamespace(cfg.getNamespace())
+          .endMetadata()
+          .withNewSpec()
+             .withNewPipelineSpec()
+                .withTasks(tasks)
+             .endPipelineSpec()
+          .endSpec()
+          .build();
+        // @formatter:on
+        return pipelineRun;
+    }
+
+    public static Pipeline generatePipeline(Configurator cfg, List<PipelineTask> tasks) {
+        // @formatter:off
+        Pipeline pipeline = new PipelineBuilder()
+            .withNewMetadata()
+               .withName(cfg.getJob().getName())
+               .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+               .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+               .withNamespace(cfg.getNamespace())
+            .endMetadata()
+            .withNewSpec()
+               .withTasks(tasks)
+            .endSpec()
+            .build();
+        // @formatter:on
+        return pipeline;
     }
 
     public static PipelineRun createPackBuilder(Configurator cfg) {
