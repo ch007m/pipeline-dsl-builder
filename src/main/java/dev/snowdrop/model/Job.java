@@ -1,16 +1,26 @@
 package dev.snowdrop.model;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The type Job.
  */
 public class Job {
-   private String resourceType;
    private String name;
    private String description;
+   private String resourceType;
+   private List<Map<String, Object>> params;
    private List<Action> actions;
-   private Builder builder;
+
+   public List<Map<String, Object>> getParams() {
+      return params;
+   }
+
+   public void setParams(List<Map<String, Object>> params) {
+      this.params = params;
+   }
+
    public List<Action> getActions() {
       return actions;
    }
@@ -53,24 +63,6 @@ public class Job {
     */
    public void setDescription(String description) {
       this.description = description;
-   }
-
-   /**
-    * Gets builder.
-    *
-    * @return the builder
-    */
-   public Builder getBuilder() {
-      return builder;
-   }
-
-   /**
-    * Sets builder.
-    *
-    * @param builder the builder
-    */
-   public void setBuilder(Builder builder) {
-      this.builder = builder;
    }
 
    /**

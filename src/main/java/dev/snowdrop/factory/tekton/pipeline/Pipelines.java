@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
 
@@ -98,11 +99,17 @@ public class Pipelines {
 
         Class<T> type;
         List<PipelineTask> tasks = new ArrayList<>();
+        List<Param> pipelineParams = new ArrayList<>();
         PipelineTask aTask;
 
         String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
         if (tektonResourceType == null) {
             throw new RuntimeException("Missing tekton resource type");
+        }
+
+        List<Map<String, Object>> params = cfg.getJob().getParams();
+        if (params != null && !params.isEmpty()) {
+                pipelineParams = populatePipelineParams(cfg.getJob().getParams());
         }
 
         for (Action action : actions) {
@@ -120,7 +127,7 @@ public class Pipelines {
         switch (tektonResourceType) {
             case "pipelinerun":
                 type = (Class<T>) PipelineRun.class;
-                return type.cast(generatePipelineRun(cfg, tasks));
+                return type.cast(generatePipelineRun(cfg, tasks, pipelineParams));
 
             case "pipeline":
                 type = (Class<T>) Pipeline.class;
@@ -131,7 +138,27 @@ public class Pipelines {
         }
     }
 
-    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks) {
+    private static List<Param> populatePipelineParams(List<Map<String, Object>> params) {
+        List<Param> paramList = new ArrayList<>();
+        for (Map<String, Object> hash : params) {
+            hash.forEach((key, val) -> {
+                    String newVal;
+                    if (val instanceof String) {
+                        newVal = String.valueOf(val);
+                    } else if (val instanceof Boolean) {
+                        newVal = Boolean.toString((Boolean) val);
+                    } else {
+                        newVal = String.valueOf(val); // Default to String representation
+                    }
+
+                    paramList.add(new ParamBuilder().withName(key).withValue(new ParamValue(newVal)).build());
+                }
+            );
+        }
+        return paramList;
+    }
+
+    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks, List<Param> params) {
         // @formatter:off
         PipelineRun pipelineRun = new PipelineRunBuilder()
           .withNewMetadata()
@@ -141,6 +168,7 @@ public class Pipelines {
              .withNamespace(cfg.getNamespace())
           .endMetadata()
           .withNewSpec()
+             .withParams(params)
              .withNewPipelineSpec()
                 .withTasks(tasks)
              .endPipelineSpec()
@@ -151,6 +179,7 @@ public class Pipelines {
     }
 
     public static Pipeline generatePipeline(Configurator cfg, List<PipelineTask> tasks) {
+        // TODO: To be reviewed
         // @formatter:off
         Pipeline pipeline = new PipelineBuilder()
             .withNewMetadata()

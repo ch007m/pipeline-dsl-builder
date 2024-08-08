@@ -7,6 +7,16 @@ job:
   resourceType: PipelineRun
   name: pack-builder-push
   description: "This Pipeline builds a builder image using the pack CLI."
+  params:
+  - debug: true
+  - git-url: "https://github.com/redhat-buildpacks/ubi-image-builder.git"
+  - source-dir: "."
+  - output-image: "quay.io/snowdrop/ubi-builder"
+  - imageUrl: "buildpacksio/pack"
+  - imageTag: "latest"
+  - packCmdBuilderFlags:
+    - -v
+    - --publish
   actions:
     - name: git-clone
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3
