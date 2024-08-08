@@ -57,6 +57,34 @@ The `configurations` folder proposes different YAML configurations of what you c
 Configuration used:
 ```yaml
 # configurations/tekton/simple-job-embedded-script-cfg.yaml
+
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: tekton
+# The domain allows to organize the resources, tasks to be generated
+domain: example
+
+# Kubernetes namespace
+namespace: user
+
+job:
+  name: simple-job-embedded-script # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline echoing a message
+
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  resourceType: Pipeline
+
+  # What the job should perform as task. the action can refer to either a Task or define it
+  action:
+    # The ref or reference expressed using the uri://<task-name>:<url>
+    # will fetch the code of the action to be executed
+    ref:
+
+    # The script to be executed using a linux container
+    script: |
+      #!/usr/bin/env bash
+      
+      set -e
+      echo "Say Hello"
 ```
 Command to generate the resource
 ```bash
@@ -65,6 +93,31 @@ java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekt
 Resource generated:
 ```yaml
 # generated/example/pipeline-simple-job-embedded-script.yaml
+
+---
+apiVersion: "tekton.dev/v1"
+kind: "Pipeline"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
+  labels:
+    app.kubernetes.io/version: "0.2"
+  name: "simple-job-embedded-script"
+spec:
+  tasks:
+  - name: "simple-job-embedded-script"
+    taskSpec:
+      steps:
+      - image: "ubuntu"
+        name: "run-script"
+        script: |
+          #!/usr/bin/env bash
+
+          set -e
+          echo "Say Hello"
+
 ```
 
 #### Simple pipeline with script fetched from a github repository
@@ -72,6 +125,30 @@ Resource generated:
 Configuration used:
 ```yaml
 # configurations/tekton/simple-job-fetch-script-cfg.yaml
+
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: tekton
+# The domain allows to organize the resources, tasks to be generated
+domain: example
+
+# Kubernetes namespace
+namespace:
+
+job:
+  name: simple-job-fetch-script # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline echoing a message
+
+  # One of the supported resources: PipelineRun, Pipeline, Task
+  resourceType: Pipeline
+
+  # What the job should perform as task. the action can refer to either a Task or define it
+  action:
+    # The ref or reference expressed using the uri://<task-name>:<url>
+    # will fetch the code of the action to be executed
+    ref:
+
+    # The url of the script file to be executed using a linux container
+    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh
 ```
 
 Command to generate the resource:
@@ -82,6 +159,31 @@ java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekt
 Resource generated:
 ```yaml
 # generated/example/pipeline-simple-job-fetch-script.yaml
+
+---
+apiVersion: "tekton.dev/v1"
+kind: "Pipeline"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
+  labels:
+    app.kubernetes.io/version: "0.2"
+  name: "simple-job-fetch-script"
+spec:
+  tasks:
+  - name: "simple-job-fetch-script"
+    taskSpec:
+      steps:
+      - image: "ubuntu"
+        name: "run-script"
+        script: |
+          #!/usr/bin/env bash
+
+          set -e
+          echo "Say Hello"
+
 ```
 
 ##### PipelineRun to run the pack CLI and create a builder image
