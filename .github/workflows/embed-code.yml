@@ -35,17 +35,6 @@ jobs:
             doc:
               - '**.md'
 
-      #- name: Push the README file with snippet
-      #  if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-      #  run: |
-      #    git config user.name "${{ github.actor }}"
-      #    git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-      #
-      #    set +e
-      #    git add README.md
-      #    # git commit -m "README.md file augmented with snippet codes"
-      #    # git push
-
       - name: Create pull request for the updated  docs
         if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         uses: peter-evans/create-pull-request@v6

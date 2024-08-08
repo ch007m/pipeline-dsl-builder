@@ -43,16 +43,6 @@ jobs:
         run: |
           ls -la generated/example
 
-      #- name: Push the README file with snippet
-      #  run: |
-      #    git config user.name "${{ github.actor }}"
-      #    git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-      #
-      #    set +e
-      #    git add generated/*
-      #    git commit -m "New \"pipelines\" yaml file(s) generated"
-      #    git push
-
       #- name: Get doc files that have changed
       #  id: changed-files-yaml
       #  uses: tj-actions/changed-files@v44
@@ -61,15 +51,18 @@ jobs:
       #      doc:
       #        - '**.md'
 
+      # NOT USED ANYMORE
+      # Sometimes the python script happens ``` end of the last YAML line and remove the next README CR
+      #
       #- name: Markdown Code Embed
       #  continue-on-error: true
       #  #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
       #  run: |
       #    #!/usr/bin/env bash
       #    set -e
-#
+      #
       #    git clone https://github.com/ippie52/markdown_code_embed.git
-#
+      #
       #    python markdown_code_embed/mdce.py -f README.md
 
       - name: Embed snippet code within the README.md file
