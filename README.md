@@ -92,7 +92,7 @@ java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekt
 ```
 Resource generated:
 ```yaml
-# generated/example/pipeline-simple-job-embedded-script.yaml
+# generated/tekton/example/pipeline-simple-job-embedded-script.yaml
 
 ---
 apiVersion: "tekton.dev/v1"
@@ -158,7 +158,7 @@ java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekt
 
 Resource generated:
 ```yaml
-# generated/example/pipeline-simple-job-fetch-script.yaml
+# generated/tekton/example/pipeline-simple-job-fetch-script.yaml
 
 ---
 apiVersion: "tekton.dev/v1"
@@ -200,7 +200,7 @@ java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekt
 ```
 Resource generated:
 ```yaml
-# generated/buildpack/pipelinerun-pack-builder-push-run.yaml
+# generated/tekton/buildpack/pipelinerun-pack-builder-push-run.yaml
 ```
 
 ### Using Konflux provider

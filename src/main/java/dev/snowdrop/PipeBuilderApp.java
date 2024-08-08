@@ -63,7 +63,7 @@ public class PipeBuilderApp implements Runnable {
         }
         logger.info("#### Pipeline domain selected: {}", cfg.getDomain());
 
-        String resourcesPath = outputPath + "/" + cfg.getDomain();
+        String resourcesPath = outputPath + "/" + cfg.getType() + "/" + cfg.getDomain();
         Type providerType = Type.valueOf(cfg.getType().toUpperCase());
         Domain domain = Domain.valueOf(cfg.getDomain().toUpperCase());
 
