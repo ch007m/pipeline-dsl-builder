@@ -83,7 +83,6 @@ job:
       
       set -e
       echo "Say Hello"
-
 ```
 Command to generate the resource
 ```bash
@@ -143,7 +142,6 @@ job:
 
     # The url of the script file to be executed using a linux container
     scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh
-
 ```
 
 Command to generate the resource:
