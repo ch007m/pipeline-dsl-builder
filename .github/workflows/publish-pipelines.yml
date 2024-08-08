@@ -8,15 +8,6 @@ on:
       - main
 
 jobs:
-  simple:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - run: |
-          npx embedme README.md
-          cat README.md
-
   generate:
     runs-on: ubuntu-latest
     permissions:
@@ -70,16 +61,20 @@ jobs:
       #      doc:
       #        - '**.md'
 
-      - name: Markdown Code Embed
-        continue-on-error: true
-        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+      #- name: Markdown Code Embed
+      #  continue-on-error: true
+      #  #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+      #  run: |
+      #    #!/usr/bin/env bash
+      #    set -e
+#
+      #    git clone https://github.com/ippie52/markdown_code_embed.git
+#
+      #    python markdown_code_embed/mdce.py -f README.md
+
+      - name: Embed snippet code within the README.md file
         run: |
-          #!/usr/bin/env bash
-          set -e
-
-          git clone https://github.com/ippie52/markdown_code_embed.git
-
-          python markdown_code_embed/mdce.py -f README.md
+          npx embedme README.md
 
       - name: Get current date
         id: date
