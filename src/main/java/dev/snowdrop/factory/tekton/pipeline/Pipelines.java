@@ -101,9 +101,10 @@ public class Pipelines {
         // @formatter:off
       Pipeline pipeline = new PipelineBuilder()
           .withNewMetadata()
-                   .withName(cfg.getJob().getName())
-                   .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+             .withName(cfg.getJob().getName())
+             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+             .withNamespace(cfg.getNamespace())
           .endMetadata()
           .withNewSpec()
              .withTasks()

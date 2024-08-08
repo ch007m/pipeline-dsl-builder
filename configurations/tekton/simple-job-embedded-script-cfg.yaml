@@ -4,7 +4,7 @@ type: tekton
 domain: example
 
 # Kubernetes namespace
-namespace:
+namespace: user
 
 job:
   name: simple-job-embedded-script # name of the pipeline to be created

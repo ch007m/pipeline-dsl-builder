@@ -74,15 +74,15 @@ jobs:
       - name: Get current date
         id: date
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "CURRENT_DATE=date::$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Create pull request for the updated README file
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: new-generated-pipelines-${{ steps.date.outputs.date }}
-          title: "New resources generated and README changed - ${{ steps.date.outputs.date }}"
+          branch: new-generated-pipelines-${{ env.CURRENT_DATE }}
+          title: "New resources generated and README changed - ${{ env.CURRENT_DATE }}"
           body: |
             Pull request for New resources generated and README changed.
 
