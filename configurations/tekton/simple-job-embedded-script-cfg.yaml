@@ -25,4 +25,3 @@ job:
       
       set -e
       echo "Say Hello"
-
