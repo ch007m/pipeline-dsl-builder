@@ -48,15 +48,15 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
+    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
   labels:
-    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "build"
+    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/used-by: "build-cloud"
   name: "my-quarkus-1"
 spec:
@@ -441,15 +441,15 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
   labels:
-    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
+    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
@@ -848,9 +848,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
-    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "pack-builder-push"
@@ -1035,9 +1035,9 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
     tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/platforms: "linux/amd64"
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-embedded-script"
@@ -1100,8 +1100,8 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/platforms: "linux/amd64"
     tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
