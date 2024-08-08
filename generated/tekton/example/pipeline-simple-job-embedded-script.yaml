@@ -1,0 +1,24 @@
+---
+apiVersion: "tekton.dev/v1"
+kind: "Pipeline"
+metadata:
+  annotations:
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.40.0"
+  labels:
+    app.kubernetes.io/version: "0.2"
+  name: "simple-job-embedded-script"
+  namespace: "user"
+spec:
+  tasks:
+  - name: "simple-job-embedded-script"
+    taskSpec:
+      steps:
+      - image: "ubuntu"
+        name: "run-script"
+        script: |-
+          #!/usr/bin/env bash
+
+          set -e
+          echo "Say Hello"
