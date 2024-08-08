@@ -8,6 +8,15 @@ on:
       - main
 
 jobs:
+  simple:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: |
+          npx embedme --verify -f README.md
+          cat README.md
+
   generate:
     runs-on: ubuntu-latest
     permissions:
