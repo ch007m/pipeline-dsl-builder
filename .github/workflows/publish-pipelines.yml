@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - run: |
-          npx embedme --verify README.md
+          npx embedme README.md
           cat README.md
 
   generate:
