@@ -92,8 +92,10 @@ jobs:
             printf '%s\n' "# $generate_path" >> SCENARIO.md
             printf '%s\n' "\`\`\`"  >> SCENARIO.md
           done
+          
+          cat SCENARIO.md
 
-      - name: Embed snippet code within the README.md file
+      - name: Embed snippet code within the SCENARIO.md file
         run: |
           npx embedme SCENARIO.md
 
