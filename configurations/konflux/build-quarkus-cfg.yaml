@@ -21,4 +21,5 @@ job:
   # One of the supported resources: PipelineRun, Pipeline, Task
   resourceType: PipelineRun
   name: my-quarkus-1
+  description: PipelineRun performing a pack build
 

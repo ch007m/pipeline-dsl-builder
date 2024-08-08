@@ -28,29 +28,13 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean package
 
-      - name: Run the builder application
+      - name: Run the builder application over the existing configurations
         run: |
-          config=(
-            tekton/simple-job-embedded-script-cfg.yaml
-            tekton/simple-job-fetch-script-cfg.yaml
-            tekton/pack-builder-cfg.yaml
-          )
-          for i in "${array[@]}"
+          files=(configurations/**/*)
+          for f in "${files[@]}"
           do
-            java -jar target/quarkus-app/quarkus-run.jar -o generated -c configurations/$i
+            java -jar target/quarkus-app/quarkus-run.jar -o generated -c $f
           done
-
-      - name: Check Pipeline generated
-        run: |
-          ls -la generated/example
-
-      #- name: Get doc files that have changed
-      #  id: changed-files-yaml
-      #  uses: tj-actions/changed-files@v44
-      #  with:
-      #    files_yaml: |
-      #      doc:
-      #        - '**.md'
 
       # NOT USED ANYMORE
       # Sometimes the python script happens ``` end of the last YAML line and remove the next README CR
@@ -66,23 +50,63 @@ jobs:
       #
       #    python markdown_code_embed/mdce.py -f README.md
 
+      # NOT USED
+      #- name: Get doc files that have changed
+      #  id: changed-files-yaml
+      #  uses: tj-actions/changed-files@v44
+      #  with:
+      #    files_yaml: |
+      #      doc:
+      #        - '**.md'
+
+      - name: Generate the content of the SCENARIO.md file
+        run: |
+          fence="\`\`\`"
+          cfg_files=(configurations/**/*)
+          
+          printf '%s\n\n' "# Scenario" > SCENARIO.md
+          
+          for f in "${cfg_files[@]}"
+          do
+            type=$(cat "$f" | yq -r ".type")
+            domain=$(cat "$f" | yq -r ".domain")
+            title=$(cat "$f" | yq -r ".job.description")
+            printf '%s\n\n' "## Provider: $type" >> SCENARIO.md
+            printf '%s\n\n' "### $title" >> SCENARIO.md
+            printf '%s\n' "Command to be executed: " >> SCENARIO.md
+            printf '%s\n' "$fence bash" >> SCENARIO.md
+            printf '%s\n' "$CMD -o out/flows -c $f" >> SCENARIO.md
+            printf '%s\n' "$fence"  >> SCENARIO.md
+          
+            printf '%s\n' "using as configuration: " >> SCENARIO.md
+            printf '%s\n' "$fence yaml" >> SCENARIO.md
+            printf '%s\n' "# $f" >> SCENARIO.md
+            printf '%s\n' "$fence"  >> SCENARIO.md
+          
+            printf '%s\n' "Generated file: " >> SCENARIO.md
+            printf '%s\n' "$fence yaml" >> SCENARIO.md
+            generate_path="generated/$type/$domain/$(basename $f)"
+            printf '%s\n' "# $generate_path" >> SCENARIO.md
+            printf '%s\n' "$fence"  >> SCENARIO.md
+          done
+
       - name: Embed snippet code within the README.md file
         run: |
-          npx embedme README.md
+          npx embedme SCENARIO.md
 
-      - name: Get current date
-        id: date
-        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      #- name: Get current date
+      #  id: date
+      #  #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+      #  run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: Create pull request for the updated README file
-        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: new-generated-pipelines-${{ env.CURRENT_DATE }}
-          title: "New resources generated and README changed - ${{ env.CURRENT_DATE }}"
-          labels: |
-            documentation
-          body: |
-            Pull request for New resources generated and README changed.
+      #- name: Create pull request for the updated README file
+      #  #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+      #  uses: peter-evans/create-pull-request@v6
+      #  with:
+      #    token: ${{ secrets.GITHUB_TOKEN }}
+      #    branch: new-generated-pipelines-${{ env.CURRENT_DATE }}
+      #    title: "New resources generated and README changed - ${{ env.CURRENT_DATE }}"
+      #    labels: |
+      #      documentation
+      #    body: |
+      #      Pull request for New resources generated and README changed.

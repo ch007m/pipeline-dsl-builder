@@ -12,4 +12,5 @@ job:
   # One of the supported resources: PipelineRun, Pipeline, Task
   resourceType: PipelineRun
   name: buildpack-builder
+  description: PipelineRun using the pack client to build a builder image
 
