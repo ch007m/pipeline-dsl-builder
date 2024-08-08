@@ -108,13 +108,13 @@ jobs:
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: Create pull request for the updated README file
+      - name: Create pull request for the updated SCENARIO.md file
         #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: new-generated-pipelines-${{ env.CURRENT_DATE }}
-          title: "New resources generated and README changed - ${{ env.CURRENT_DATE }}"
+          title: "New resources generated and SCENARIO.md file updated - ${{ env.CURRENT_DATE }}"
           labels: |
             documentation
           body: |
