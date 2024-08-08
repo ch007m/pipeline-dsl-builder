@@ -13,7 +13,6 @@ job:
   # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
 
-  # What the job should perform as task. the action can refer to either a Task or define it
   actions:
     - name: say-hello
       # The ref or reference expressed using the uri://<task-name>:<url>
