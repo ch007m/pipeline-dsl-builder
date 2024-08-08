@@ -4,8 +4,8 @@ kind: "Pipeline"
 metadata:
   annotations:
     tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-embedded-script"
