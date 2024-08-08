@@ -40,14 +40,16 @@ public class SnakeYamlTests {
 
         Action action = new Action();
         action.setParams(params);
-        action.setRef("bundles://pack-builder:quay.io/ch007m/tekton-bundle:latest");
+        action.setName("git-clone");
+        action.setRef("bundle://quay.io/ch007m/tekton-bundle:latest");
 
         yaml.dump(action, writer);
 
         String expectedYaml = "!!dev.snowdrop.model.Action\n" +
+            "name: git-clone\n" +
             "params:\n"+
             "- {enable: true, url: $(params.git-url)}\n" +
-            "ref: bundles://pack-builder:quay.io/ch007m/tekton-bundle:latest\n" +
+            "ref: bundle://quay.io/ch007m/tekton-bundle:latest\n" +
             "script: null\n" +
             "scriptFileUrl: null\n";
         assertEquals(expectedYaml, writer.toString());
@@ -56,7 +58,8 @@ public class SnakeYamlTests {
     @Test
     public void fromActionParamsYamlToAction_Object() {
         String actionParams = """
-            ref: "bundles://pack-builder:quay.io/ch007m/tekton-bundle:latest"
+            name: git-clone
+            ref: "bundle://pack-builder:quay.io/ch007m/tekton-bundle:latest"
             params:
             - url: "$(params.git-url)"
             - enable: true
@@ -68,7 +71,8 @@ public class SnakeYamlTests {
         Yaml yaml = new Yaml(constructor);
         Action a = yaml.load(actionParams);
         assertNotNull(a);
-        assertEquals("bundles://pack-builder:quay.io/ch007m/tekton-bundle:latest",a.getRef());
+        assertEquals("bundle://pack-builder:quay.io/ch007m/tekton-bundle:latest",a.getRef());
+        assertEquals("git-clone",a.getName());
         assertEquals("$(params.git-url)", a.getParams().get(0).get("url"));
         assertEquals(true,a.getParams().get(1).get("enable"));
         assertEquals(List.of("$(params.packCmdBuilderFlags)"),a.getParams().get(2).get("PACK_CMD_FLAGS"));

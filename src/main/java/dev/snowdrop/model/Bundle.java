@@ -19,6 +19,10 @@ public class Bundle {
       this.name = name;
    }
 
+   public Bundle(String uri) {
+      this.uri = uri;
+   }
+
    public String getUri() {
       return uri;
    }

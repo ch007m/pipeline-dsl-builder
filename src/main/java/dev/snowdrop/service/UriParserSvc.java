@@ -13,7 +13,7 @@ public class UriParserSvc {
 
     public static Bundle extract(String uriToParse) {
         Bundle b = null;
-        String regex = "(bundles|git)://([^:]+):(.+)";
+        String regex = "(bundle|git)://(.+)";
 
         // Compile the regex pattern
         Pattern pattern = Pattern.compile(regex);
@@ -24,15 +24,13 @@ public class UriParserSvc {
         // Check if the pattern matches the input string
         if (matcher.matches()) {
             // Extract the URI, task name, and URL
-            String uri = matcher.group(1);
-            String taskName = matcher.group(2);
-            String url = matcher.group(3);
+            String protocol = matcher.group(1);
+            String url = matcher.group(2);
 
             // Print the extracted values
-            logger.info("URI: " + uri);
-            logger.info("Task Name: " + taskName);
-            logger.info("URL: " + url);
-            b = new Bundle(url, taskName);
+            logger.info("Protocol: " + protocol);
+            logger.info("Url: " + url);
+            b = new Bundle(url);
         } else {
             logger.warn("The input string does not match the expected format.");
         }

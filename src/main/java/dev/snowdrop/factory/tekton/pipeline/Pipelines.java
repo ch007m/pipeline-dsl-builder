@@ -6,8 +6,6 @@ import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Bundle;
 import dev.snowdrop.model.Configurator;
-import dev.snowdrop.model.Domain;
-import dev.snowdrop.service.ConfiguratorSvc;
 import dev.snowdrop.service.FileUtilSvc;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.*;
@@ -16,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
@@ -26,48 +25,19 @@ public class Pipelines {
     private static Type TYPE;
 
     public static <T> T createResource(Configurator cfg) {
-        // TODO: Enhance the method to be able to generate the resource according to the resourceType: Pipeline, PipelineRun
         Class<T> type;
         List<Action> actions = cfg.getJob().getActions();
+        String domain = cfg.getDomain().toUpperCase();
 
-        for (Action action : actions) {
-            String domain = cfg.getDomain().toUpperCase();
-            String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
-
-            if (tektonResourceType == null) {
-                throw new RuntimeException("Missing tekton resource type");
-            }
-
-            switch (tektonResourceType) {
-                case "pipelinerun":
-                    type = (Class<T>) PipelineRun.class;
-                    break;
-                case "pipeline":
-                    type = (Class<T>) Pipeline.class;
-                    break;
-                default:
-                    throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
-            }
-
-            // TODO Temporary hack to be changed
-            if (domain.equals(Domain.BUILDPACK.name())) {
-                return type.cast(createPackBuilder(cfg));
-            }
-
-            if (action == null) {
-                logger.error("No action configured");
-            }
-
-            if (action.getRef() != null) {
-                return type.cast(generatePipeline(cfg, createTaskUsingRef(cfg.getJob().getName(), action)));
-            }
-
-            if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                return type.cast(generatePipeline(cfg, createTaskWithEmbeddedScript(cfg.getJob().getName(), action)));
-            }
+        if (domain == null) {
+            throw new RuntimeException("Missing domain");
         }
-        // TODO
-        return null;
+
+        if (actions.isEmpty()) {
+            throw new RuntimeException("Missing actions");
+        }
+
+        return generatePipeline(cfg, actions);
     }
 
     private static PipelineTask createTaskWithEmbeddedScript(String name, Action action) {
@@ -83,7 +53,7 @@ public class Pipelines {
             }
         } else {
             throw new RuntimeException("No embedded script configured");
-        };
+        }
 
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
@@ -101,8 +71,8 @@ public class Pipelines {
         return pipelineTask;
     }
 
-    private static PipelineTask createTaskUsingRef(String name, Action action) {
-        Bundle b = UriParserSvc.extract(action.getRef());
+    private static PipelineTask createTaskUsingRef(String name, String taskURL) {
+        Bundle b = UriParserSvc.extract(taskURL);
         if (b == null) {
             //logger.error("Bundle reference ws not parsed properly");
             throw new RuntimeException("Bundle reference was not parsed properly");
@@ -123,37 +93,71 @@ public class Pipelines {
         }
     }
 
-    public static Pipeline generatePipeline(Configurator cfg, PipelineTask aTask) {
+    public static <T> T generatePipeline(Configurator cfg, List<Action> actions) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
-        // @formatter:off
-      Pipeline pipeline = new PipelineBuilder()
-          .withNewMetadata()
-             .withName(cfg.getJob().getName())
-             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
-             .withNamespace(cfg.getNamespace())
-          .endMetadata()
-          .withNewSpec()
-             .withTasks()
-                 // TODO: Enhance the code to iterate within the list of the actions = tasks
-                 .withTasks(aTask)
-                // Embedded Task with script
-/*                .addNewTask()
-                   .withName("task-embedded-script")
-                   .withTaskSpec(
-                      new EmbeddedTaskBuilder()
-                       .addNewStep()
-                          .withName("run-script")
-                          .withImage("ubuntu")
-                          .withScript(FileUtilSvc.loadFileAsString("echo.sh"))
-                       .endStep()
-                       .build()
-                   )
-                .endTask()*/
-          .endSpec()
-          .build();
-      // @formatter:on
-        return pipeline;
+
+        Class<T> type;
+        List<PipelineTask> tasks = new ArrayList<>();
+        PipelineTask aTask;
+
+        String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
+        if (tektonResourceType == null) {
+            throw new RuntimeException("Missing tekton resource type");
+        }
+
+        for (Action action : actions) {
+            if (action.getRef() != null) {
+                aTask = createTaskUsingRef(action.getName(), action.getRef());
+                tasks.add(aTask);
+            }
+
+            if (action.getScript() != null || action.getScriptFileUrl() != null) {
+                aTask = createTaskWithEmbeddedScript(action.getName(), action);
+                tasks.add(aTask);
+            }
+        }
+
+        switch (tektonResourceType) {
+            case "pipelinerun":
+                type = (Class<T>) PipelineRun.class;
+
+                // @formatter:off
+                PipelineRun pipelineRun = new PipelineRunBuilder()
+                  .withNewMetadata()
+                     .withName(cfg.getJob().getName())
+                     .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+                     .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+                     .withNamespace(cfg.getNamespace())
+                  .endMetadata()
+                  .withNewSpec()
+                     .withNewPipelineSpec()
+                        .withTasks(tasks)
+                     .endPipelineSpec()
+                  .endSpec()
+                  .build();
+                // @formatter:on
+                return type.cast(pipelineRun);
+
+            case "pipeline":
+                type = (Class<T>) Pipeline.class;
+
+                // @formatter:off
+                Pipeline pipeline = new PipelineBuilder()
+                  .withNewMetadata()
+                     .withName(cfg.getJob().getName())
+                     .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+                     .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+                     .withNamespace(cfg.getNamespace())
+                  .endMetadata()
+                  .withNewSpec()
+                     .withTasks(tasks)
+                  .endSpec()
+                  .build();
+                // @formatter:on
+                return type.cast(pipeline);
+            default:
+                throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
+        }
     }
 
     public static PipelineRun createPackBuilder(Configurator cfg) {

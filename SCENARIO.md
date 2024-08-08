@@ -832,9 +832,9 @@ job:
   description: "This Pipeline builds a builder image using the pack CLI."
   # What the job should perform as task. the action can refer to either a Task or define it
   actions:
-    - # The ref or reference expressed using the uri://<task-name>:<url>
+    - # The ref or reference expressed using the <bundle|git>://<url>
       # will fetch the code of the action to be executed
-      ref: bundles://pack-builder:quay.io/ch007m/tekton-bundle:latest
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest
       # The script to be executed using a linux container
       script:
 

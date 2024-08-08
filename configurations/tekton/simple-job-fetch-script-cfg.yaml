@@ -15,7 +15,8 @@ job:
 
   # What the job should perform as task. the action can refer to either a Task or define it
   actions:
-    - # The ref or reference expressed using the uri://<task-name>:<url>
+    - name: say-hello
+      # The ref or reference expressed using the uri://<task-name>:<url>
       # will fetch the code of the action to be executed
       ref:
       # The url of the script file to be executed using a linux container
