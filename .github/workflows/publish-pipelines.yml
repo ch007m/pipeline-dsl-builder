@@ -83,9 +83,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: new-generated-pipelines-${{ env.CURRENT_DATE }}
           title: "New resources generated and README changed - ${{ env.CURRENT_DATE }}"
+          labels: |
+            documentation
           body: |
             Pull request for New resources generated and README changed.
-
-          base: main
-          labels: |
-            documentation  
