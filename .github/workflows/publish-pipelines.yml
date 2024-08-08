@@ -30,8 +30,11 @@ jobs:
 
       - name: Run the builder application over the existing configurations
         run: |
-          files=(configurations/**/*)
-          for f in "${files[@]}"
+          # Cleanup the generated folder
+          rm -rf generated/**/*
+          
+          cfg_files=(configurations/**/*)
+          for f in "${cfg_files[@]}"
           do
             java -jar target/quarkus-app/quarkus-run.jar -o generated -c $f
           done
@@ -100,19 +103,19 @@ jobs:
         run: |
           npx embedme SCENARIO.md
 
-      #- name: Get current date
-      #  id: date
-      #  #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-      #  run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      - name: Get current date
+        id: date
+        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      #- name: Create pull request for the updated README file
-      #  #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
-      #  uses: peter-evans/create-pull-request@v6
-      #  with:
-      #    token: ${{ secrets.GITHUB_TOKEN }}
-      #    branch: new-generated-pipelines-${{ env.CURRENT_DATE }}
-      #    title: "New resources generated and README changed - ${{ env.CURRENT_DATE }}"
-      #    labels: |
-      #      documentation
-      #    body: |
-      #      Pull request for New resources generated and README changed.
+      - name: Create pull request for the updated README file
+        #if: steps.changed-files-yaml.outputs.doc_any_changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: new-generated-pipelines-${{ env.CURRENT_DATE }}
+          title: "New resources generated and README changed - ${{ env.CURRENT_DATE }}"
+          labels: |
+            documentation
+          body: |
+            Pull request for New resources generated and README changed.
