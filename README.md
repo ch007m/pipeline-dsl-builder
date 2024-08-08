@@ -82,9 +82,7 @@ job:
       #!/usr/bin/env bash
       
       set -e
-      echo "Say Hello"
-
-```
+      echo "Say Hello"```
 Command to generate the resource
 ```bash
 java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
@@ -142,9 +140,7 @@ job:
     ref:
 
     # The url of the script file to be executed using a linux container
-    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh
-
-```
+    scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/echo.sh```
 
 Command to generate the resource:
 ```bash
