@@ -442,15 +442,15 @@ kind: "Pipeline"
 metadata:
   annotations:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
   labels:
-    pipelines.openshift.io/used-by: "build-cloud"
-    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
+    pipelines.openshift.io/runtime: "java"
+    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
@@ -1059,9 +1059,9 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
     tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-embedded-script"
