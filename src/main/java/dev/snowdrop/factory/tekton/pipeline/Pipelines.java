@@ -44,7 +44,7 @@ public class Pipelines {
         return createJob(cfg, actions);
     }
 
-    private static PipelineTask createTaskWithEmbeddedScript(String name, Action action) {
+    private static PipelineTask createTaskWithEmbeddedScript(String name, Action action, List<Workspace> workspaces) {
         String embeddedScript;
 
         if (action.getScript() != null) {
@@ -75,7 +75,7 @@ public class Pipelines {
         return pipelineTask;
     }
 
-    private static PipelineTask createTaskUsingRef(String name, String taskURL) {
+    private static PipelineTask createTaskUsingRef(String name, String taskURL, List<Workspace> workspaces) {
         Bundle b = UriParserSvc.extract(taskURL);
         if (b == null) {
             //logger.error("Bundle reference ws not parsed properly");
@@ -123,12 +123,12 @@ public class Pipelines {
 
         for (Action action : actions) {
             if (action.getRef() != null) {
-                aTask = createTaskUsingRef(action.getName(), action.getRef());
+                aTask = createTaskUsingRef(action.getName(), action.getRef(), cfg.getJob().getWorkspaces());
                 tasks.add(aTask);
             }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action.getName(), action);
+                aTask = createTaskWithEmbeddedScript(action.getName(), action, cfg.getJob().getWorkspaces());
                 tasks.add(aTask);
             }
         }

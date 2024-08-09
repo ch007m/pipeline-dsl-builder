@@ -17,7 +17,7 @@ job:
   - packCmdBuilderFlags:
     - -v
     - --publish
-  # All to workspaces will be mounted for each action except when the action overrides them
+  # The workspaces declared here will be mounted for each action except when if an action overrides it to mount it using a different name
   workspaces:
     - name: pack-workspace
       volumeClaimTemplate:
