@@ -6,6 +6,8 @@ public class Volume {
     private String accessMode;
     private String secret;
 
+    public static String STORAGE = "storage";
+
     public String getName() {
         return name;
     }

@@ -6,6 +6,8 @@ import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Bundle;
 import dev.snowdrop.model.Configurator;
+import dev.snowdrop.model.Volume;
+import dev.snowdrop.model.Workspace;
 import dev.snowdrop.service.FileUtilSvc;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.*;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
 
@@ -100,6 +103,7 @@ public class Pipelines {
         Class<T> type;
         List<PipelineTask> tasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
+        List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
         PipelineTask aTask;
 
         String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
@@ -107,9 +111,14 @@ public class Pipelines {
             throw new RuntimeException("Missing tekton resource type");
         }
 
+        List<Workspace> wks = cfg.getJob().getWorkspaces();
+        if (Optional.ofNullable(wks).map(List::size).orElse(0) > 0) {
+            pipelineWorkspaces = populatePipelineWorkspaces(wks);
+        }
+
         List<Map<String, Object>> params = cfg.getJob().getParams();
         if (params != null && !params.isEmpty()) {
-                pipelineParams = populatePipelineParams(cfg.getJob().getParams());
+            pipelineParams = populatePipelineParams(cfg.getJob().getParams());
         }
 
         for (Action action : actions) {
@@ -127,15 +136,60 @@ public class Pipelines {
         switch (tektonResourceType) {
             case "pipelinerun":
                 type = (Class<T>) PipelineRun.class;
-                return type.cast(generatePipelineRun(cfg, tasks, pipelineParams));
+                return type.cast(generatePipelineRun(cfg, tasks, pipelineParams, pipelineWorkspaces));
 
             case "pipeline":
                 type = (Class<T>) Pipeline.class;
-                return type.cast(generatePipeline(cfg, tasks));
+                return type.cast(generatePipeline(cfg, tasks, pipelineWorkspaces));
 
             default:
                 throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
         }
+    }
+
+    private static List<WorkspaceBinding> populatePipelineWorkspaces(List<Workspace> wks) {
+        List<WorkspaceBinding> workspaceList = new ArrayList<>();
+        for (Workspace wk : wks) {
+            WorkspaceBindingBuilder binding = new WorkspaceBindingBuilder();
+            binding.withName(wk.getName());
+
+            if (wk.getVolumeClaimTemplate() != null) {
+                dev.snowdrop.model.Volume v = wk.getVolumeClaimTemplate();
+                // @formatter:off
+                binding.withVolumeClaimTemplate(
+                    new PersistentVolumeClaimBuilder()
+                    .editOrNewSpec()
+                      .withResources(
+                        new VolumeResourceRequirementsBuilder()
+                          .addToRequests(
+                              v.STORAGE,
+                              new Quantity(v.getStorage()))
+                          .build()
+                        )
+                        .addToAccessModes(v.getAccessMode())
+                       .endSpec()
+                    .build()
+                );
+                // @formatter:on
+                workspaceList.add(binding.build());
+            }
+
+            // If volumes size > 0 than we assume that the user would like to use: Projected
+            if (wk.getVolumeSources() != null && wk.getVolumeSources().size() > 0) {
+                ProjectedVolumeSourceBuilder pvsb = new ProjectedVolumeSourceBuilder();
+                for (Volume v : wk.getVolumeSources()) {
+                    if (v.getSecret() != null) {
+                        pvsb.addNewSource()
+                            .withSecret(new SecretProjectionBuilder().withName(v.getSecret()).build())
+                            .endSource();
+                    }
+                }
+                binding.withProjected(pvsb.build());
+                workspaceList.add(binding.build());
+            }
+
+        }
+        return workspaceList;
     }
 
     private static List<Param> populatePipelineParams(List<Map<String, Object>> params) {
@@ -158,7 +212,7 @@ public class Pipelines {
         return paramList;
     }
 
-    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks, List<Param> params) {
+    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks, List<Param> params, List<WorkspaceBinding> pipelineWorkspaces) {
         // @formatter:off
         PipelineRun pipelineRun = new PipelineRunBuilder()
           .withNewMetadata()
@@ -169,6 +223,7 @@ public class Pipelines {
           .endMetadata()
           .withNewSpec()
              .withParams(params)
+            .withWorkspaces(pipelineWorkspaces)
              .withNewPipelineSpec()
                 .withTasks(tasks)
              .endPipelineSpec()
@@ -178,7 +233,7 @@ public class Pipelines {
         return pipelineRun;
     }
 
-    public static Pipeline generatePipeline(Configurator cfg, List<PipelineTask> tasks) {
+    public static Pipeline generatePipeline(Configurator cfg, List<PipelineTask> tasks, List<WorkspaceBinding> pipelineWorkspaces) {
         // TODO: To be reviewed
         // @formatter:off
         Pipeline pipeline = new PipelineBuilder()

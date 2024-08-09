@@ -22,11 +22,11 @@ job:
     - name: pack-workspace
       volumeClaimTemplate:
         storage: 1Gi
-        accessMode: RedWriteOnce
+        accessMode: ReadWriteOnce
     - name: source-dir
       volumeClaimTemplate:
         storage: 1Gi
-        accessMode: RedWriteOnce
+        accessMode: ReadWriteOnce
     - name: data-store
       volumeSources:
         - secret: pack-config-toml
