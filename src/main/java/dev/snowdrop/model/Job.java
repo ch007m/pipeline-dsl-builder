@@ -11,7 +11,16 @@ public class Job {
    private String description;
    private String resourceType;
    private List<Map<String, Object>> params;
+   private List<Workspace> workspaces;
    private List<Action> actions;
+
+   public List<Workspace> getWorkspaces() {
+      return workspaces;
+   }
+
+   public void setWorkspaces(List<Workspace> workspaces) {
+      this.workspaces = workspaces;
+   }
 
    public List<Map<String, Object>> getParams() {
       return params;

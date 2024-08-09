@@ -2,6 +2,8 @@ package dev.snowdrop;
 
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Job;
+import dev.snowdrop.model.Volume;
+import dev.snowdrop.model.Workspace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -51,6 +53,35 @@ public class SnakeYamlTests {
             "script: null\n" +
             "scriptFileUrl: null\n";
         assertEquals(expectedYaml, writer.toString());
+    }
+
+    @Test
+    public void fromYamlToObject() {
+        String yamlStr = """
+          name: action-with-workspaces
+          workspaces:
+            - name: source-dir
+              volumeClaimTemplate:
+                storage: 1Gi
+                accessMode: ReadWriteOnce
+            - name: data-store
+              volumeSources:
+                - secret: pack-config-toml
+                - secret: quay-creds
+          """;
+
+        Constructor constructor = new Constructor(Job.class, new LoaderOptions());
+        Yaml yaml = new Yaml(constructor);
+        Job j = yaml.load(yamlStr);
+
+        assertNotNull(j);
+
+        assertEquals("source-dir",j.getWorkspaces().get(0).getName());
+        assertEquals("ReadWriteOnce",j.getWorkspaces().get(0).getVolumeClaimTemplate().getAccessMode());
+        assertEquals("1Gi",j.getWorkspaces().get(0).getVolumeClaimTemplate().getStorage());
+
+        assertEquals("pack-config-toml",j.getWorkspaces().get(1).getVolumeSources().get(0).getSecret());
+        assertEquals("quay-creds",j.getWorkspaces().get(1).getVolumeSources().get(1).getSecret());
     }
 
     @Test
