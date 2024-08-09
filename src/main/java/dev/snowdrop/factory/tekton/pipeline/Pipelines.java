@@ -187,7 +187,8 @@ public class Pipelines {
                   .withResolver("bundles")
                   .withParams()
                     .addNewParam().withName("bundle").withValue(new ParamValue(b.getUri())).endParam()
-                    .addNewParam().withName("name").withValue(new ParamValue(b.getName())).endParam()
+                    // The name of the task to be fetched should be equal to the name of the Action's name !!
+                    .addNewParam().withName("name").withValue(new ParamValue(action.getName())).endParam()
                     .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
                   .endTaskRef()
                   .withWorkspaces(populateTaskWorkspaces(action, workspaces))
