@@ -7,7 +7,6 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Map;
 
 import static dev.snowdrop.service.CodeGeneratorSvc.*;
 

@@ -1,21 +1,23 @@
 package dev.snowdrop.factory.konflux.pipeline;
 
 import dev.snowdrop.factory.AnnotationsProviderFactory;
-import dev.snowdrop.factory.Type;
 import dev.snowdrop.factory.LabelsProviderFactory;
+import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Configurator;
-import io.fabric8.kubernetes.api.model.*;
-import io.fabric8.tekton.pipeline.v1.*;
+import io.fabric8.tekton.pipeline.v1.Pipeline;
+import io.fabric8.tekton.pipeline.v1.PipelineBuilder;
+import io.fabric8.tekton.pipeline.v1.PipelineRun;
+import io.fabric8.tekton.pipeline.v1.PipelineRunBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.List;
 
-import static dev.snowdrop.factory.Bundles.getBundleURL;
-import static dev.snowdrop.factory.konflux.pipeline.Finally.*;
-import static dev.snowdrop.factory.konflux.pipeline.Params.*;
-import static dev.snowdrop.factory.konflux.pipeline.Results.*;
+import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
+import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINERUN_PARAMS;
+import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINE_PARAMS;
+import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
-import static dev.snowdrop.factory.konflux.pipeline.Workspaces.*;
+import static dev.snowdrop.factory.konflux.pipeline.Workspaces.KONFLUX_PIPELINERUN_WORKSPACES;
+import static dev.snowdrop.factory.konflux.pipeline.Workspaces.KONFLUX_PIPELINE_WORKSPACES;
 
 public class Pipelines {
 

@@ -4,7 +4,6 @@ import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
-import io.fabric8.tekton.pipeline.v1.Pipeline;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,14 +11,9 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import static dev.snowdrop.factory.Type.KONFLUX;
-import static dev.snowdrop.factory.Type.TEKTON;
-import static dev.snowdrop.factory.konflux.pipeline.Pipelines.*;
-import static dev.snowdrop.factory.tekton.pipeline.Pipelines.*;
-import static dev.snowdrop.model.Domain.BUILD;
-import static dev.snowdrop.model.Domain.BUILDPACK;
-import static dev.snowdrop.service.ApplicationComponentBuilder.createApplication;
-import static dev.snowdrop.service.ApplicationComponentBuilder.createComponent;
+import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuild;
+import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
+import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createResource;
 
 @TopCommand
 @Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")

@@ -1,50 +1,34 @@
 package dev.snowdrop.model;
 
-import java.util.ArrayList;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
 public class Workspace {
     private String name;
+    private String workspace;
     private Volume volumeClaimTemplate;
     private List<Volume> volumeSources;
 
-    public Volume getVolumeClaimTemplate() {
-        return volumeClaimTemplate;
+    public Workspace name(String name) {
+        this.name = name;
+        return this;
     }
 
-    public void setVolumeClaimTemplate(Volume volumeClaimTemplate) {
-        this.volumeClaimTemplate = volumeClaimTemplate;
+    public Workspace workspace(String workspace) {
+        this.workspace = workspace;
+        return this;
     }
 
-    public List<Volume> getVolumeSources() {
-        return volumeSources;
-    }
 
-    public void setVolumeSources(List<Volume> volumeSources) {
-        /*
-        List<Volume> newVolumeSources = new ArrayList<>();
-        Volume newVolume = new Volume();
-        for (Volume v : volumeSources) {
-            if (v.getSecret() != "") {
-                newVolume.setSecret(v.getSecret());
-                newVolumeSources.add(newVolume);
-            }
-        }
-        if (newVolumeSources.isEmpty()) {
-            this.volumeSources = volumeSources;
-        } else {
-            this.volumeSources = newVolumeSources;
-        }
-        */
-        this.volumeSources = volumeSources;
-    }
-
-    public String getName() {
-        return name;
+    public void setWorkspace(String workspace) {
+        this.workspace = workspace;
     }
 
     public void setName(String name) {
         this.name = name;
     }
-
 }

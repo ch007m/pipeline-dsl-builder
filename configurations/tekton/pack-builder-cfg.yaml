@@ -37,6 +37,9 @@ job:
       params:
         - url: "$(params.git-url)"
         - subdirectory: "."
+      workspaces:
+        - name: output
+          workspace: source-dir
     - name: fetch-packconfig-registrysecret
       ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
     - name: list-source-workspace

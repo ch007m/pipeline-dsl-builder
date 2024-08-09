@@ -51,7 +51,8 @@ public class SnakeYamlTests {
             "- {enable: true, url: $(params.git-url)}\n" +
             "ref: bundle://quay.io/ch007m/tekton-bundle:latest\n" +
             "script: null\n" +
-            "scriptFileUrl: null\n";
+            "scriptFileUrl: null\n" +
+            "workspaces: null\n";
         assertEquals(expectedYaml, writer.toString());
     }
 

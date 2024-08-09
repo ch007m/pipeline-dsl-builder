@@ -1,5 +1,10 @@
 package dev.snowdrop.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Bundle {
    private String name;
    private String version;
@@ -21,45 +26,5 @@ public class Bundle {
 
    public Bundle(String uri) {
       this.uri = uri;
-   }
-
-   public String getUri() {
-      return uri;
-   }
-
-   public void setUri(String uri) {
-      this.uri = uri;
-   }
-
-   public String getRegistry() {
-      return registry;
-   }
-
-   public void setRegistry(String registry) {
-      this.registry = registry;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
-   }
-
-   public String getVersion() {
-      return version;
-   }
-
-   public void setVersion(String version) {
-      this.version = version;
-   }
-
-   public String getSha256() {
-      return sha256;
-   }
-
-   public void setSha256(String sha256) {
-      this.sha256 = sha256;
    }
 }

@@ -1,6 +1,9 @@
 package dev.snowdrop.factory.konflux.pipeline;
 
-import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.SecretVolumeSourceBuilder;
+import io.fabric8.kubernetes.api.model.VolumeResourceRequirementsBuilder;
 import io.fabric8.tekton.pipeline.v1.PipelineWorkspaceDeclaration;
 import io.fabric8.tekton.pipeline.v1.PipelineWorkspaceDeclarationBuilder;
 import io.fabric8.tekton.pipeline.v1.WorkspaceBinding;

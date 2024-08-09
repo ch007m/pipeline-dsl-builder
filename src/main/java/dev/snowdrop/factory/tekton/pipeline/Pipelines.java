@@ -3,11 +3,8 @@ package dev.snowdrop.factory.tekton.pipeline;
 import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
-import dev.snowdrop.model.Action;
-import dev.snowdrop.model.Bundle;
-import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Volume;
-import dev.snowdrop.model.Workspace;
+import dev.snowdrop.model.*;
 import dev.snowdrop.service.FileUtilSvc;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.*;
@@ -20,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
 
@@ -42,59 +40,6 @@ public class Pipelines {
         }
 
         return createJob(cfg, actions);
-    }
-
-    private static PipelineTask createTaskWithEmbeddedScript(String name, Action action, List<Workspace> workspaces) {
-        String embeddedScript;
-
-        if (action.getScript() != null) {
-            embeddedScript = action.getScript();
-        } else if (action.getScriptFileUrl() != null) {
-            try {
-                embeddedScript = FileUtilSvc.fetchScriptFileContent(action.getScriptFileUrl());
-            } catch (IOException e) {
-                throw new RuntimeException("Cannot fetch the script file: " + action.getScriptFileUrl(), e);
-            }
-        } else {
-            throw new RuntimeException("No embedded script configured");
-        }
-
-        PipelineTask pipelineTask = new PipelineTaskBuilder()
-            // @formatter:off
-            .withName(name)
-            .withTaskSpec(
-               new EmbeddedTaskBuilder()
-                .addNewStep()
-                   .withName("run-script")
-                   .withImage("ubuntu")
-                   .withScript(embeddedScript)
-                .endStep()
-                .build())
-            .build();
-            // @formatter:on
-        return pipelineTask;
-    }
-
-    private static PipelineTask createTaskUsingRef(String name, String taskURL, List<Workspace> workspaces) {
-        Bundle b = UriParserSvc.extract(taskURL);
-        if (b == null) {
-            //logger.error("Bundle reference ws not parsed properly");
-            throw new RuntimeException("Bundle reference was not parsed properly");
-        } else {
-            PipelineTask pipelineTask = new PipelineTaskBuilder()
-                // @formatter:off
-            .withName(name)
-            .withNewTaskRef()
-               .withResolver("bundles")
-               .withParams()
-                 .addNewParam().withName("bundle").withValue(new ParamValue(b.getUri())).endParam()
-                 .addNewParam().withName("name").withValue(new ParamValue(b.getName())).endParam()
-                 .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
-            .endTaskRef()
-            .build();
-            // @formatter:on
-            return pipelineTask;
-        }
     }
 
     public static <T> T createJob(Configurator cfg, List<Action> actions) {
@@ -123,12 +68,12 @@ public class Pipelines {
 
         for (Action action : actions) {
             if (action.getRef() != null) {
-                aTask = createTaskUsingRef(action.getName(), action.getRef(), cfg.getJob().getWorkspaces());
+                aTask = createTaskUsingRef(action, cfg.getJob().getWorkspaces());
                 tasks.add(aTask);
             }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action.getName(), action, cfg.getJob().getWorkspaces());
+                aTask = createTaskWithEmbeddedScript(action, cfg.getJob().getWorkspaces());
                 tasks.add(aTask);
             }
         }
@@ -144,6 +89,111 @@ public class Pipelines {
 
             default:
                 throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
+        }
+    }
+
+    private static List<WorkspacePipelineTaskBinding> populateTaskWorkspaces(Action action, List<Workspace> wksJob) {
+        List<WorkspacePipelineTaskBinding> wksPipeline = new ArrayList<>();
+        List<Workspace> wksAction = action.getWorkspaces();
+
+        if (wksJob != null && !wksJob.isEmpty()) {
+            if (wksAction != null && !wksAction.isEmpty()) {
+                // Create a map of the Job's workspaces
+                Map<String, Workspace> parentWksMap = wksJob.stream()
+                    .collect(Collectors.toMap(Workspace::getName, name -> name));
+
+                // Merge the job workspaces's list, overriding with the child list and
+                // replacing only if the workspace name is different from the job's workspace name
+                List<Workspace> mergedList = new ArrayList<>(wksJob);
+                for (Workspace childWks : wksAction) {
+                    if (parentWksMap.containsKey(childWks.getWorkspace())) {
+                        Workspace parentWorkspace = parentWksMap.get(childWks.getWorkspace());
+
+                        // If the names are different, replace the parent entry with the child entry,
+                        // but keep the parent's workspace field
+                        if (!parentWorkspace.getName().equals(childWks.getName())) {
+                            mergedList.remove(parentWorkspace);
+                            mergedList.add(new Workspace()
+                                .name(childWks.getName())
+                                .workspace(parentWorkspace.getName()));
+                        }
+                    }
+                }
+
+                for (Workspace wks : mergedList) {
+                    WorkspacePipelineTaskBindingBuilder wuBuilder = new WorkspacePipelineTaskBindingBuilder();
+                    wuBuilder
+                        .withName(wks.getName())
+                        .withWorkspace(wks.getWorkspace() != null ? wks.getWorkspace() : wks.getName())
+                        .build();
+                    wksPipeline.add(wuBuilder.build());
+                }
+            } else {
+                for (Workspace wks : wksJob) {
+                    WorkspacePipelineTaskBindingBuilder wuBuilder = new WorkspacePipelineTaskBindingBuilder();
+                    wuBuilder
+                        .withName(wks.getName())
+                        .withWorkspace(wks.getName())
+                        .build();
+                    wksPipeline.add(wuBuilder.build());
+                }
+            }
+        }
+        return wksPipeline;
+    }
+
+    private static PipelineTask createTaskWithEmbeddedScript(Action action, List<Workspace> workspaces) {
+        String embeddedScript;
+
+        if (action.getScript() != null) {
+            embeddedScript = action.getScript();
+        } else if (action.getScriptFileUrl() != null) {
+            try {
+                embeddedScript = FileUtilSvc.fetchScriptFileContent(action.getScriptFileUrl());
+            } catch (IOException e) {
+                throw new RuntimeException("Cannot fetch the script file: " + action.getScriptFileUrl(), e);
+            }
+        } else {
+            throw new RuntimeException("No embedded script configured");
+        }
+
+        PipelineTask pipelineTask = new PipelineTaskBuilder()
+            // @formatter:off
+            .withName(action.getName())
+            .withWorkspaces(populateTaskWorkspaces(action, workspaces))
+            .withTaskSpec(
+                new EmbeddedTaskBuilder()
+                  .addNewStep()
+                    .withName("run-script")
+                    .withImage(action.STEP_SCRIPT_IMAGE)
+                    .withScript(embeddedScript)
+                  .endStep()
+                  .build())
+            .build();
+        // @formatter:on
+        return pipelineTask;
+    }
+
+    private static PipelineTask createTaskUsingRef(Action action, List<Workspace> workspaces) {
+        Bundle b = UriParserSvc.extract(action.getRef());
+        if (b == null) {
+            //logger.error("Bundle reference ws not parsed properly");
+            throw new RuntimeException("Bundle reference was not parsed properly");
+        } else {
+            PipelineTask pipelineTask = new PipelineTaskBuilder()
+                // @formatter:off
+                .withName(action.getName())
+                .withNewTaskRef()
+                  .withResolver("bundles")
+                  .withParams()
+                    .addNewParam().withName("bundle").withValue(new ParamValue(b.getUri())).endParam()
+                    .addNewParam().withName("name").withValue(new ParamValue(b.getName())).endParam()
+                    .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+                  .endTaskRef()
+                  .withWorkspaces(populateTaskWorkspaces(action, workspaces))
+                .build();
+            // @formatter:on
+            return pipelineTask;
         }
     }
 
