@@ -3,16 +3,16 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/used-by: "build-cloud"
+    pipelines.openshift.io/strategy: "build"
   name: "my-quarkus-1"
 spec:
   params:

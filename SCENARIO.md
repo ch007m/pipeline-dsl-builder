@@ -48,16 +48,16 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/used-by: "build-cloud"
+    pipelines.openshift.io/strategy: "build"
   name: "my-quarkus-1"
 spec:
   params:
@@ -441,16 +441,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
+    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/strategy: "buildpack"
     pipelines.openshift.io/runtime: "java"
-    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
@@ -830,13 +830,51 @@ job:
   resourceType: PipelineRun
   name: pack-builder-push
   description: "This Pipeline builds a builder image using the pack CLI."
-  # What the job should perform as task. the action can refer to either a Task or define it
+  params:
+  - debug: true
+  - git-url: "https://github.com/redhat-buildpacks/ubi-image-builder.git"
+  - source-dir: "."
+  - output-image: "quay.io/snowdrop/ubi-builder"
+  - imageUrl: "buildpacksio/pack"
+  - imageTag: "latest"
+  - packCmdBuilderFlags:
+    - -v
+    - --publish
+  # All to workspaces will be mounted for each action except when the action overrides them
+  workspaces:
+    - name: pack-workspace
+      volumeClaimTemplate:
+        storage: 1Gi
+        accessMode: RedWriteOnce
+    - name: source-dir
+      volumeClaimTemplate:
+        storage: 1Gi
+        accessMode: RedWriteOnce
+    - name: data-store
+      volumeSources:
+        - secret: pack-config-toml
+        - secret: quay-creds
   actions:
-    - # The ref or reference expressed using the <bundle|git>://<url>
-      # will fetch the code of the action to be executed
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest
-      # The script to be executed using a linux container
-      script:
+    - name: git-clone
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3
+      params:
+        - url: "$(params.git-url)"
+        - subdirectory: "."
+    - name: fetch-packconfig-registrysecret
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+    - name: list-source-workspace
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+    - name: pack-builder
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      params:
+        - PACK_SOURCE_DIR: "$(params.source-dir)"
+        - PACK_CLI_IMAGE: "$(params.imageUrl)"
+        - PACK_CLI_IMAGE_VERSION: "$(params.imageTag)"
+        - BUILDER_IMAGE_NAME: "$(params.output-image)"
+        - PACK_BUILDER_TOML: "ubi-builder.toml"
+        - PACK_CMD_FLAGS:
+          - "$(params.packCmdBuilderFlags)"
+
 
 ```
 Generated file: 
@@ -848,9 +886,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
+    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "pack-builder-push"
@@ -869,122 +907,49 @@ spec:
   - name: "imageTag"
     value: "latest"
   - name: "packCmdBuilderFlags"
-    value:
-    - "-v"
-    - "--publish"
+    value: "[-v, --publish]"
   pipelineSpec:
     tasks:
     - name: "git-clone"
-      params:
-      - name: "url"
-        value: "$(params.git-url)"
-      - name: "subdirectory"
-        value: "."
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3"
         - name: "name"
-          value: "git-clone"
+          value: null
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "output"
-        workspace: "source-dir"
     - name: "fetch-packconfig-registrysecret"
-      runAfter:
-      - "git-clone"
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: "fetch-packconfig-registrysecret"
+          value: null
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "data-store"
-        workspace: "data-store"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
     - name: "list-source-workspace"
-      runAfter:
-      - "fetch-packconfig-registrysecret"
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: "list-source-workspace"
+          value: null
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "source-dir"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
     - name: "pack-builder"
-      params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
-      - name: "PACK_CLI_IMAGE"
-        value: "$(params.imageUrl)"
-      - name: "PACK_CLI_IMAGE_VERSION"
-        value: "$(params.imageTag)"
-      - name: "BUILDER_IMAGE_NAME"
-        value: "$(params.output-image)"
-      - name: "PACK_BUILDER_TOML"
-        value: "ubi-builder.toml"
-      - name: "PACK_CMD_FLAGS"
-        value:
-        - "$(params.packCmdBuilderFlags)"
-      runAfter:
-      - "fetch-packconfig-registrysecret"
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: "pack-builder"
+          value: null
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "source-dir"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
-  workspaces:
-  - name: "source-dir"
-    volumeClaimTemplate:
-      apiVersion: "v1"
-      kind: "PersistentVolumeClaim"
-      spec:
-        accessModes:
-        - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "1Gi"
-  - name: "pack-workspace"
-    volumeClaimTemplate:
-      apiVersion: "v1"
-      kind: "PersistentVolumeClaim"
-      spec:
-        accessModes:
-        - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "1Gi"
-  - name: "data-store"
-    projected:
-      sources:
-      - secret:
-          name: "pack-config-toml"
-      - secret:
-          name: "quay-creds"
 
 ```
 ## Provider: tekton
@@ -1014,9 +979,9 @@ job:
   # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
 
-  # What the job should perform as task. the action can refer to either a Task or define it
   actions:
-    - # The ref or reference expressed using the uri://<task-name>:<url>
+    - name: say-hello
+      # The ref or reference expressed using the uri://<task-name>:<url>
       # will fetch the code of the action to be executed
       ref:
       # The script to be executed using a linux container
@@ -1035,16 +1000,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
-    tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-embedded-script"
   namespace: "user"
 spec:
   tasks:
-  - name: "simple-job-embedded-script"
+  - name: "say-hello"
     taskSpec:
       steps:
       - image: "ubuntu"
@@ -1083,9 +1048,9 @@ job:
   # One of the supported resources: PipelineRun, Pipeline
   resourceType: Pipeline
 
-  # What the job should perform as task. the action can refer to either a Task or define it
   actions:
-    - # The ref or reference expressed using the uri://<task-name>:<url>
+    - name: say-hello
+      # The ref or reference expressed using the uri://<task-name>:<url>
       # will fetch the code of the action to be executed
       ref:
       # The url of the script file to be executed using a linux container
@@ -1100,15 +1065,15 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-fetch-script"
 spec:
   tasks:
-  - name: "simple-job-fetch-script"
+  - name: "say-hello"
     taskSpec:
       steps:
       - image: "ubuntu"
