@@ -48,15 +48,15 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/runtime: "java"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
   name: "my-quarkus-1"
 spec:
@@ -441,16 +441,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
   labels:
+    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
-    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
@@ -840,7 +840,7 @@ job:
   - packCmdBuilderFlags:
     - -v
     - --publish
-  # All to workspaces will be mounted for each action except when the action overrides them
+  # The workspaces declared here will be mounted for each action except if an action overrides it to use a different name
   workspaces:
     - name: pack-workspace
       volumeClaimTemplate:
@@ -860,6 +860,9 @@ job:
       params:
         - url: "$(params.git-url)"
         - subdirectory: "."
+      workspaces:
+        - name: output
+          workspace: source-dir
     - name: fetch-packconfig-registrysecret
       ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
     - name: list-source-workspace
@@ -886,9 +889,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
     tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
-    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
   labels:
     app.kubernetes.io/version: "0.2"
   name: "pack-builder-push"
@@ -920,6 +923,13 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
+      workspaces:
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+      - name: "data-store"
+        workspace: "data-store"
+      - name: "output"
+        workspace: "source-dir"
     - name: "fetch-packconfig-registrysecret"
       taskRef:
         params:
@@ -930,6 +940,13 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
+      workspaces:
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+      - name: "source-dir"
+        workspace: "source-dir"
+      - name: "data-store"
+        workspace: "data-store"
     - name: "list-source-workspace"
       taskRef:
         params:
@@ -940,6 +957,13 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
+      workspaces:
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+      - name: "source-dir"
+        workspace: "source-dir"
+      - name: "data-store"
+        workspace: "data-store"
     - name: "pack-builder"
       taskRef:
         params:
@@ -950,6 +974,13 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
+      workspaces:
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+      - name: "source-dir"
+        workspace: "source-dir"
+      - name: "data-store"
+        workspace: "data-store"
   workspaces:
   - name: "pack-workspace"
     volumeClaimTemplate:
