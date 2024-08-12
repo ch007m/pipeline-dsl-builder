@@ -48,16 +48,16 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
+    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "build"
-    pipelines.openshift.io/used-by: "build-cloud"
   name: "my-quarkus-1"
 spec:
   params:
@@ -442,15 +442,15 @@ kind: "Pipeline"
 metadata:
   annotations:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
   labels:
-    pipelines.openshift.io/used-by: "build-cloud"
-    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
+    pipelines.openshift.io/runtime: "java"
+    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
@@ -889,9 +889,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
     tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
   labels:
     app.kubernetes.io/version: "0.2"
   name: "pack-builder-push"
@@ -914,12 +914,17 @@ spec:
   pipelineSpec:
     tasks:
     - name: "git-clone"
+      params:
+      - name: "url"
+        value: "$(params.git-url)"
+      - name: "subdirectory"
+        value: "."
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3"
         - name: "name"
-          value: null
+          value: "git-clone"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -936,7 +941,7 @@ spec:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: null
+          value: "fetch-packconfig-registrysecret"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -953,7 +958,7 @@ spec:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: null
+          value: "list-source-workspace"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -965,12 +970,25 @@ spec:
       - name: "data-store"
         workspace: "data-store"
     - name: "pack-builder"
+      params:
+      - name: "PACK_SOURCE_DIR"
+        value: "$(params.source-dir)"
+      - name: "PACK_CLI_IMAGE"
+        value: "$(params.imageUrl)"
+      - name: "PACK_CLI_IMAGE_VERSION"
+        value: "$(params.imageTag)"
+      - name: "BUILDER_IMAGE_NAME"
+        value: "$(params.output-image)"
+      - name: "PACK_BUILDER_TOML"
+        value: "ubi-builder.toml"
+      - name: "PACK_CMD_FLAGS"
+        value: "[$(params.packCmdBuilderFlags)]"
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: null
+          value: "pack-builder"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -1036,7 +1054,7 @@ job:
   description: Simple example of a Tekton pipeline echoing a message
 
   # One of the supported resources: PipelineRun, Pipeline
-  resourceType: Pipeline
+  resourceType: PipelineRun
 
   actions:
     - name: say-hello
@@ -1052,32 +1070,33 @@ job:
 ```
 Generated file: 
 ```yaml
-# generated/tekton/example/pipeline-simple-job-embedded-script.yaml
+# generated/tekton/example/pipelinerun-simple-job-embedded-script.yaml
 
 ---
 apiVersion: "tekton.dev/v1"
-kind: "Pipeline"
+kind: "PipelineRun"
 metadata:
   annotations:
     tekton.dev/platforms: "linux/amd64"
-    tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
+    tekton.dev/pipelines.minVersion: "0.40.0"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-embedded-script"
   namespace: "user"
 spec:
-  tasks:
-  - name: "say-hello"
-    taskSpec:
-      steps:
-      - image: "ubuntu"
-        name: "run-script"
-        script: |-
-          #!/usr/bin/env bash
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
 
-          set -e
-          echo "Say Hello"
+            set -e
+            echo "Say Hello"
 
 ```
 ## Provider: tekton
@@ -1105,7 +1124,7 @@ job:
   description: Simple example of a Tekton pipeline echoing a message
 
   # One of the supported resources: PipelineRun, Pipeline
-  resourceType: Pipeline
+  resourceType: PipelineRun
 
   actions:
     - name: say-hello
@@ -1117,30 +1136,31 @@ job:
 ```
 Generated file: 
 ```yaml
-# generated/tekton/example/pipeline-simple-job-fetch-script.yaml
+# generated/tekton/example/pipelinerun-simple-job-fetch-script.yaml
 
 ---
 apiVersion: "tekton.dev/v1"
-kind: "Pipeline"
+kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
-    tekton.dev/pipelines.minVersion: "0.40.0"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.2"
   name: "simple-job-fetch-script"
 spec:
-  tasks:
-  - name: "say-hello"
-    taskSpec:
-      steps:
-      - image: "ubuntu"
-        name: "run-script"
-        script: |
-          #!/usr/bin/env bash
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |
+            #!/usr/bin/env bash
 
-          set -e
-          echo "Say Hello"
+            set -e
+            echo "Say Hello"
 
 ```
