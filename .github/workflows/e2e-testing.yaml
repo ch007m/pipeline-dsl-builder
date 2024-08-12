@@ -50,7 +50,7 @@ jobs:
           cfg_files=(generated/tekton/example/*)
           for f in "${cfg_files[@]}"
           do
-            echo "Deploy the pipelinerun: $f
+            echo "Deploy the pipelinerun: $f"
             kubectl apply -f $f
             sleep 5s
             
