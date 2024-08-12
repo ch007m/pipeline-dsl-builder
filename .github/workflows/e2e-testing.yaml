@@ -51,14 +51,14 @@ jobs:
            namespaceExist=$(cat $f  | yq -r '.metadata.namespace != null')
            if ($namespaceExist); then
              namespace=$(cat $f  | yq -r '.metadata.namespace')
-             kubectl create ns $namespace
+             kubectl create ns $namespace --dry-run=client -o yaml | kubectl apply -f -
            else
              namespace="default"
-             kubectl create ns user
+             kubectl create ns user --dry-run=client -o yaml | kubectl apply -f -
            fi
                     
             echo "Deploy the pipelinerun: $f"
-            kubectl apply -n $namespace -f $f
+            kubectl apply -n $namespace -f $f 
             sleep 5s
             
             echo "Watch the log of the pipelinerun for: $f"
