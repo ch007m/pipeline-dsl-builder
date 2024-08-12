@@ -6,7 +6,7 @@ on:
 env:
   IDPBUILDER_VERSION: v0.6.0
 
-  TEKTON_VERSION: v0.60.1
+  TEKTON_VERSION: v0.61.1
   TEKTON_CLIENT_VERSION: 0.37.0
 
 jobs:
@@ -39,4 +39,5 @@ jobs:
 
       - name: Check resources installed on the cluster
         run: |
+          kubectl rollout status -n tekton-pipelines deployment/tekton-pipelines-controller
           kubectl get po -A
