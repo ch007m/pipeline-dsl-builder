@@ -98,18 +98,17 @@ jobs:
             config.toml: CmV4cGVyaW1lbnRhbCA9IHRydWU=
           EOF
 
-      #- name: Test if we can push an image to gitea
-      #  run: |
-      #    REGISTRY="gitea.cnoe.localtest.me:8443/giteaadmin"
-      #    podman login --tls-verify=false --authfile=${HOME}/.docker/config.json \
-      #      -u $GITEA_USERNAME \
-      #      -p $GITEA_PASSWORD \
-      #      $GITEA_REGISTRY
-      #    podman pull alpine
-      #    podman tag alpine:latest $REGISTRY/alpine:latest
-      #    podman push $REGISTRY/alpine:latest
-      #    podman push --tls-verify=false --authfile=${HOME}/.docker/config.json \
-      #      $REGISTRY/alpine:latest
+      - name: Test if we can push an image to gitea
+        run: |
+          REGISTRY="gitea.cnoe.localtest.me:8443/giteaadmin"
+          podman login --tls-verify=false --authfile=${HOME}/.docker/config.json \
+            -u $GITEA_USERNAME \
+            -p $GITEA_PASSWORD \
+            $GITEA_REGISTRY
+          podman pull alpine
+          podman tag alpine:latest $REGISTRY/alpine:latest
+          podman push --tls-verify=false --authfile=${HOME}/.docker/config.json \
+            $REGISTRY/alpine:latest
 
       - name: Deploy tekton examples - pipelinerun and check status
         run: |
