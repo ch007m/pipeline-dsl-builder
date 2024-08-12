@@ -1,0 +1,38 @@
+name: Install-tekton-test-pipelineruns
+
+on:
+  workflow_dispatch:
+
+env:
+  IDPBUILDER_VERSION: v0.6.0
+
+  TEKTON_VERSION: v0.60.1
+  TEKTON_CLIENT_VERSION: 0.37.0
+
+jobs:
+  setup-idp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install idpbuilder
+        run: |
+          version=${IDPBUILDER_VERSION}
+          curl -L -o ./idpbuilder.tar.gz "https://github.com/cnoe-io/idpbuilder/releases/download/${version}/idpbuilder-$(uname | awk '{print tolower($0)}')-$(uname -m | sed 's/x86_64/amd64/').tar.gz"
+          tar xzf idpbuilder.tar.gz
+          sudo mv ./idpbuilder /usr/local/bin/
+
+          idpbuilder version
+
+      - name: Install tekton client
+        run: |
+          curl -sSL "https://github.com/tektoncd/cli/releases/download/v{$TEKTON_CLIENT_VERSION}/tkn_${TEKTON_CLIENT_VERSION}_Linux_x86_64.tar.gz" -o tkn.tar.gz
+          sudo tar xvzf tkn.tar.gz -C /usr/local/bin/ tkn
+          tkn version
+
+      - name: Create an IDP cluster and install the packages
+        run: |
+          PACKAGES_DIR=manifests/idp/packages
+          idpbuilder create \
+            -p $PACKAGES_DIR/tekton \
