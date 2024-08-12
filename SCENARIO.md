@@ -48,12 +48,12 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
   labels:
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
@@ -442,15 +442,15 @@ kind: "Pipeline"
 metadata:
   annotations:
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
   labels:
     pipelines.openshift.io/runtime: "java"
-    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/strategy: "buildpack"
+    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
@@ -889,9 +889,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
-    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "pack-builder-push"
@@ -910,7 +910,9 @@ spec:
   - name: "imageTag"
     value: "latest"
   - name: "packCmdBuilderFlags"
-    value: "[-v, --publish]"
+    value:
+    - "-v"
+    - "--publish"
   pipelineSpec:
     tasks:
     - name: "git-clone"
@@ -982,7 +984,8 @@ spec:
       - name: "PACK_BUILDER_TOML"
         value: "ubi-builder.toml"
       - name: "PACK_CMD_FLAGS"
-        value: "[$(params.packCmdBuilderFlags)]"
+        value:
+        - "$(params.packCmdBuilderFlags)"
       taskRef:
         params:
         - name: "bundle"
@@ -1143,9 +1146,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
     tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-fetch-script"
