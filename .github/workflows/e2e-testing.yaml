@@ -41,3 +41,8 @@ jobs:
         run: |
           kubectl rollout status -n tekton-pipelines deployment/tekton-pipelines-controller
           kubectl get po -A
+
+      - name: Deploy pipelinerun and check status
+        run: |
+          kubectl apply -f generated/tekton/example/pipeline-simple-job-embedded-script.yaml
+          tkn pipelinerun logs -f
