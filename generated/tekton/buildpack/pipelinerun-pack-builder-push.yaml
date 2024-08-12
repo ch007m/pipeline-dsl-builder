@@ -18,7 +18,7 @@ spec:
   - name: "source-dir"
     value: "."
   - name: "output-image"
-    value: "quay.io/snowdrop/ubi-builder"
+    value: "gitea.cnoe.localtest.me:8443/giteaadmin/ubi-builder"
   - name: "imageUrl"
     value: "buildpacksio/pack"
   - name: "imageTag"
