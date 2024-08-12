@@ -143,4 +143,4 @@ spec:
       - secret:
           name: "pack-config-toml"
       - secret:
-          name: "quay-creds"
+          name: "gitea-creds"
