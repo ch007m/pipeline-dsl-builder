@@ -40,6 +40,7 @@ jobs:
       - name: Check resources installed on the cluster
         run: |
           kubectl rollout status -n tekton-pipelines deployment/tekton-pipelines-controller
+          kubectl rollout status -n tekton-pipelines deployment/tekton-pipelines-webhook
           kubectl get po -A
 
       - name: Deploy pipelinerun and check status
@@ -49,6 +50,9 @@ jobs:
           cfg_files=(generated/tekton/example/*)
           for f in "${cfg_files[@]}"
           do
+            echo "Deploy the pipelinerun: $f
             kubectl apply -f $f
+            
+            echo "Watch the log of the pipelinerun for: $f
             tkn pipelinerun logs -f
           done
