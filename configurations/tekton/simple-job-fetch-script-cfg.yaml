@@ -11,7 +11,7 @@ job:
   description: Simple example of a Tekton pipeline echoing a message
 
   # One of the supported resources: PipelineRun, Pipeline
-  resourceType: Pipeline
+  resourceType: PipelineRun
 
   actions:
     - name: say-hello
