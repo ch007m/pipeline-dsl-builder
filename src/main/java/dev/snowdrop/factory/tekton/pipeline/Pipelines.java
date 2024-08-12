@@ -249,16 +249,18 @@ public class Pipelines {
         List<Param> paramList = new ArrayList<>();
         for (Map<String, Object> hash : params) {
             hash.forEach((key, val) -> {
-                    String newVal;
+                    ParamValue paramValue;
                     if (val instanceof String) {
-                        newVal = String.valueOf(val);
+                        paramValue = new ParamValue((String)val);
                     } else if (val instanceof Boolean) {
-                        newVal = Boolean.toString((Boolean) val);
+                        paramValue = new ParamValue(Boolean.toString((Boolean) val));
+                    } else if (val instanceof List<?>){
+                        paramValue = new ParamValue((List<String>) val);
                     } else {
-                        newVal = String.valueOf(val); // Default to String representation
+                        paramValue = new ParamValue(String.valueOf(val)); // Default to String representation
                     }
 
-                    paramList.add(new ParamBuilder().withName(key).withValue(new ParamValue(newVal)).build());
+                    paramList.add(new ParamBuilder().withName(key).withValue(paramValue).build());
                 }
             );
         }
