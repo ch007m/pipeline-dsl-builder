@@ -43,24 +43,51 @@ jobs:
           kubectl rollout status -n tekton-pipelines deployment/tekton-pipelines-webhook
           kubectl get po -A
 
-      - name: Deploy pipelinerun and check status
+      - name: Test if we can push an image to gitea
+        run: |
+          REGISTRY="gitea.cnoe.localtest.me:8443/giteaadmin"
+          docker pull alpine
+          docker tag alpine:latest $REGISTRY:latest
+          docker push $REGISTRY:latest
+
+      - name: Deploy tekton examples - pipelinerun and check status
         run: |
           cfg_files=(generated/tekton/example/*)
           for f in "${cfg_files[@]}"
           do
-           namespaceExist=$(cat $f  | yq -r '.metadata.namespace != null')
-           if ($namespaceExist); then
-             namespace=$(cat $f  | yq -r '.metadata.namespace')
-             kubectl create ns $namespace --dry-run=client -o yaml | kubectl apply -f -
-           else
-             namespace="default"
-             kubectl create ns user --dry-run=client -o yaml | kubectl apply -f -
-           fi
+            namespaceDefined=$(cat $f  | yq -r '.metadata.namespace != null')
+            if ($namespaceDefined); then
+              namespace=$(cat $f  | yq -r '.metadata.namespace')
+            else
+              namespace="default"
+            fi
+            kubectl create ns $namespace --dry-run=client -o yaml | kubectl apply -f -
                     
             echo "Deploy the pipelinerun: $f"
             kubectl apply -n $namespace -f $f 
             sleep 5s
             
+            echo "Watch the log of the pipelinerun for: $f"
+            tkn pipelinerun logs -n $namespace -f
+          done
+
+      - name: Deploy tekton buildpack example
+        run: |
+          cfg_files=(generated/tekton/buildpack/*)
+          for f in "${cfg_files[@]}"
+          do
+            namespaceDefined=$(cat $f  | yq -r '.metadata.namespace != null')
+            if ($namespaceDefined); then
+              namespace=$(cat $f  | yq -r '.metadata.namespace')
+            else
+              namespace="default"
+            fi
+            kubectl create ns $namespace --dry-run=client -o yaml | kubectl apply -f -
+
+            echo "Deploy the pipelinerun: $f"
+            kubectl apply -n $namespace -f $f 
+            sleep 5s
+
             echo "Watch the log of the pipelinerun for: $f"
             tkn pipelinerun logs -n $namespace -f
           done
