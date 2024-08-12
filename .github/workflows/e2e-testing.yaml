@@ -49,7 +49,7 @@ jobs:
           for f in "${cfg_files[@]}"
           do
            namespaceExist=$(cat $f  | yq -r '.metadata.namespace != null')
-           if ($namespaceExist) {
+           if ($namespaceExist); then
              namespace=$(cat $f  | yq -r '.metadata.namespace')
              kubectl create ns $namespace
            else
