@@ -3,9 +3,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
     tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.40.0"
+    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
   labels:
     app.kubernetes.io/version: "0.2"
   name: "pack-builder-push"
@@ -28,12 +28,17 @@ spec:
   pipelineSpec:
     tasks:
     - name: "git-clone"
+      params:
+      - name: "url"
+        value: "$(params.git-url)"
+      - name: "subdirectory"
+        value: "."
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3"
         - name: "name"
-          value: null
+          value: "git-clone"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -50,7 +55,7 @@ spec:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: null
+          value: "fetch-packconfig-registrysecret"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -67,7 +72,7 @@ spec:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: null
+          value: "list-source-workspace"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -79,12 +84,25 @@ spec:
       - name: "data-store"
         workspace: "data-store"
     - name: "pack-builder"
+      params:
+      - name: "PACK_SOURCE_DIR"
+        value: "$(params.source-dir)"
+      - name: "PACK_CLI_IMAGE"
+        value: "$(params.imageUrl)"
+      - name: "PACK_CLI_IMAGE_VERSION"
+        value: "$(params.imageTag)"
+      - name: "BUILDER_IMAGE_NAME"
+        value: "$(params.output-image)"
+      - name: "PACK_BUILDER_TOML"
+        value: "ubi-builder.toml"
+      - name: "PACK_CMD_FLAGS"
+        value: "[$(params.packCmdBuilderFlags)]"
       taskRef:
         params:
         - name: "bundle"
           value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
         - name: "name"
-          value: null
+          value: "pack-builder"
         - name: "kind"
           value: "task"
         resolver: "bundles"
