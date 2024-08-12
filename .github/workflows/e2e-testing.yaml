@@ -71,16 +71,22 @@ jobs:
         run: |
           GITEA_CREDS=$(echo -n "$GITEA_USERNAME:$GITEA_PASSWORD" | base64 -w 0)
       
-          cat <<EOF > config.json
-          {
-            "auths": {
-              "$GITEA_REGISTRY": {
-                "auth": "$GITEA_CREDS"
-              }
-            }
-          }
-          EOF
-          kubectl create secret generic gitea-creds -n default --from-file=config.json
+          #cat <<EOF > config.json
+          #{
+          #  "auths": {
+          #    "$GITEA_REGISTRY": {
+          #      "auth": "$GITEA_CREDS"
+          #    }
+          #  }
+          #}
+          #EOF
+          #kubectl create secret generic gitea-creds -n default --from-file=config.json          
+          
+          kubectl create secret docker-registry gitea-creds \
+            --docker-username="$GITEA_USERNAME" \
+            --docker-password="$GITEA_PASSWORD" \
+            --docker-server="$GITEA_REGISTRY"
+
 
       - name: Create pack secret containing for pack CLI the config.toml
         run: |

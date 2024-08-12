@@ -45,13 +45,15 @@ spec:
           value: "task"
         resolver: "bundles"
       workspaces:
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
-      - name: "data-store"
-        workspace: "data-store"
+      #- name: "pack-workspace"
+      #  workspace: "pack-workspace"
+      #- name: "data-store"
+      #  workspace: "data-store"
       - name: "output"
         workspace: "source-dir"
     - name: "fetch-packconfig-registrysecret"
+      runAfter:
+      - git-clone
       taskRef:
         params:
         - name: "bundle"
@@ -64,11 +66,13 @@ spec:
       workspaces:
       - name: "pack-workspace"
         workspace: "pack-workspace"
-      - name: "source-dir"
-        workspace: "source-dir"
+      #- name: "source-dir"
+      #  workspace: "source-dir"
       - name: "data-store"
         workspace: "data-store"
     - name: "list-source-workspace"
+      runAfter:
+      - fetch-packconfig-registrysecret
       taskRef:
         params:
         - name: "bundle"
@@ -86,6 +90,8 @@ spec:
       - name: "data-store"
         workspace: "data-store"
     - name: "pack-builder"
+      runAfter:
+      - list-source-workspace
       params:
       - name: "PACK_SOURCE_DIR"
         value: "$(params.source-dir)"
