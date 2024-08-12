@@ -4,8 +4,8 @@ kind: "PipelineRun"
 metadata:
   annotations:
     tekton.dev/platforms: "linux/amd64"
-    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
     tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
   labels:
     app.kubernetes.io/version: "0.1"
   name: "pack-builder-push"
@@ -18,7 +18,7 @@ spec:
   - name: "source-dir"
     value: "."
   - name: "output-image"
-    value: "gitea.cnoe.localtest.me:8443/giteaadmin/ubi-builder"
+    value: "quay.io/snowdrop/ubi-builder"
   - name: "imageUrl"
     value: "buildpacksio/pack"
   - name: "imageTag"
@@ -45,15 +45,13 @@ spec:
           value: "task"
         resolver: "bundles"
       workspaces:
-      #- name: "pack-workspace"
-      #  workspace: "pack-workspace"
-      #- name: "data-store"
-      #  workspace: "data-store"
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+      - name: "data-store"
+        workspace: "data-store"
       - name: "output"
         workspace: "source-dir"
     - name: "fetch-packconfig-registrysecret"
-      runAfter:
-      - git-clone
       taskRef:
         params:
         - name: "bundle"
@@ -66,13 +64,11 @@ spec:
       workspaces:
       - name: "pack-workspace"
         workspace: "pack-workspace"
-      #- name: "source-dir"
-      #  workspace: "source-dir"
+      - name: "source-dir"
+        workspace: "source-dir"
       - name: "data-store"
         workspace: "data-store"
     - name: "list-source-workspace"
-      runAfter:
-      - fetch-packconfig-registrysecret
       taskRef:
         params:
         - name: "bundle"
@@ -87,11 +83,9 @@ spec:
         workspace: "pack-workspace"
       - name: "source-dir"
         workspace: "source-dir"
-      #- name: "data-store"
-      #  workspace: "data-store"
+      - name: "data-store"
+        workspace: "data-store"
     - name: "pack-builder"
-      runAfter:
-      - list-source-workspace
       params:
       - name: "PACK_SOURCE_DIR"
         value: "$(params.source-dir)"

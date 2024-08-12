@@ -48,15 +48,15 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/runtime: "java"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
   name: "my-quarkus-1"
 spec:
@@ -441,15 +441,15 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
   labels:
-    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/used-by: "build-cloud"
+    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
   name: "buildpack-builder"
 spec:
@@ -853,7 +853,7 @@ job:
     - name: data-store
       volumeSources:
         - secret: pack-config-toml
-        - secret: quay-creds
+        - secret: gitea-creds # quay-creds, docker-creds, etc
   actions:
     - name: git-clone
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3
@@ -890,8 +890,8 @@ kind: "PipelineRun"
 metadata:
   annotations:
     tekton.dev/platforms: "linux/amd64"
-    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
     tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
   labels:
     app.kubernetes.io/version: "0.1"
   name: "pack-builder-push"
@@ -1029,7 +1029,7 @@ spec:
       - secret:
           name: "pack-config-toml"
       - secret:
-          name: "quay-creds"
+          name: "gitea-creds"
 
 ```
 ## Provider: tekton
@@ -1080,9 +1080,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
-    tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-embedded-script"
