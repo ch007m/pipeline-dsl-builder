@@ -36,3 +36,7 @@ jobs:
           PACKAGES_DIR=manifests/idp/packages
           idpbuilder create \
             -p $PACKAGES_DIR/tekton \
+
+      - name: Check resources installed on the cluster
+        run: |
+          kubectl get po -A
