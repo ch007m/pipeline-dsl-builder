@@ -160,6 +160,7 @@ public class Pipelines {
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
             .withName(action.getName())
+            .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
             .withWorkspaces(populateTaskWorkspaces(action, workspaces))
             .withTaskSpec(
                 new EmbeddedTaskBuilder()
@@ -191,7 +192,8 @@ public class Pipelines {
                     .addNewParam().withName("name").withValue(new ParamValue(action.getName())).endParam()
                     .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
                   .endTaskRef()
-                  .withWorkspaces(populateTaskWorkspaces(action, workspaces))
+                .withWorkspaces(populateTaskWorkspaces(action, workspaces))
+                .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
                 .build();
             // @formatter:on
             return pipelineTask;
