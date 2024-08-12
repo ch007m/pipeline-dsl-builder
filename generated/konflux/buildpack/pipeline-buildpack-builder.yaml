@@ -3,16 +3,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
   labels:
-    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
+    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
