@@ -52,7 +52,8 @@ jobs:
           do
             echo "Deploy the pipelinerun: $f
             kubectl apply -f $f
+            sleep 5s
             
-            echo "Watch the log of the pipelinerun for: $f
+            echo "Watch the log of the pipelinerun for: $f"
             tkn pipelinerun logs -f
           done
