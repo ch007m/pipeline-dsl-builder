@@ -87,7 +87,6 @@ jobs:
             --docker-password="$GITEA_PASSWORD" \
             --docker-server="$GITEA_REGISTRY"
 
-
       - name: Create pack secret containing for pack CLI the config.toml
         run: |
           cat <<EOF | kubectl apply -f -

@@ -87,8 +87,8 @@ spec:
         workspace: "pack-workspace"
       - name: "source-dir"
         workspace: "source-dir"
-      - name: "data-store"
-        workspace: "data-store"
+      #- name: "data-store"
+      #  workspace: "data-store"
     - name: "pack-builder"
       runAfter:
       - list-source-workspace
