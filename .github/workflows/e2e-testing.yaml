@@ -45,15 +45,22 @@ jobs:
 
       - name: Deploy pipelinerun and check status
         run: |
-          kubectl create ns user
-          
           cfg_files=(generated/tekton/example/*)
           for f in "${cfg_files[@]}"
           do
+           namespaceExist=$(cat $f  | yq -r '.metadata.namespace != null')
+           if ($namespaceExist) {
+             namespace=$(cat $f  | yq -r '.metadata.namespace')
+             kubectl create ns $namespace
+           else
+             namespace="default"
+             kubectl create ns user
+           fi
+                    
             echo "Deploy the pipelinerun: $f"
-            kubectl apply -f $f
+            kubectl apply -n $namespace -f $f
             sleep 5s
             
             echo "Watch the log of the pipelinerun for: $f"
-            tkn pipelinerun logs -f
+            tkn pipelinerun logs -n $namespace -f
           done
