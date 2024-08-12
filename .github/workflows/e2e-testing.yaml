@@ -46,5 +46,9 @@ jobs:
         run: |
           kubectl create ns user
           
-          kubectl apply -f generated/tekton/example/pipeline-simple-job-embedded-script.yaml
-          tkn pipelinerun logs -f
+          cfg_files=(generated/tekton/example/*)
+          for f in "${cfg_files[@]}"
+          do
+            kubectl apply -f $f
+            tkn pipelinerun logs -f
+          done
