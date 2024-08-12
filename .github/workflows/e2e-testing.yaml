@@ -129,6 +129,9 @@ jobs:
             
             echo "Watch the log of the pipelinerun for: $f"
             tkn pipelinerun logs -n $namespace -f
+          
+            echo "Remove the pipelineRun tested ..."
+            kubectl delete pr --all -A
           done
 
       - name: Deploy tekton buildpack example
