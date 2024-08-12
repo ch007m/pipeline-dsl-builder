@@ -44,5 +44,7 @@ jobs:
 
       - name: Deploy pipelinerun and check status
         run: |
+          kubectl create ns user
+          
           kubectl apply -f generated/tekton/example/pipeline-simple-job-embedded-script.yaml
           tkn pipelinerun logs -f
