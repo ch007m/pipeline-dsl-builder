@@ -95,12 +95,12 @@ public class OCIBundleGrabber {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
+                    logger.info(line);
                 }
             }
 
             int exitCode = process.waitFor();
-            System.out.println("Process exited with code: " + exitCode);
+            logger.info("Process exited with code: " + exitCode);
         } catch (Exception e) {
             e.printStackTrace();
         }
