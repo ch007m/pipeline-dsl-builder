@@ -1,4 +1,4 @@
-package dev.snowdrop.command;
+package dev.snowdrop.command.fetch;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "extractBundle", description = "Fetch and extract the YAML resources from OCI bundle")
-public class OCIBundleCommand implements Runnable {
+public class OCIBundleFetchCommand implements Runnable {
 
     private static final String OUTPUT_TEKTON_PATH = "temp/oci/tekton";
 
@@ -34,7 +34,7 @@ public class OCIBundleCommand implements Runnable {
     @CommandLine.Option(names = {"-p", "--path"}, description = "Path where files will be extracted", required = true)
     String path;
 
-    private static final Logger logger = LoggerFactory.getLogger(OCIBundleCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(OCIBundleFetchCommand.class);
 
     @Override
     public void run() {

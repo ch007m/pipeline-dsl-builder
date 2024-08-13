@@ -1,5 +1,6 @@
 package dev.snowdrop.command;
 
+import dev.snowdrop.command.fetch.OCIBundleFetchCommand;
 import io.fabric8.tekton.pipeline.v1.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class YamlToJavaCommand implements Runnable {
    @CommandLine.Option(names = {"-p", "--path"}, description = "Path of the yaml resource file to process", required = true)
    String path;
 
-   private static final Logger logger = LoggerFactory.getLogger(OCIBundleCommand.class);
+   private static final Logger logger = LoggerFactory.getLogger(OCIBundleFetchCommand.class);
 
    @Override
    public void run() {

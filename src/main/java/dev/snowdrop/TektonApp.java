@@ -1,8 +1,9 @@
 package dev.snowdrop;
 
 import dev.snowdrop.command.BuilderCommand;
-import dev.snowdrop.command.OCIBundleCommand;
-import dev.snowdrop.command.YamlToJavaCommand;
+import dev.snowdrop.command.FetchCommand;
+import dev.snowdrop.command.fetch.GitFetchCommand;
+import dev.snowdrop.command.fetch.OCIBundleFetchCommand;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import picocli.CommandLine;
@@ -12,8 +13,9 @@ import picocli.CommandLine;
 @CommandLine.Command(
     subcommands = {
         BuilderCommand.class,
-        OCIBundleCommand.class,
-        YamlToJavaCommand.class
+        GitFetchCommand.class,
+        OCIBundleFetchCommand.class
+        // TODO: Verify with Quarkus team if we can use nested TopCommands to group them => FetchCommand.class
     },
     mixinStandardHelpOptions = true,
     description = "Tekton commands")
