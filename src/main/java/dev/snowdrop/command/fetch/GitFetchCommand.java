@@ -2,7 +2,7 @@ package dev.snowdrop.command.fetch;
 
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "fetchURL", description = "Fetch and extract the YAML resources from OCI bundle")
+@CommandLine.Command(name = "fetchURL", description = "Fetch and extract the YAML resources from git URL")
 public class GitFetchCommand implements Runnable {
 
     @CommandLine.Option(names = {"-u", "--url"}, description = "The url of the YAML resource to fetch", required = true)

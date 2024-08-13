@@ -8,6 +8,8 @@ import picocli.CommandLine;
 @TopCommand
 @CommandLine.Command(
     mixinStandardHelpOptions = true,
+    name = "fetch",
+    description = "Fetch the task from OCI bundle, git repository",
     subcommands = {
         OCIBundleFetchCommand.class,
         GitFetchCommand.class,
