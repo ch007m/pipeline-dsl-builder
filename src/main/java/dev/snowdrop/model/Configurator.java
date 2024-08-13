@@ -11,4 +11,5 @@ public class Configurator {
    private String namespace;
    private Job job;
    private Repository repository;
+   private String outputPath;
 }

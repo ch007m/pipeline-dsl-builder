@@ -30,7 +30,9 @@ public class UriParserSvc {
             // Print the extracted values
             logger.info("Protocol: " + protocol);
             logger.info("Url: " + url);
-            b = new Bundle(url);
+            b = new Bundle()
+                .protocol(protocol)
+                .uri(url);
         } else {
             logger.warn("The input string does not match the expected format.");
         }

@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.nio.file.Paths;
+
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuild;
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
 import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createResource;
@@ -34,6 +36,9 @@ public class BuilderCommand implements Runnable {
         // Parse and validate the configuration
         Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);
 
+        // Set the outputPath to the configurator object
+        cfg.setOutputPath(outputPath);
+
         if (cfg == null) {
             logger.error("Configuration file cannot be empty !");
             System.exit(1);
@@ -51,7 +56,7 @@ public class BuilderCommand implements Runnable {
         }
         logger.info("#### Pipeline domain selected: {}", cfg.getDomain());
 
-        String resourcesPath = outputPath + "/" + cfg.getType() + "/" + cfg.getDomain();
+        String resourcesPath = Paths.get(cfg.getOutputPath(), cfg.getType(), cfg.getDomain()).toString();
         Type providerType = Type.valueOf(cfg.getType().toUpperCase());
         Domain domain = Domain.valueOf(cfg.getDomain().toUpperCase());
 

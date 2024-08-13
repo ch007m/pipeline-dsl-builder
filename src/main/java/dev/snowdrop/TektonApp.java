@@ -1,7 +1,7 @@
 package dev.snowdrop;
 
 import dev.snowdrop.command.BuilderCommand;
-import dev.snowdrop.command.FetchCommand;
+// import dev.snowdrop.command.FetchCommand;
 import dev.snowdrop.command.fetch.GitFetchCommand;
 import dev.snowdrop.command.fetch.OCIBundleFetchCommand;
 import io.quarkus.picocli.runtime.annotations.TopCommand;

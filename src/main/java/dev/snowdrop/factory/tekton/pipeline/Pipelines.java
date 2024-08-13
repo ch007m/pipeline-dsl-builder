@@ -20,11 +20,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
+import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
 public class Pipelines {
 
     private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
     private static Type TYPE;
+    private static String taskExtractedDirectory;
 
     public static <T> T createResource(Configurator cfg) {
         Class<T> type;
@@ -68,8 +70,25 @@ public class Pipelines {
 
         for (Action action : actions) {
             if (action.getRef() != null) {
-                aTask = createTaskUsingRef(action, cfg.getJob().getWorkspaces());
-                tasks.add(aTask);
+                // Create a Bundle using the action reference
+                // bundle://<REGISTRY>/<ORG>/<BUNDLE_TASK-NAME>:<VERSION>@sha256:<SHA256>
+                // or
+                // git://<GIT_URL>/<TASK>.yaml
+                Bundle bundle = UriParserSvc.extract(action.getRef());
+
+                if (bundle == null) {
+                    //logger.error("Bundle reference was not parsed properly");
+                    throw new RuntimeException("Bundle reference was not parsed properly");
+                } else {
+                    // Fetch the content of the task (Git url, oci bundle, etc) to get
+                    // its list of params, workspaces, etc that we will use to populate defaults
+                    fetchExtractTask(bundle, action.getName(), cfg.getOutputPath());
+
+                    // Generate the Task
+                    aTask = createTaskUsingRef(action, bundle, cfg.getJob().getWorkspaces());
+                    tasks.add(aTask);
+                }
+
             }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
@@ -175,29 +194,26 @@ public class Pipelines {
         return pipelineTask;
     }
 
-    private static PipelineTask createTaskUsingRef(Action action, List<Workspace> workspaces) {
-        Bundle b = UriParserSvc.extract(action.getRef());
-        if (b == null) {
-            //logger.error("Bundle reference ws not parsed properly");
-            throw new RuntimeException("Bundle reference was not parsed properly");
-        } else {
+    private static PipelineTask createTaskUsingRef(Action action, Bundle bundle, List<Workspace> workspaces) {
+            // Generate the Pipeline's task
             PipelineTask pipelineTask = new PipelineTaskBuilder()
                 // @formatter:off
                 .withName(action.getName())
                 .withNewTaskRef()
                   .withResolver("bundles")
                   .withParams()
-                    .addNewParam().withName("bundle").withValue(new ParamValue(b.getUri())).endParam()
+                    .addNewParam().withName("bundle").withValue(new ParamValue(bundle.getUri())).endParam()
                     // The name of the task to be fetched should be equal to the name of the Action's name !!
                     .addNewParam().withName("name").withValue(new ParamValue(action.getName())).endParam()
                     .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
                   .endTaskRef()
+                // TODO: As we cannot propagate workspaces - see: https://github.com/ch007m/pipeline-dsl-builder/issues/20
+                // This code should be reviewed
                 .withWorkspaces(populateTaskWorkspaces(action, workspaces))
                 .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
                 .build();
             // @formatter:on
             return pipelineTask;
-        }
     }
 
     private static List<WorkspaceBinding> populatePipelineWorkspaces(List<Workspace> wks) {
@@ -251,10 +267,10 @@ public class Pipelines {
             hash.forEach((key, val) -> {
                     ParamValue paramValue;
                     if (val instanceof String) {
-                        paramValue = new ParamValue((String)val);
+                        paramValue = new ParamValue((String) val);
                     } else if (val instanceof Boolean) {
                         paramValue = new ParamValue(Boolean.toString((Boolean) val));
-                    } else if (val instanceof List<?>){
+                    } else if (val instanceof List<?>) {
                         paramValue = new ParamValue((List<String>) val);
                     } else {
                         paramValue = new ParamValue(String.valueOf(val)); // Default to String representation
@@ -278,7 +294,7 @@ public class Pipelines {
           .endMetadata()
           .withNewSpec()
              .withParams(params)
-            .withWorkspaces(pipelineWorkspaces)
+             .withWorkspaces(pipelineWorkspaces)
              .withNewPipelineSpec()
                 .withTasks(tasks)
              .endPipelineSpec()
