@@ -39,7 +39,7 @@ EOF
 ```
 and launch it:
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -c my-config.yaml -o out/flows
+java -jar target/quarkus-app/quarkus-run.jar builder -c my-config.yaml -o out/flows
 ```  
 
 Next, check the pipeline(s) generated under `./out/flows/<domain>`

@@ -1,6 +1,6 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.PipeBuilderApp;
+import dev.snowdrop.BuilderCommand;
 import dev.snowdrop.model.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class UriParserSvc {
-    private static final Logger logger = LoggerFactory.getLogger(PipeBuilderApp.class);
+    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
 
     public static Bundle extract(String uriToParse) {
         Bundle b = null;

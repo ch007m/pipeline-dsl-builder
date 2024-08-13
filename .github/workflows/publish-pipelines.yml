@@ -36,7 +36,7 @@ jobs:
           cfg_files=(configurations/**/*)
           for f in "${cfg_files[@]}"
           do
-            java -jar target/quarkus-app/quarkus-run.jar -o generated -c $f
+            java -jar target/quarkus-app/quarkus-run.jar builder -o generated -c $f
           done
 
       # NOT USED ANYMORE
@@ -66,7 +66,7 @@ jobs:
         run: |
           cfg_files=(configurations/**/*)
           
-          CMD="java -jar target/quarkus-app/quarkus-run.jar"
+          CMD="java -jar target/quarkus-app/quarkus-run.jar builder"
           
           printf '%s\n\n' "# Scenario" > SCENARIO.md
           

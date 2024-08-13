@@ -1,6 +1,6 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.PipeBuilderApp;
+import dev.snowdrop.BuilderCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class FileUtilSvc {
 
-   private static final Logger logger = LoggerFactory.getLogger(PipeBuilderApp.class);
+   private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
    private static final String SCRIPTS_PATH = "scripts/";
 
    public static String loadFileAsString(String fileName) {

@@ -1,6 +1,5 @@
 package dev.snowdrop;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,6 +13,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -22,24 +22,23 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class OCIBundleGrabber {
+@CommandLine.Command(name = "extractBundle", description = "Fetch and extract the YAML resources from OCI bundle")
+public class OCIBundleCommand implements Runnable {
 
     private static final String OUTPUT_OCI_PATH = "temp/oci";
     private static final String OUTPUT_TEKTON_PATH = "temp/oci/tekton";
     private static final String INDEX_OCI_FILE_PATH = OUTPUT_OCI_PATH + "/index.json";
     private static final String BLOBS_DIRECTORY = OUTPUT_OCI_PATH + "/blobs/sha256/";
 
-    private static final Logger logger = LoggerFactory.getLogger(OCIBundleGrabber.class);
+    @CommandLine.Option(names = {"-b", "--bundle"}, description = "The OCI bundle URL", required = true)
+    String configuration;
 
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            logger.error("Please provide as argument the OCI url: ");
-            logger.error("OCIBundleGrabber quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1");
-            System.exit(1);
-        }
+    private static final Logger logger = LoggerFactory.getLogger(OCIBundleCommand.class);
 
+    @Override
+    public void run() {
         // Fetch the OCI bundle
-        grabOCIBundle(args[0], OUTPUT_OCI_PATH);
+        grabOCIBundle(configuration, OUTPUT_OCI_PATH);
 
         // Search about the layer packaging the Tekton task
         try {
@@ -127,11 +126,12 @@ public class OCIBundleGrabber {
                     }
                     logger.info("Path to file extracted: " + outputFile.getAbsolutePath() + "\n");
 
+                    // Create the Tekton folder to copy the YAML files
                     Files.createDirectories(Paths.get(OUTPUT_TEKTON_PATH));
 
                     String yaml = asYaml(Files.readString(outputFile.toPath()));
                     String yamlFileName = OUTPUT_TEKTON_PATH + "/" + outputFile.getName().replaceFirst("[.][^.]+$", ".yaml");
-                    logger.info("yaml file name: " + yamlFileName);
+                    logger.debug("yaml file name: " + yamlFileName);
                     Files.write(Paths.get(yamlFileName), yaml.getBytes());
                 }
             }

@@ -1,6 +1,6 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.PipeBuilderApp;
+import dev.snowdrop.BuilderCommand;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.Serialization;
@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 
 public class ConfiguratorSvc {
 
-   private static final Logger logger = LoggerFactory.getLogger(PipeBuilderApp.class);
+   private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
 
    public static Configurator LoadConfiguration(String configFile) {
       Configurator configurator = new Configurator();

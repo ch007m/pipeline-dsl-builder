@@ -16,21 +16,16 @@ import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
 import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createResource;
 
 @TopCommand
-@Command(name = "pipelinebuilder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline for Konflux")
-public class PipeBuilderApp implements Runnable {
+@Command(name = "builder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline(run)s")
+public class BuilderCommand implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(PipeBuilderApp.class);
+    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
 
     @Option(names = {"-c", "--configuration-path"}, description = "The path of the configuration file", required = true)
     String configuration;
 
     @Option(names = {"-o", "--output-path"}, description = "The output path", required = true)
     String outputPath;
-
-    public static void main(String[] args) {
-        int exitCode = new CommandLine(new PipeBuilderApp()).execute(args);
-        System.exit(exitCode);
-    }
 
     @Override
     public void run() {
