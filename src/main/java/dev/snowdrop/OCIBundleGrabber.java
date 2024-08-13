@@ -12,6 +12,8 @@ import dev.snowdrop.model.oci.ManifestEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -27,10 +29,12 @@ public class OCIBundleGrabber {
     private static final String INDEX_OCI_FILE_PATH = OUTPUT_OCI_PATH + "/index.json";
     private static final String BLOBS_DIRECTORY = OUTPUT_OCI_PATH + "/blobs/sha256/";
 
+    private static final Logger logger = LoggerFactory.getLogger(OCIBundleGrabber.class);
+
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("Please provide as argument the OCI url: ");
-            System.err.println("OCIBundleGrabber quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1");
+            logger.error("Please provide as argument the OCI url: ");
+            logger.error("OCIBundleGrabber quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1");
             System.exit(1);
         }
 
@@ -49,14 +53,14 @@ public class OCIBundleGrabber {
             AtomicReference<String> digest = new AtomicReference<>(manifestEntry.getDigest());
             String sha256 = digest.get().substring(7, digest.get().length());
 
-            System.out.println("mediaType: " + mediaType);
-            System.out.println("digest: " + digest);
-            System.out.println("sha256: " + sha256);
+            logger.info("mediaType: " + mediaType);
+            logger.info("digest: " + digest);
+            logger.info("sha256: " + sha256);
 
             Manifest manifest = new ObjectMapper().readValue(new File(BLOBS_DIRECTORY + "/" + sha256), Manifest.class);
             if (manifest != null) {
                 // Searching about the layer containing the json file of the Task
-                System.out.println("Manifest found within blobs folder");
+                logger.info("Manifest found within blobs folder");
                 List<Manifest.Layer> taskLayers = manifest.getLayers().stream()
                     .filter(layer -> "task".equals(layer.getAnnotations().get("dev.tekton.image.kind")))
                     .collect(Collectors.toList());
@@ -64,7 +68,7 @@ public class OCIBundleGrabber {
                 if (!taskLayers.isEmpty()) {
                     taskLayers.forEach(layer -> {
                         String layerDigest = layer.getDigest();
-                        System.out.println("Found task layer: " + layerDigest + " for task: " + layer.getAnnotations().get("dev.tekton.image.name"));
+                        logger.info("Found task layer: " + layerDigest + " for task: " + layer.getAnnotations().get("dev.tekton.image.name"));
                         extractAndProcessBlob(new File(BLOBS_DIRECTORY + "/" + layerDigest.substring(7, layerDigest.length())));
                     });
                 }
@@ -119,13 +123,13 @@ public class OCIBundleGrabber {
                             fos.write(buffer, 0, length);
                         }
                     }
-                    System.out.println("Path to file extracted: " + outputFile.getAbsolutePath() + "\n");
+                    logger.info("Path to file extracted: " + outputFile.getAbsolutePath() + "\n");
 
                     Files.createDirectories(Paths.get(OUTPUT_TEKTON_PATH));
 
                     String yaml = asYaml(Files.readString(outputFile.toPath()));
                     String yamlFileName = OUTPUT_TEKTON_PATH + "/" + outputFile.getName().replaceFirst("[.][^.]+$", ".yaml");
-                    System.out.println("yaml file name: " + yamlFileName);
+                    logger.info("yaml file name: " + yamlFileName);
                     Files.write(Paths.get(yamlFileName), yaml.getBytes());
                 }
             }
