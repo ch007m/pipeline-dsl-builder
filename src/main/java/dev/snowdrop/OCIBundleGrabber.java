@@ -101,7 +101,9 @@ public class OCIBundleGrabber {
 
             int exitCode = process.waitFor();
             logger.info("Process exited with code: " + exitCode);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -138,7 +140,7 @@ public class OCIBundleGrabber {
         }
     }
 
-    public static String asYaml(String jsonString) throws JsonProcessingException, IOException {
+    public static String asYaml(String jsonString) throws IOException {
         // parse JSON
         JsonNode jsonNodeTree = new ObjectMapper().readTree(jsonString);
         // save it as YAML
