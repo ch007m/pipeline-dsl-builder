@@ -6,7 +6,7 @@
 
 Command to be executed: 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/konflux/build-quarkus-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/konflux/build-quarkus-cfg.yaml
 ```
 using as configuration: 
 ```yaml
@@ -48,15 +48,15 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/runtime: "java"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
   name: "my-quarkus-1"
 spec:
@@ -408,7 +408,7 @@ spec:
 
 Command to be executed: 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/konflux/buildpack-builder-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/konflux/buildpack-builder-cfg.yaml
 ```
 using as configuration: 
 ```yaml
@@ -441,16 +441,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
-    pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
-      \ == 'main'"
     build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+    pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
+      \ == 'main'"
   labels:
-    pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/strategy: "buildpack"
+    pipelines.openshift.io/runtime: "java"
   name: "buildpack-builder"
 spec:
   finally:
@@ -815,7 +815,7 @@ spec:
 
 Command to be executed: 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/pack-builder-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/pack-builder-cfg.yaml
 ```
 using as configuration: 
 ```yaml
@@ -853,7 +853,7 @@ job:
     - name: data-store
       volumeSources:
         - secret: pack-config-toml
-        - secret: quay-creds
+        - secret: gitea-creds # quay-creds, docker-creds, etc
   actions:
     - name: git-clone
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3
@@ -889,8 +889,8 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
+    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.60.x"
   labels:
     app.kubernetes.io/version: "0.1"
@@ -1029,7 +1029,7 @@ spec:
       - secret:
           name: "pack-config-toml"
       - secret:
-          name: "quay-creds"
+          name: "gitea-creds"
 
 ```
 ## Provider: tekton
@@ -1038,7 +1038,7 @@ spec:
 
 Command to be executed: 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/simple-job-embedded-script-cfg.yaml
 ```
 using as configuration: 
 ```yaml
@@ -1108,7 +1108,7 @@ spec:
 
 Command to be executed: 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar -o out/flows -c configurations/tekton/simple-job-fetch-script-cfg.yaml
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/simple-job-fetch-script-cfg.yaml
 ```
 using as configuration: 
 ```yaml
