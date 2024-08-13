@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -38,9 +39,17 @@ public class OCIBundleFetchCommand implements Runnable {
             List<Manifest.Layer> filteredLayers = filterLayersUsingAnnotation(TASK_DIGEST_ANNOTATION, layers, path);
 
             filteredLayers.stream().forEach(layer -> {
-                extractTaskFromBlob(
-                    Paths.get(path, "/tekton"),
-                    new File(path + "/blobs/sha256" + "/" + layer.getDigest().substring(7, layer.getDigest().length())));
+                String blobFile = Paths.get(path , "blobs/sha256" , layer.getDigest().substring(7, layer.getDigest().length())).toString();
+
+                // Extract from the BLOB file the task(s)
+                List<String> jsonFiles = extractTasksFromBlob(new File(blobFile));
+
+                // Convert json to YAML
+                jsonFiles.stream().forEach(file -> {
+                    Path tasksPath = Paths.get(path, "tasks");
+                    String jsonFileName = file.substring(file.lastIndexOf('/') + 1);
+                    convertJSONtoYAML(tasksPath, jsonFileName);
+                });
             });
         } else {
             logger.error("No layers found for the oci bundle !");

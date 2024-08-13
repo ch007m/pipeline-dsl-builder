@@ -6,22 +6,31 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import dev.snowdrop.model.Bundle;
+import dev.snowdrop.model.Job;
 import dev.snowdrop.model.oci.Index;
 import dev.snowdrop.model.oci.Manifest;
 import dev.snowdrop.model.oci.ManifestEntry;
+import io.fabric8.tekton.pipeline.v1.Task;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RemoteTaskSvc {
     private static final Logger logger = LoggerFactory.getLogger(RemoteTaskSvc.class);
@@ -30,6 +39,10 @@ public class RemoteTaskSvc {
     public static String BUNDLE_PREFIX = "bundle";
 
     public static void fetchExtractTask(Bundle b, String taskName, String path) {
+        Map<String, String> tasksMap = new HashMap<>();
+        String bundlePath = Paths.get(path, BUNDLE_PREFIX, taskName).toString();
+        Path tasksPath = Paths.get(bundlePath, "tasks");
+
         switch(b.getProtocol()) {
             case "git": {
                 logger.info("Fetching the git url: https://%s", b.getUri());
@@ -37,7 +50,6 @@ public class RemoteTaskSvc {
             }
             case "bundle": {
                 // Create a Tekton task directory to extract the content
-                String bundlePath = Paths.get(path, BUNDLE_PREFIX, taskName).toString();
                 try {
                     Files.createDirectories(Path.of(bundlePath));
                 } catch(IOException ex) {
@@ -57,9 +69,16 @@ public class RemoteTaskSvc {
                     List<Manifest.Layer> filteredLayers = filterLayersUsingAnnotation(TASK_DIGEST_ANNOTATION, layers, bundlePath);
 
                     filteredLayers.stream().forEach(layer -> {
-                        extractTaskFromBlob(
-                            Paths.get(bundlePath, "/task"),
-                            new File(bundlePath + "/blobs/sha256" + "/" + layer.getDigest().substring(7, layer.getDigest().length())));
+                        String blobFile = Paths.get(bundlePath , "blobs/sha256" , layer.getDigest().substring(7, layer.getDigest().length())).toString();
+
+                        // Extract from the BLOB file the task(s)
+                        List<String> jsonFiles = extractTasksFromBlob(new File(blobFile));
+
+
+                        // Convert json file to YAML
+                        jsonFiles.stream().forEach(jsonFile -> {
+                            convertJSONtoYAML(tasksPath, jsonFile);
+                        });
                     });
                 } else {
                     logger.info("No layers found for the oci bundle !");
@@ -71,6 +90,26 @@ public class RemoteTaskSvc {
         }
     }
 
+    public static void convertJSONtoYAML(Path path, String jsonFileName) {
+        try {
+            // Create the Tekton folder to copy the files
+            Files.createDirectories(path);
+
+            // Convert JSON to YAML
+            String yaml = asYaml(Files.readString(Path.of(jsonFileName)));
+
+            // Write YAML file
+            // Define the YAML file name from the json file
+            String yamlFileName = Paths.get(jsonFileName).getFileName().toString().replaceFirst("[.][^.]+$", ".yaml");
+            Path yamlFilePath = Paths.get(path.toString(), yamlFileName);
+
+            logger.info("Task yaml path: " + yamlFilePath);
+            Files.write(yamlFilePath, yaml.getBytes());
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     public static void grabOCIBundle(String oci, String outputPath) {
         String orasCommand = "oras copy " + oci + " --to-oci-layout " + outputPath;
@@ -142,7 +181,8 @@ public class RemoteTaskSvc {
         return null;
     }
 
-    public static void extractTaskFromBlob(Path outPutPath, File blobFile) {
+    public static List<String> extractTasksFromBlob(File blobFile) {
+        List<String> extractedFiles = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream(blobFile);
              GzipCompressorInputStream gis = new GzipCompressorInputStream(fis);
              TarArchiveInputStream tis = new TarArchiveInputStream(gis)) {
@@ -159,20 +199,14 @@ public class RemoteTaskSvc {
                             fos.write(buffer, 0, length);
                         }
                     }
-                    logger.info("Path to file extracted: " + outputFile.getAbsolutePath() + "\n");
-
-                    // Create the Tekton folder to copy the YAML files
-                    Files.createDirectories(outPutPath);
-
-                    String yaml = asYaml(Files.readString(outputFile.toPath()));
-                    String yamlFileName = outPutPath + "/" + outputFile.getName().replaceFirst("[.][^.]+$", ".yaml");
-                    logger.debug("yaml file name: " + yamlFileName);
-                    Files.write(Paths.get(yamlFileName), yaml.getBytes());
+                    logger.info("Path of the file extracted: " + outputFile.getAbsolutePath() + "\n");
+                    extractedFiles.add(outputFile.getPath());
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return extractedFiles;
     }
 
     public static String asYaml(String jsonString) throws IOException {

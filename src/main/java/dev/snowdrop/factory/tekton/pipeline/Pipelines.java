@@ -11,15 +11,23 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
+import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
 public class Pipelines {
@@ -80,9 +88,33 @@ public class Pipelines {
                     //logger.error("Bundle reference was not parsed properly");
                     throw new RuntimeException("Bundle reference was not parsed properly");
                 } else {
-                    // Fetch the content of the task (Git url, oci bundle, etc) to get
-                    // its list of params, workspaces, etc that we will use to populate defaults
+                    // Fetch the content of the task using the remote URL: Git url, oci bundle, etc
                     fetchExtractTask(bundle, action.getName(), cfg.getOutputPath());
+
+                    // Walk through the yaml task files and create the Task object
+                    String bundlePath = Paths.get(cfg.getOutputPath(), BUNDLE_PREFIX, action.getName()).toString();
+                    Path tasksPath = Paths.get(bundlePath, "tasks");
+                    List<Task> tasksReferenced = new ArrayList<>();
+
+                    try (Stream<Path> filesWalk = Files.walk(tasksPath)) {
+                        List<String> result = filesWalk
+                            .filter(Files::isRegularFile)
+                            .distinct() // Remove duplicates
+                            .map(x -> x.toString())
+                            .collect(Collectors.toList());
+
+                        result.forEach(file -> {
+                            Constructor constructor = new Constructor(Task.class, new LoaderOptions());
+                            Yaml yaml = new Yaml(constructor);
+                            try {
+                                tasksReferenced.add(yaml.load(Files.readString(Path.of(file))));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                     // Generate the Task
                     aTask = createTaskUsingRef(action, bundle, cfg.getJob().getWorkspaces());
@@ -195,9 +227,9 @@ public class Pipelines {
     }
 
     private static PipelineTask createTaskUsingRef(Action action, Bundle bundle, List<Workspace> workspaces) {
-            // Generate the Pipeline's task
-            PipelineTask pipelineTask = new PipelineTaskBuilder()
-                // @formatter:off
+        // Generate the Pipeline's task
+        PipelineTask pipelineTask = new PipelineTaskBuilder()
+            // @formatter:off
                 .withName(action.getName())
                 .withNewTaskRef()
                   .withResolver("bundles")
@@ -213,7 +245,7 @@ public class Pipelines {
                 .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
                 .build();
             // @formatter:on
-            return pipelineTask;
+        return pipelineTask;
     }
 
     private static List<WorkspaceBinding> populatePipelineWorkspaces(List<Workspace> wks) {
