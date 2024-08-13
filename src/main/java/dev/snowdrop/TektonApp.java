@@ -1,29 +1,27 @@
 package dev.snowdrop;
 
-import dev.snowdrop.command.BuilderCommand;
-// import dev.snowdrop.command.FetchCommand;
-import dev.snowdrop.command.FetchCommand;
-import dev.snowdrop.command.fetch.GitFetchCommand;
-import dev.snowdrop.command.fetch.OCIBundleFetchCommand;
-import io.quarkus.picocli.runtime.annotations.TopCommand;
+import dev.snowdrop.command.AllCommand;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 
 @QuarkusMain
-@TopCommand
-@CommandLine.Command(
-    subcommands = {
-        BuilderCommand.class,
-        //FetchCommand.class
-        GitFetchCommand.class,
-        OCIBundleFetchCommand.class
-        // TODO: Verify with Quarkus team if we can use nested TopCommands to group them => FetchCommand.class
-    },
-    mixinStandardHelpOptions = true,
-    description = "Tekton commands")
 public class TektonApp {
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new TektonApp()).execute(args);
-        System.exit(exitCode);
+        Quarkus.run(AppCommands.class, args);
+    }
+
+    public static class AppCommands implements QuarkusApplication {
+        @Inject
+        CommandLine.IFactory factory;
+
+        @Override
+
+        public int run(String... args) throws Exception {
+            return new CommandLine(new AllCommand(), factory).execute(args);
+        }
+
     }
 }
