@@ -1,4 +1,4 @@
-package dev.snowdrop;
+package dev.snowdrop.command;
 
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Configurator;
@@ -7,7 +7,6 @@ import dev.snowdrop.service.ConfiguratorSvc;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

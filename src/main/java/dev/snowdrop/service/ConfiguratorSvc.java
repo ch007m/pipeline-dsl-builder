@@ -1,6 +1,6 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.BuilderCommand;
+import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.Serialization;

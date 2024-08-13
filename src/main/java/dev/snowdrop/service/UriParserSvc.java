@@ -1,6 +1,6 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.BuilderCommand;
+import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.model.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

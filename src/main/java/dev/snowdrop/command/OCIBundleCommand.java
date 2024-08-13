@@ -1,4 +1,4 @@
-package dev.snowdrop;
+package dev.snowdrop.command;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;

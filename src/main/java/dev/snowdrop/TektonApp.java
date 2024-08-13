@@ -1,5 +1,8 @@
 package dev.snowdrop;
 
+import dev.snowdrop.command.BuilderCommand;
+import dev.snowdrop.command.OCIBundleCommand;
+import dev.snowdrop.command.YamlToJavaCommand;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
@@ -11,7 +14,8 @@ import picocli.CommandLine;
 @CommandLine.Command(
     subcommands = {
         BuilderCommand.class,
-        OCIBundleCommand.class
+        OCIBundleCommand.class,
+        YamlToJavaCommand.class
     },
     mixinStandardHelpOptions = true,
     description = "Tekton commands")
