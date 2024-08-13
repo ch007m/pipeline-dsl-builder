@@ -1,8 +1,11 @@
 package dev.snowdrop;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import dev.snowdrop.model.oci.Index;
 import dev.snowdrop.model.oci.Manifest;
 import dev.snowdrop.model.oci.ManifestEntry;
@@ -11,6 +14,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -18,6 +23,7 @@ import java.util.stream.Collectors;
 public class OCIBundleGrabber {
 
     private static final String OUTPUT_OCI_PATH = "temp/oci";
+    private static final String OUTPUT_TEKTON_PATH = "temp/oci/tekton";
     private static final String INDEX_OCI_FILE_PATH = OUTPUT_OCI_PATH + "/index.json";
     private static final String BLOBS_DIRECTORY = OUTPUT_OCI_PATH + "/blobs/sha256/";
 
@@ -114,10 +120,25 @@ public class OCIBundleGrabber {
                         }
                     }
                     System.out.println("Path to file extracted: " + outputFile.getAbsolutePath() + "\n");
+
+                    Files.createDirectories(Paths.get(OUTPUT_TEKTON_PATH));
+
+                    String yaml = asYaml(Files.readString(outputFile.toPath()));
+                    String yamlFileName = OUTPUT_TEKTON_PATH + "/" + outputFile.getName().replaceFirst("[.][^.]+$", ".yaml");
+                    System.out.println("yaml file name: " + yamlFileName);
+                    Files.write(Paths.get(yamlFileName), yaml.getBytes());
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String asYaml(String jsonString) throws JsonProcessingException, IOException {
+        // parse JSON
+        JsonNode jsonNodeTree = new ObjectMapper().readTree(jsonString);
+        // save it as YAML
+        String jsonAsYaml = new YAMLMapper().writeValueAsString(jsonNodeTree);
+        return jsonAsYaml;
     }
 }
