@@ -55,6 +55,10 @@ public class Pipelines {
         List<PipelineTask> tasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
+        Map<Integer, Action> actionOrderMap = Optional.ofNullable(cfg.getJob().getActions())
+            .orElse(Collections.emptyList()) // Handle null case by providing an empty list
+            .stream()
+            .collect(Collectors.toMap(Action::getId, id -> id));
         PipelineTask aTask;
 
         String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
@@ -128,7 +132,7 @@ public class Pipelines {
                         runAfter = action.getRunAfter();
                     } else {
                         if (action.getId() > 1) {
-                            runAfter = actions.get(action.getId() - 1).getName();
+                            runAfter = actionOrderMap.get(action.getId() - 1).getName();
                         }
                     }
 
@@ -261,7 +265,7 @@ public class Pipelines {
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
                 .withName(action.getName())
-                .withRunAfter(runAfter != null ? runAfter : "")
+                .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
                 .withNewTaskRef()
                   .withResolver("bundles")
                   .withParams()

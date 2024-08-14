@@ -21,10 +21,9 @@ public class Action {
 
     public static final String STEP_SCRIPT_IMAGE = "ubuntu";
 
-    public Action()
-    {
+    public Action() {
         instanceCounter++;
-        id = instanceCounter;
+        id = Integer.valueOf(instanceCounter);
     }
 
 }
