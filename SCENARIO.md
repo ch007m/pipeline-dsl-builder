@@ -48,16 +48,16 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.redhat.com/commit_sha: "{{revision}}"
   labels:
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/used-by: "build-cloud"
-    pipelines.openshift.io/strategy: "build"
   name: "my-quarkus-1"
 spec:
   params:
@@ -441,16 +441,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
-    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
   labels:
     pipelines.openshift.io/runtime: "java"
-    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/strategy: "buildpack"
+    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
@@ -890,8 +890,8 @@ kind: "PipelineRun"
 metadata:
   annotations:
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "pack-builder-push"
@@ -1142,9 +1142,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
     tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/platforms: "linux/amd64"
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-fetch-script"
@@ -1213,10 +1213,10 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
       \ echoing Hello and Good bye"
-    tekton.dev/pipelines.minVersion: "0.60.x"
-    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-two-actions"
@@ -1235,6 +1235,8 @@ spec:
             set -e
             echo "Say Hello"
     - name: "say-goodbye"
+      runAfter:
+      - "say-hello"
       taskSpec:
         steps:
         - image: "ubuntu"
@@ -1244,5 +1246,123 @@ spec:
 
             set -e
             echo "and say Good bye to all of you !"
+
+```
+## Provider: tekton
+
+### Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
+
+Command to be executed: 
+```bash
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/simple-job-two-actions-worskpace-cfg.yaml
+```
+using as configuration: 
+```yaml
+# configurations/tekton/simple-job-two-actions-worskpace-cfg.yaml
+
+type: tekton
+domain: example
+
+namespace: demo
+
+job:
+  name: simple-job-two-actions-wks
+  description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
+  resourceType: PipelineRun
+  workspaces:
+    - name: shared-wks
+      volumeClaimTemplate:
+        storage: 1Gi
+        accessMode: ReadWriteOnce
+
+  actions:
+    - name: say-hello
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+          echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message
+        fi
+      workspaces:
+        - name: shared-wks
+          workspace: shared-wks
+    - name: say-goodbye
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+          cat $(workspaces.shared-wks.path)/message
+        fi
+        echo "Saying Good bye to all of you from action: say-goodbye"
+      workspaces:
+        - name: shared-wks
+          workspace: shared-wks
+```
+Generated file: 
+```yaml
+# generated/tekton/example/pipelinerun-simple-job-two-actions-wks.yaml
+
+---
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
+      \ echoing Hello and Good bye and sharing the message using a workspace"
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.60.x"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "simple-job-two-actions-wks"
+  namespace: "demo"
+spec:
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |
+            #!/usr/bin/env bash
+
+            set -e
+            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+              echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message
+            fi
+      workspaces:
+      - name: "shared-wks"
+        workspace: "shared-wks"
+    - name: "say-goodbye"
+      runAfter:
+      - "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |
+            #!/usr/bin/env bash
+
+            set -e
+            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+              cat $(workspaces.shared-wks.path)/message
+            fi
+            echo "Saying Good bye to all of you from action: say-goodbye"
+      workspaces:
+      - name: "shared-wks"
+        workspace: "shared-wks"
+  workspaces:
+  - name: "shared-wks"
+    volumeClaimTemplate:
+      apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      spec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
 
 ```
