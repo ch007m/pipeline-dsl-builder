@@ -123,7 +123,7 @@ public class Pipelines {
 
                     // Check if there is a runAfter defined for the action, otherwise
                     // add runAfter if action.id > 1 and get action where id = id -1
-                    String runAfter = "";
+                    String runAfter = null;
                     if (action.getRunAfter() != null) {
                         runAfter = action.getRunAfter();
                     } else {
@@ -261,7 +261,7 @@ public class Pipelines {
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
                 .withName(action.getName())
-                .withRunAfter(runAfter)
+                .withRunAfter(runAfter != null ? runAfter : "")
                 .withNewTaskRef()
                   .withResolver("bundles")
                   .withParams()

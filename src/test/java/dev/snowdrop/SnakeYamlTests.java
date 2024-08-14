@@ -2,8 +2,6 @@ package dev.snowdrop;
 
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Job;
-import dev.snowdrop.model.Volume;
-import dev.snowdrop.model.Workspace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -23,12 +21,6 @@ public class SnakeYamlTests {
     Yaml yaml;
     StringWriter writer;
 
-    @BeforeEach
-    public void init() {
-        yaml = new Yaml();
-        writer = new StringWriter();
-    }
-
     @Test
     public void paramsWithDifferentObjects() {
         List<Map<String, Object>> params = new ArrayList<>();
@@ -43,10 +35,12 @@ public class SnakeYamlTests {
         action.setName("git-clone");
         action.setRef("bundle://quay.io/ch007m/tekton-bundle:latest");
 
+        StringWriter writer = new StringWriter();
+        Yaml yaml = new Yaml();
         yaml.dump(action, writer);
 
         String expectedYaml = "!!dev.snowdrop.model.Action\n" +
-            "id: 2\n" +
+            "id: 1\n" +
             "name: git-clone\n" +
             "params:\n"+
             "- {enable: true, url: $(params.git-url)}\n" +

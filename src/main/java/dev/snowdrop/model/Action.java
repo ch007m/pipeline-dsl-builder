@@ -10,7 +10,7 @@ import java.util.Map;
 @Getter
 public class Action {
     static int instanceCounter = 0;
-    private Integer id = 1;
+    private Integer id = 0;
     private String name;
     private String ref;
     private String script;
