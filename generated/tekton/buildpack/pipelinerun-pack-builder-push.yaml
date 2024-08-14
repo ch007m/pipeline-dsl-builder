@@ -4,8 +4,8 @@ kind: "PipelineRun"
 metadata:
   annotations:
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "pack-builder-push"
@@ -45,10 +45,6 @@ spec:
           value: "task"
         resolver: "bundles"
       workspaces:
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
-      - name: "data-store"
-        workspace: "data-store"
       - name: "output"
         workspace: "source-dir"
     - name: "fetch-packconfig-registrysecret"
@@ -62,12 +58,10 @@ spec:
           value: "task"
         resolver: "bundles"
       workspaces:
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
-      - name: "source-dir"
-        workspace: "source-dir"
       - name: "data-store"
         workspace: "data-store"
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
     - name: "list-source-workspace"
       taskRef:
         params:
@@ -79,12 +73,10 @@ spec:
           value: "task"
         resolver: "bundles"
       workspaces:
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
       - name: "source-dir"
         workspace: "source-dir"
-      - name: "data-store"
-        workspace: "data-store"
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
     - name: "pack-builder"
       params:
       - name: "PACK_SOURCE_DIR"
@@ -110,12 +102,10 @@ spec:
           value: "task"
         resolver: "bundles"
       workspaces:
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
       - name: "source-dir"
         workspace: "source-dir"
-      - name: "data-store"
-        workspace: "data-store"
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
   workspaces:
   - name: "pack-workspace"
     volumeClaimTemplate:
