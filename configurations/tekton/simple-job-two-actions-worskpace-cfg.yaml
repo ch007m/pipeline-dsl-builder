@@ -1,0 +1,30 @@
+type: tekton
+domain: example
+
+namespace: demo
+
+job:
+  name: simple-job-two-actions-wks
+  description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
+
+  resourceType: PipelineRun
+
+  actions:
+    - name: say-hello
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "Say Hello"
+      workspaces:
+        - name: shared-wks
+          workspace: shared-wks
+    - name: say-goodbye
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "and say Good bye to all of you !"
+      workspaces:
+        - name: shared-wks
+          workspace: shared-wks
