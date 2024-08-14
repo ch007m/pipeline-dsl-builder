@@ -3,13 +3,14 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
+      \ echoing Hello and Good bye"
     tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.1"
-  name: "simple-job-embedded-script"
-  namespace: "user"
+  name: "simple-job-two-actions"
+  namespace: "demo"
 spec:
   pipelineSpec:
     tasks:
@@ -18,8 +19,18 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |-
+          script: |
             #!/usr/bin/env bash
 
             set -e
             echo "Say Hello"
+    - name: "say-goodbye"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
+
+            set -e
+            echo "and say Good bye to all of you !"
