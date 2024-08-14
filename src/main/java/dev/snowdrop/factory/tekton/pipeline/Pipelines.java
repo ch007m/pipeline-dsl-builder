@@ -76,7 +76,24 @@ public class Pipelines {
             pipelineParams = populatePipelineParams(cfg.getJob().getParams());
         }
 
+
+        // Create a HashMap of the job workspaces using as's key the workspace's name
+        Map<String, Workspace> jobWorkspacesMap = cfg.getJob().getWorkspaces().stream()
+            .collect(Collectors.toMap(Workspace::getName, name -> name));
+
         for (Action action : actions) {
+
+            // Check if there is a runAfter defined for the action, otherwise
+            // add runAfter if action.id > 1 and get action where id = id -1
+            String runAfter = null;
+            if (action.getRunAfter() != null) {
+                runAfter = action.getRunAfter();
+            } else {
+                if (action.getId() > 1) {
+                    runAfter = actionOrderMap.get(action.getId() - 1).getName();
+                }
+            }
+
             if (action.getRef() != null) {
                 // Create a Bundle using the action reference
                 // bundle://<REGISTRY>/<ORG>/<BUNDLE_TASK-NAME>:<VERSION>@sha256:<SHA256>
@@ -121,21 +138,6 @@ public class Pipelines {
                         e.printStackTrace();
                     }
 
-                    // Create a HashMap of the job workspaces using as's key the workspace's name
-                    Map<String, Workspace> jobWorkspacesMap = cfg.getJob().getWorkspaces().stream()
-                        .collect(Collectors.toMap(Workspace::getName, name -> name));
-
-                    // Check if there is a runAfter defined for the action, otherwise
-                    // add runAfter if action.id > 1 and get action where id = id -1
-                    String runAfter = null;
-                    if (action.getRunAfter() != null) {
-                        runAfter = action.getRunAfter();
-                    } else {
-                        if (action.getId() > 1) {
-                            runAfter = actionOrderMap.get(action.getId() - 1).getName();
-                        }
-                    }
-
                     // Generate the Task
                     aTask = createTaskUsingRef(action, runAfter, bundle, jobWorkspacesMap, taskRefMap);
                     tasks.add(aTask);
@@ -144,7 +146,7 @@ public class Pipelines {
             }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action, cfg.getJob().getWorkspaces());
+                aTask = createTaskWithEmbeddedScript(action, runAfter, cfg.getJob().getWorkspaces());
                 tasks.add(aTask);
             }
         }
@@ -218,7 +220,7 @@ public class Pipelines {
         }
     }
 
-    private static PipelineTask createTaskWithEmbeddedScript(Action action, List<Workspace> jobWorkspaces) {
+    private static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<Workspace> jobWorkspaces) {
         String embeddedScript;
 
         if (action.getScript() != null) {
@@ -242,6 +244,7 @@ public class Pipelines {
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
             .withName(action.getName())
+            .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
             .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
             .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, null))
             .withTaskSpec(
