@@ -46,6 +46,7 @@ public class SnakeYamlTests {
         yaml.dump(action, writer);
 
         String expectedYaml = "!!dev.snowdrop.model.Action\n" +
+            "id: 1\n" +
             "name: git-clone\n" +
             "params:\n"+
             "- {enable: true, url: $(params.git-url)}\n" +

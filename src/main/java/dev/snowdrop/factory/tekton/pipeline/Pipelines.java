@@ -31,7 +31,6 @@ public class Pipelines {
 
     private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
     private static Type TYPE;
-    private static String taskExtractedDirectory;
 
     public static <T> T createResource(Configurator cfg) {
         Class<T> type;
@@ -122,8 +121,15 @@ public class Pipelines {
                     Map<String, Workspace> jobWorkspacesMap = cfg.getJob().getWorkspaces().stream()
                         .collect(Collectors.toMap(Workspace::getName, name -> name));
 
+                    String runAfter = "";
+
+                    // Add runAfter if action.id > 1 and get action where id = id -1
+                    if (action.getId() > 1) {
+                        runAfter = actions.get(action.getId()-1).getName();
+                    }
+
                     // Generate the Task
-                    aTask = createTaskUsingRef(action, bundle, jobWorkspacesMap, taskRefMap);
+                    aTask = createTaskUsingRef(action, runAfter, bundle, jobWorkspacesMap, taskRefMap);
                     tasks.add(aTask);
                 }
 
@@ -243,13 +249,15 @@ public class Pipelines {
         return pipelineTask;
     }
 
-    private static PipelineTask createTaskUsingRef(Action action, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
+    private static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
         // List of workspaces defined for the referenced's task
         List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
+
         // Generate the Pipeline's task
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
                 .withName(action.getName())
+                .withRunAfter(runAfter)
                 .withNewTaskRef()
                   .withResolver("bundles")
                   .withParams()
