@@ -22,13 +22,4 @@ public class Workspace {
         this.workspace = workspace;
         return this;
     }
-
-
-    public void setWorkspace(String workspace) {
-        this.workspace = workspace;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
