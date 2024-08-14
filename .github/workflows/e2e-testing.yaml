@@ -31,10 +31,6 @@ jobs:
           sudo tar xvzf tkn.tar.gz -C /usr/local/bin/ tkn
           tkn version
 
-      - name: Install podman
-        run: |          
-          sudo apt-get -y install podman
-
       - name: Create an IDP cluster and install the packages
         run: |
           PACKAGES_DIR=manifests/idp/packages
