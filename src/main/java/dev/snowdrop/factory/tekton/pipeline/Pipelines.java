@@ -52,14 +52,15 @@ public class Pipelines {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
         Class<T> type;
+        PipelineTask aTask;
         List<PipelineTask> tasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
+
         Map<Integer, Action> actionOrderMap = Optional.ofNullable(cfg.getJob().getActions())
             .orElse(Collections.emptyList()) // Handle null case by providing an empty list
             .stream()
             .collect(Collectors.toMap(Action::getId, id -> id));
-        PipelineTask aTask;
 
         String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
         if (tektonResourceType == null) {
@@ -93,6 +94,20 @@ public class Pipelines {
                 if (action.getId() > 1) {
                     runAfter = actionOrderMap.get(action.getId() - 1).getName();
                 }
+            }
+
+            List<When> whenList = new ArrayList<>();
+            if (action.getWhen() != null && action.getWhen().size() > 0) {
+                action.getWhen().stream().forEach(w -> {
+                    String operator = "in";
+                    String[] res= w.split(":");
+                    whenList.add(
+                        new When()
+                            .input(res[0])
+                            .operator(operator)
+                            .values(List.of(res[1]))
+                    );
+                });
             }
 
             if (action.getRef() != null) {
@@ -147,7 +162,7 @@ public class Pipelines {
             }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action, runAfter, jobWorkspacesMap);
+                aTask = createTaskWithEmbeddedScript(action, runAfter, whenList, jobWorkspacesMap);
                 tasks.add(aTask);
             }
         }
@@ -234,7 +249,7 @@ public class Pipelines {
         return wksPipelineTask;
     }
 
-    private static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, Map<String, Workspace> jobWorkspacesMap) {
+    private static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<When> when, Map<String, Workspace> jobWorkspacesMap) {
         String embeddedScript;
 
         if (action.getScript() != null) {
@@ -253,6 +268,15 @@ public class Pipelines {
             // @formatter:off
             .withName(action.getName())
             .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
+/*            .withWhen().addToWhen(
+                when.stream().forEach(w -> {
+                    return new WhenExpressionBuilder()
+                        .withInput(w.getInput())
+                        .withOperator(w.getOperator())
+                        .withValues(w.getValues())
+                        .build();
+                })
+            )*/
             .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
             .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, null))
             .withTaskSpec(

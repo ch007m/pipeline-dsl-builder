@@ -18,6 +18,7 @@ public class Action {
     private String runAfter;
     private List<Map<String, Object>> params;
     private List<Workspace> workspaces;
+    private List<String> when;
 
     public static final String STEP_SCRIPT_IMAGE = "ubuntu";
 

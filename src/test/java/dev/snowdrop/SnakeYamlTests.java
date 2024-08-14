@@ -48,6 +48,7 @@ public class SnakeYamlTests {
             "runAfter: null\n" +
             "script: null\n" +
             "scriptFileUrl: null\n" +
+            "when: null\n" +
             "workspaces: null\n";
         assertEquals(expectedYaml, writer.toString());
     }
