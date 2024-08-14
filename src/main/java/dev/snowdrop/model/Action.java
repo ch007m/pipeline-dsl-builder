@@ -15,6 +15,7 @@ public class Action {
     private String ref;
     private String script;
     private String scriptFileUrl;
+    private String runAfter;
     private List<Map<String, Object>> params;
     private List<Workspace> workspaces;
 

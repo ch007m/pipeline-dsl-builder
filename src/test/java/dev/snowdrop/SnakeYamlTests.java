@@ -51,6 +51,7 @@ public class SnakeYamlTests {
             "params:\n"+
             "- {enable: true, url: $(params.git-url)}\n" +
             "ref: bundle://quay.io/ch007m/tekton-bundle:latest\n" +
+            "runAfter: null\n" +
             "script: null\n" +
             "scriptFileUrl: null\n" +
             "workspaces: null\n";

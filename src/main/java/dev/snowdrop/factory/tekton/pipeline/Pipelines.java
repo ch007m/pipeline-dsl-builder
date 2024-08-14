@@ -121,11 +121,15 @@ public class Pipelines {
                     Map<String, Workspace> jobWorkspacesMap = cfg.getJob().getWorkspaces().stream()
                         .collect(Collectors.toMap(Workspace::getName, name -> name));
 
+                    // Check if there is a runAfter defined for the action, otherwise
+                    // add runAfter if action.id > 1 and get action where id = id -1
                     String runAfter = "";
-
-                    // Add runAfter if action.id > 1 and get action where id = id -1
-                    if (action.getId() > 1) {
-                        runAfter = actions.get(action.getId()-1).getName();
+                    if (action.getRunAfter() != null) {
+                        runAfter = action.getRunAfter();
+                    } else {
+                        if (action.getId() > 1) {
+                            runAfter = actions.get(action.getId() - 1).getName();
+                        }
                     }
 
                     // Generate the Task
