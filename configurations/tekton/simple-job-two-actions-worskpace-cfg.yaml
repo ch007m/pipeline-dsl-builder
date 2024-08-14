@@ -6,8 +6,12 @@ namespace: demo
 job:
   name: simple-job-two-actions-wks
   description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
-
   resourceType: PipelineRun
+  workspaces:
+    - name: shared-wks
+      volumeClaimTemplate:
+        storage: 1Gi
+        accessMode: ReadWriteOnce
 
   actions:
     - name: say-hello
@@ -15,7 +19,9 @@ job:
         #!/usr/bin/env bash
         
         set -e
-        echo "Say Hello"
+        if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+          echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message
+        fi
       workspaces:
         - name: shared-wks
           workspace: shared-wks
@@ -24,7 +30,10 @@ job:
         #!/usr/bin/env bash
         
         set -e
-        echo "and say Good bye to all of you !"
+        if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+          cat $(workspaces.shared-wks.path)/message
+        fi
+        echo "Saying Good bye to all of you from action: say-goodbye"
       workspaces:
         - name: shared-wks
           workspace: shared-wks

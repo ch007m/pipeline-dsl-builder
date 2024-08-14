@@ -76,9 +76,10 @@ public class Pipelines {
             pipelineParams = populatePipelineParams(cfg.getJob().getParams());
         }
 
-
         // Create a HashMap of the job workspaces using as's key the workspace's name
-        Map<String, Workspace> jobWorkspacesMap = cfg.getJob().getWorkspaces().stream()
+        Map<String, Workspace> jobWorkspacesMap = Optional.ofNullable(cfg.getJob().getWorkspaces())
+            .orElse(Collections.emptyList())
+            .stream()
             .collect(Collectors.toMap(Workspace::getName, name -> name));
 
         for (Action action : actions) {
@@ -146,7 +147,7 @@ public class Pipelines {
             }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action, runAfter, cfg.getJob().getWorkspaces());
+                aTask = createTaskWithEmbeddedScript(action, runAfter, jobWorkspacesMap);
                 tasks.add(aTask);
             }
         }
@@ -206,21 +207,34 @@ public class Pipelines {
             });
 
         } else {
-            // As the Task referenced do not declare workspaces, then we can return an empty list
+            // taskWorkspaces can be null - empty when we generate a Pipeline using TaskSpec and embedded script
+            // In this case, we will check if wks have been defined at the level of the action
+            // and if the wks exisyts within the Job's workspace
+            actionWorkspacesMap.keySet().forEach(k -> {
+                if (wksMerged.containsKey(k) && jobWorkspacesMap.containsKey(k)) {
+                    // Job's workspace and task's workspace matches
+                    // We will now check if name
+                    logger.info("Match found using as key: " + k);
+
+                    Workspace wksMatching = wksMerged.get(k);
+
+                    WorkspacePipelineTaskBindingBuilder wuBuilder = new WorkspacePipelineTaskBindingBuilder();
+                    wuBuilder
+                        .withName(wksMatching.getName())
+                        .withWorkspace(wksMatching.getWorkspace() != null ? wksMatching.getWorkspace() : wksMatching.getName())
+                        .build();
+                    wksPipelineTask.add(wuBuilder.build());
+                } else {
+                    throw new RuntimeException("The following workspace has not defined at the job's level: " + k);
+                }
+            });
+
             return wksPipelineTask;
         }
         return wksPipelineTask;
     }
 
-    private static boolean isOptional(WorkspaceDeclaration wks) {
-        if (wks.getOptional() != null && wks.getOptional()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<Workspace> jobWorkspaces) {
+    private static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, Map<String, Workspace> jobWorkspacesMap) {
         String embeddedScript;
 
         if (action.getScript() != null) {
@@ -234,12 +248,6 @@ public class Pipelines {
         } else {
             throw new RuntimeException("No embedded script configured");
         }
-
-        // Create a HashMap of the job workspaces using as's key the workspace's name
-        Map<String, Workspace> jobWorkspacesMap = Optional.ofNullable(jobWorkspaces)
-            .orElse(Collections.emptyList()) // Handle null case by providing an empty list
-            .stream()
-            .collect(Collectors.toMap(Workspace::getName, name -> name));
 
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
@@ -277,7 +285,6 @@ public class Pipelines {
                     .addNewParam().withName("name").withValue(new ParamValue(action.getName())).endParam()
                     .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
                   .endTaskRef()
-                // TODO Propagation mechanism should be reviewed as discussed here - see: https://github.com/ch007m/pipeline-dsl-builder/issues/20
                 .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
                 .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
                 .build();
