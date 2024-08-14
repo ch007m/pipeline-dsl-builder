@@ -48,16 +48,16 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
-    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
+    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/runtime: "java"
-    pipelines.openshift.io/used-by: "build-cloud"
   name: "my-quarkus-1"
 spec:
   params:
@@ -441,16 +441,16 @@ apiVersion: "tekton.dev/v1"
 kind: "Pipeline"
 metadata:
   annotations:
-    pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
-      \ == 'main'"
-    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
+    pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
+      \ == 'main'"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
+    pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     pipelines.openshift.io/strategy: "buildpack"
-    pipelines.openshift.io/used-by: "build-cloud"
   name: "buildpack-builder"
 spec:
   finally:
@@ -1076,9 +1076,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
-    tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-embedded-script"
@@ -1142,9 +1142,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
-    tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-fetch-script"
@@ -1213,8 +1213,8 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/platforms: "linux/amd64"
     tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
       \ echoing Hello and Good bye"
   labels:
@@ -1246,6 +1246,96 @@ spec:
 
             set -e
             echo "and say Good bye to all of you !"
+
+```
+## Provider: tekton
+
+### Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye when condirion is met
+
+Command to be executed: 
+```bash
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/simple-job-two-actions-when-cfg.yaml
+```
+using as configuration: 
+```yaml
+# configurations/tekton/simple-job-two-actions-when-cfg.yaml
+
+type: tekton
+domain: example
+namespace: demo
+
+job:
+  name: simple-job-two-actions-when # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye when condirion is met
+  resourceType: PipelineRun
+  params:
+    - message: true
+  actions:
+    - name: say-hello
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "Say Hello"
+    - name: say-goodbye
+      when:
+        - "$(params.say-goodbye): true"
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "and say Good bye to all of you !"
+```
+Generated file: 
+```yaml
+# generated/tekton/example/pipelinerun-simple-job-two-actions-when.yaml
+
+---
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
+      \ echoing Hello and Good bye when condirion is met"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "simple-job-two-actions-when"
+  namespace: "demo"
+spec:
+  params:
+  - name: "message"
+    value: "true"
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |
+            #!/usr/bin/env bash
+
+            set -e
+            echo "Say Hello"
+    - name: "say-goodbye"
+      runAfter:
+      - "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
+
+            set -e
+            echo "and say Good bye to all of you !"
+      when:
+      - input: "$(params.say-goodbye)"
+        operator: "in"
+        values:
+        - "true"
 
 ```
 ## Provider: tekton
