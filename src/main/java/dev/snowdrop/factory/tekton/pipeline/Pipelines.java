@@ -220,7 +220,9 @@ public class Pipelines {
         }
 
         // Create a HashMap of the job workspaces using as's key the workspace's name
-        Map<String, Workspace> jobWorkspacesMap = jobWorkspaces.stream()
+        Map<String, Workspace> jobWorkspacesMap = Optional.ofNullable(jobWorkspaces)
+            .orElse(Collections.emptyList()) // Handle null case by providing an empty list
+            .stream()
             .collect(Collectors.toMap(Workspace::getName, name -> name));
 
         PipelineTask pipelineTask = new PipelineTaskBuilder()
