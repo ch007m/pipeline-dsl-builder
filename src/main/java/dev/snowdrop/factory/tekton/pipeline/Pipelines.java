@@ -105,7 +105,7 @@ public class Pipelines {
                         new When()
                             .input(res[0])
                             .operator(operator)
-                            .values(List.of(res[1]))
+                            .values(List.of(res[1].trim()))
                     );
                 });
             }
@@ -268,15 +268,14 @@ public class Pipelines {
             // @formatter:off
             .withName(action.getName())
             .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
-/*            .withWhen().addToWhen(
-                when.stream().forEach(w -> {
-                    return new WhenExpressionBuilder()
+            .withWhen().addToWhen(
+                when.stream()
+                .map(w -> new WhenExpressionBuilder()
                         .withInput(w.getInput())
                         .withOperator(w.getOperator())
                         .withValues(w.getValues())
-                        .build();
-                })
-            )*/
+                        .build())
+                    .toArray(WhenExpression[]::new))
             .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
             .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, null))
             .withTaskSpec(
