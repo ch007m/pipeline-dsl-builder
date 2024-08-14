@@ -25,4 +25,4 @@ job:
         #!/usr/bin/env bash
         
         set -e
-        echo "and say Good bye"
+        echo "and say Good bye to all of you !"
