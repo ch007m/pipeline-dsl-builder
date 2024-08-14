@@ -47,16 +47,6 @@ jobs:
           kubectl rollout status -n tekton-pipelines deployment/tekton-pipelines-webhook
           kubectl get po -A
 
-      #- name: Create the gitea organization
-      #  run: |
-      #    echo "Creating the organization: $REPO_ORG on $GITEA_REGISTRY"
-      #    curl -k -X POST \
-      #      "https://$GITEA_REGISTRY/api/v1/orgs" \
-      #      -H 'accept: application/json' \
-      #      -H 'Content-Type: application/json' \
-      #      -u "$GITEA_USERNAME:$GITEA_PASSWORD" \
-      #      -d '{"username": "'"$REPO_ORG"'"}'
-
       - name: Get gitea env vars
         run: |
           GITEA_REGISTRY=$(kubectl get ingress/my-gitea -n gitea -ojson | jq -r '.spec.rules[0].host')
@@ -69,18 +59,6 @@ jobs:
 
       - name: Create the secret containing the creds to write images on Gitea
         run: |
-          #GITEA_CREDS=$(echo -n "$GITEA_USERNAME:$GITEA_PASSWORD" | base64 -w 0)
-          #cat <<EOF > config.json
-          #{
-          #  "auths": {
-          #    "$GITEA_REGISTRY": {
-          #      "auth": "$GITEA_CREDS"
-          #    }
-          #  }
-          #}
-          #EOF
-          #kubectl create secret generic gitea-creds -n default --from-file=config.json          
-          
           kubectl create secret docker-registry gitea-creds \
             --docker-username="$GITEA_USERNAME" \
             --docker-password="$GITEA_PASSWORD" \
@@ -97,18 +75,6 @@ jobs:
             # To pass as parameter: experimental = true
             config.toml: CmV4cGVyaW1lbnRhbCA9IHRydWU=
           EOF
-
-      - name: Test if we can push an image to gitea
-        run: |
-          REGISTRY="gitea.cnoe.localtest.me:8443/giteaadmin"
-          podman login --tls-verify=false --authfile=${HOME}/.docker/config.json \
-            -u $GITEA_USERNAME \
-            -p $GITEA_PASSWORD \
-            $GITEA_REGISTRY
-          podman pull alpine
-          podman tag alpine:latest $REGISTRY/alpine:latest
-          podman push --tls-verify=false --authfile=${HOME}/.docker/config.json \
-            $REGISTRY/alpine:latest
 
       - name: Deploy tekton examples - pipelinerun and check status
         run: |
