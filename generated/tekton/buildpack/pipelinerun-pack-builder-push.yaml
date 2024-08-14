@@ -3,9 +3,9 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
     tekton.dev/platforms: "linux/amd64"
-    tekton.dev/pipelines.minVersion: "0.60.x"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "pack-builder-push"
@@ -18,7 +18,7 @@ spec:
   - name: "source-dir"
     value: "."
   - name: "output-image"
-    value: "gitea.cnoe.localtest.me:8443/giteaadmin"
+    value: "gitea.cnoe.localtest.me:8443/giteaadmin/ubi-builder"
   - name: "imageUrl"
     value: "buildpacksio/pack"
   - name: "imageTag"
@@ -48,6 +48,8 @@ spec:
       - name: "output"
         workspace: "source-dir"
     - name: "fetch-packconfig-registrysecret"
+      runAfter:
+      - "git-clone"
       taskRef:
         params:
         - name: "bundle"
@@ -63,6 +65,8 @@ spec:
       - name: "pack-workspace"
         workspace: "pack-workspace"
     - name: "list-source-workspace"
+      runAfter:
+      - "fetch-packconfig-registrysecret"
       taskRef:
         params:
         - name: "bundle"
@@ -92,6 +96,8 @@ spec:
       - name: "PACK_CMD_FLAGS"
         value:
         - "$(params.packCmdBuilderFlags)"
+      runAfter:
+      - "list-source-workspace"
       taskRef:
         params:
         - name: "bundle"
