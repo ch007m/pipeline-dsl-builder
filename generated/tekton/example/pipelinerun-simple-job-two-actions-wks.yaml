@@ -1,0 +1,60 @@
+---
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
+      \ echoing Hello and Good bye and sharing the message using a workspace"
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.60.x"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "simple-job-two-actions-wks"
+  namespace: "demo"
+spec:
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |
+            #!/usr/bin/env bash
+
+            set -e
+            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+              echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message
+            fi
+      workspaces:
+      - name: "shared-wks"
+        workspace: "shared-wks"
+    - name: "say-goodbye"
+      runAfter:
+      - "say-hello"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |
+            #!/usr/bin/env bash
+
+            set -e
+            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
+              cat $(workspaces.shared-wks.path)/message
+            fi
+            echo "Saying Good bye to all of you from action: say-goodbye"
+      workspaces:
+      - name: "shared-wks"
+        workspace: "shared-wks"
+  workspaces:
+  - name: "shared-wks"
+    volumeClaimTemplate:
+      apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      spec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"

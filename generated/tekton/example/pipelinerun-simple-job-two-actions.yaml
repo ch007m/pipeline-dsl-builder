@@ -3,10 +3,10 @@ apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
   annotations:
+    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/pipelines.minVersion: "0.60.x"
     tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
       \ echoing Hello and Good bye"
-    tekton.dev/pipelines.minVersion: "0.60.x"
-    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-two-actions"
@@ -25,6 +25,8 @@ spec:
             set -e
             echo "Say Hello"
     - name: "say-goodbye"
+      runAfter:
+      - "say-hello"
       taskSpec:
         steps:
         - image: "ubuntu"
