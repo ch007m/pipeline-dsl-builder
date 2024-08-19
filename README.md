@@ -31,18 +31,18 @@ type: tekton
 domain: example
 
 job:
-  name: simple-job-embedded-script # name of the pipeline to be created
+  name: simple-job-embedded-script
   description: Simple example of a Tekton pipeline echoing a message
-  resourceType: PipelineRun  # One of the supported resources: PipelineRun, Pipeline
+  resourceType: PipelineRun
 
   actions:
-    - name: say-hello
-      # The script to be executed using a linux container
-      script: |
-        #!/usr/bin/env bash
-        
-        set -e
-        echo "Say Hello"
+  - name: say-hello
+    # The script to be executed using a linux container
+    script: |
+      #!/usr/bin/env bash
+      
+      set -e
+      echo "Say Hello"
 ```
 and launch it:
 ```bash
