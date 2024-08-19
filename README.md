@@ -30,12 +30,19 @@ cat <<EOF > my-config.yaml
 type: tekton
 domain: example
 
-# A job represents a collection of kubernetes resources able to perform different tasks, steps
 job:
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
-  name: pipeline-1
-EOF
+  name: simple-job-embedded-script # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline echoing a message
+  resourceType: PipelineRun  # One of the supported resources: PipelineRun, Pipeline
+
+  actions:
+    - name: say-hello
+      # The script to be executed using a linux container
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "Say Hello"
 ```
 and launch it:
 ```bash
