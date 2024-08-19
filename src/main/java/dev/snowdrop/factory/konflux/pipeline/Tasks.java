@@ -285,6 +285,13 @@ public class Tasks {
       return task;
    }
 
+   public static PipelineTask USER_BUILD() {
+      PipelineTask task = new PipelineTaskBuilder()
+          .withName("user-build")
+          .build();
+      return task;
+   }
+
    public static PipelineTask BUILDPACKS_BUILDER() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("buildpacks-builder")

@@ -1,6 +1,7 @@
 package dev.snowdrop.factory.tekton.pipeline;
 
 import dev.snowdrop.factory.AnnotationsProviderFactory;
+import dev.snowdrop.factory.JobProvider;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Volume;
@@ -27,25 +28,14 @@ import static dev.snowdrop.factory.Bundles.getBundleURL;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
-public class Pipelines {
+public class Pipelines implements JobProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
     private static Type TYPE;
 
-    public static <T> T createResource(Configurator cfg) {
-        Class<T> type;
-        List<Action> actions = cfg.getJob().getActions();
-        String domain = cfg.getDomain().toUpperCase();
-
-        if (domain == null) {
-            throw new RuntimeException("Missing domain");
-        }
-
-        if (actions.isEmpty()) {
-            throw new RuntimeException("Missing actions");
-        }
-
-        return createJob(cfg, actions);
+    @Override
+    public <T> T getGenerator(Configurator cfg) {
+        return null;
     }
 
     public static <T> T createJob(Configurator cfg, List<Action> actions) {
@@ -550,4 +540,6 @@ public class Pipelines {
       // @formatter:on
         return pr;
     }
+
+
 }

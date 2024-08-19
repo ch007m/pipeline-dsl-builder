@@ -1,5 +1,6 @@
 package dev.snowdrop.command;
 
+import dev.snowdrop.factory.TektonResource;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
@@ -14,8 +15,7 @@ import java.nio.file.Paths;
 
 import static dev.snowdrop.factory.konflux.component.ComponentBuilder.createComponent;
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuild;
-import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
-import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createResource;
+import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createCustomBuild;
 import static dev.snowdrop.factory.konflux.application.ApplicationBuilder.createApplication;
 
 @TopCommand
@@ -41,10 +41,6 @@ public class BuilderCommand implements Runnable {
         // Set the outputPath to the configurator object
         cfg.setOutputPath(outputPath);
 
-        // Set default values for the Repository when not defined part of the configuration yaml
-        // TODO: To be reviewed to see if we can do that during yaml parsing
-        cfg.getRepository().setDefaultValues();
-
         if (cfg == null) {
             logger.error("Configuration file cannot be empty !");
             System.exit(1);
@@ -68,9 +64,13 @@ public class BuilderCommand implements Runnable {
 
         switch (providerType) {
             case TEKTON:
-                ConfiguratorSvc.writeYaml(createResource(cfg), resourcesPath);
+                ConfiguratorSvc.writeYaml(TektonResource.create(cfg), resourcesPath);
                 break;
             case KONFLUX:
+                // Set default values for the Repository when not defined part of the configuration yaml
+                // TODO: To be reviewed to see if we can do that during yaml parsing
+                cfg.getRepository().setDefaultValues();
+
                 // TODO: When the konflux switch code will be reviewed and removed, then this code should be moved after.
                 if (cfg.getApplication() != null && cfg.getApplication().isEnable()) {
                     ConfiguratorSvc.writeYaml(createApplication(cfg), resourcesPath);
@@ -87,8 +87,8 @@ public class BuilderCommand implements Runnable {
                         ConfiguratorSvc.writeYaml(createBuild(cfg), resourcesPath);
                         break;
                     case BUILDPACK:
-                        // Resource generated: Pipeline
-                        ConfiguratorSvc.writeYaml(createBuilder(cfg), resourcesPath);
+                        // Resource generated: PipelineRun
+                        ConfiguratorSvc.writeYaml(createCustomBuild(cfg), resourcesPath);
                         break;
                 } // end of switch domain
         } // end of switch providerType

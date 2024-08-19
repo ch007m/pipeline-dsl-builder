@@ -10,7 +10,7 @@ repository:
 
 job:
   # One of the supported resources: PipelineRun, Pipeline
-  resourceType: Pipeline
+  resourceType: PipelineRun
   name: buildpack-builder
   description: PipelineRun using the pack client to build a builder image
 
