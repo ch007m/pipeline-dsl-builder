@@ -11,7 +11,7 @@ public class Annotations implements AnnotationsProvider {
    @Override
    public Map<String, String> getPipelineAnnotations(Configurator cfg) {
       Map<String, String> annotations = Map.of(
-        "build.appstudio.openshift.io/repo",cfg.getRepository().getName() + "?rev={{revision}}",
+        "build.appstudio.openshift.io/repo",cfg.getRepository().getUrl() + "?rev={{revision}}",
         "build.appstudio.redhat.com/commit_sha","{{revision}}",
         "build.appstudio.redhat.com/target_branch","{{target_branch}}",
         "pipelinesascode.tekton.dev/max-keep-runs","3",

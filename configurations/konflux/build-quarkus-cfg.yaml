@@ -1,5 +1,12 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: konflux
+
+# To generate or not the Application and/or Component CR
+application:
+  enable: true
+component:
+  enable: true
+
 # The domain allows to specify for Konflux the type of the build-container - https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml#L112
 # to be executed.
 # Such a type matches a corresponding Task which is either:
@@ -14,8 +21,8 @@ domain: build
 namespace: user1
 
 repository:
-  name: https://github.com/ch007m/new-quarkus-app-1
-  branch: main
+  url: https://github.com/ch007m/new-quarkus-app-1
+  dockerfilePath: src/main/docker/Dockerfile.jvm
 
 job:
   # One of the supported resources: PipelineRun, Pipeline
