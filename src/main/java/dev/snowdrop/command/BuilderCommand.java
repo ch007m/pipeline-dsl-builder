@@ -71,12 +71,12 @@ public class BuilderCommand implements Runnable {
                 ConfiguratorSvc.writeYaml(createResource(cfg), resourcesPath);
                 break;
             case KONFLUX:
-                // TODO: When the switch code will be reviewed and removed, then this code should be moved after.
-                if (cfg.getApplication().isEnable()) {
+                // TODO: When the konflux switch code will be reviewed and removed, then this code should be moved after.
+                if (cfg.getApplication() != null && cfg.getApplication().isEnable()) {
                     ConfiguratorSvc.writeYaml(createApplication(cfg), resourcesPath);
                 }
 
-                if (cfg.getComponent().isEnable()) {
+                if (cfg.getComponent() != null &&  cfg.getComponent().isEnable()) {
                     ConfiguratorSvc.writeYaml(createComponent(cfg), resourcesPath);
                 }
 
