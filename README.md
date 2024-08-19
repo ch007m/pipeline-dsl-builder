@@ -15,16 +15,16 @@ The application has been designed around the following principles:
 
 ## How to use it
 
-Git clone the project and compile the code:
+Git clone the project and create the jar file of the standalone Quarkus application:
 
 ```bash
 ./mvnw package
 ```
 
-Create a configuration YAML file where you will define the following parameters:
+Create a configuration YAML file where you define the parameters as:
  - The `pipeline` provider to be used: `konflux` or `tekton`
  - The `domain` to group the generated files under the output path
- - A job with their parameters
+ - A job
 ```bash
 cat <<EOF > my-config.yaml
 type: tekton
