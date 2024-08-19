@@ -4,14 +4,17 @@ kind: "PipelineRun"
 metadata:
   annotations:
     tekton.dev/pipelines.minVersion: "0.60.x"
-    tekton.dev/platforms: "linux/amd64"
     tekton.dev/displayName: "Simple example of a Tekton pipeline including 2 actions\
-      \ echoing Hello and Good bye"
+      \ echoing Hello and Good bye when condirion is met"
+    tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: "0.1"
-  name: "simple-job-two-actions"
+  name: "simple-job-two-actions-when"
   namespace: "demo"
 spec:
+  params:
+  - name: "message"
+    value: "true"
   pipelineSpec:
     tasks:
     - name: "say-hello"
@@ -36,3 +39,8 @@ spec:
 
             set -e
             echo "and say Good bye to all of you !"
+      when:
+      - input: "$(params.say-goodbye)"
+        operator: "in"
+        values:
+        - "true"
