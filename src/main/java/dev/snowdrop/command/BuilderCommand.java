@@ -12,9 +12,11 @@ import picocli.CommandLine.Option;
 
 import java.nio.file.Paths;
 
+import static dev.snowdrop.factory.konflux.component.ComponentBuilder.createComponent;
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuild;
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuilder;
 import static dev.snowdrop.factory.tekton.pipeline.Pipelines.createResource;
+import static dev.snowdrop.factory.konflux.application.ApplicationBuilder.createApplication;
 
 @TopCommand
 @Command(name = "builder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline(run)s")
@@ -38,6 +40,10 @@ public class BuilderCommand implements Runnable {
 
         // Set the outputPath to the configurator object
         cfg.setOutputPath(outputPath);
+
+        // Set default values for the Repository when not defined part of the configuration yaml
+        // TODO: To be reviewed to see if we can do that during yaml parsing
+        cfg.getRepository().setDefaultValues();
 
         if (cfg == null) {
             logger.error("Configuration file cannot be empty !");
@@ -65,7 +71,16 @@ public class BuilderCommand implements Runnable {
                 ConfiguratorSvc.writeYaml(createResource(cfg), resourcesPath);
                 break;
             case KONFLUX:
-                // TODO: To be reviewed as not generated resources still include hard coded values, etc
+                // TODO: When the switch code will be reviewed and removed, then this code should be moved after.
+                if (cfg.getApplication().isEnable()) {
+                    ConfiguratorSvc.writeYaml(createApplication(cfg), resourcesPath);
+                }
+
+                if (cfg.getComponent().isEnable()) {
+                    ConfiguratorSvc.writeYaml(createComponent(cfg), resourcesPath);
+                }
+
+                // TODO: To be reviewed as generated resources still include hard coded values, etc
                 switch (domain) {
                     case BUILD:
                         // Resource generated: PipelineRun
