@@ -4,7 +4,7 @@ namespace: demo
 
 job:
   name: simple-job-two-actions-when # name of the pipeline to be created
-  description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye when condirion is met
+  description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye when condition is met
   resourceType: PipelineRun
   params:
     - message: true
