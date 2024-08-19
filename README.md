@@ -57,4 +57,4 @@ The `configurations` folder proposes different YAML configurations of what you c
 
 ## Some scenario ideas
 
-See some idea of scenario [here](SCENARIO.md) - Enjoy :-)
+Some examples of configuration are described part of this [document](SCENARIO.md) - Enjoy :-)
