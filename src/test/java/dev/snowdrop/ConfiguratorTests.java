@@ -6,7 +6,6 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.wildfly.common.Assert.assertNotNull;
 
 public class ConfiguratorTests {
 
