@@ -1163,6 +1163,222 @@ spec:
 
 Command to be executed: 
 ```bash
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/pack-builder-git-task-cfg.yaml
+```
+using as configuration: 
+```yaml
+# configurations/tekton/pack-builder-git-task-cfg.yaml
+
+type: tekton
+domain: buildpack
+namespace:
+
+job:
+  # One of the supported resources: PipelineRun, Pipeline
+  resourceType: PipelineRun
+  name: pack-builder-git-task
+  description: "This Pipeline builds a builder image using the pack CLI."
+  params:
+  - debug: true
+  - git-url: "https://github.com/redhat-buildpacks/ubi-image-builder.git"
+  - source-dir: "."
+  - output-image: "gitea.cnoe.localtest.me:8443/giteaadmin/ubi-builder"
+  - imageUrl: "buildpacksio/pack"
+  - imageTag: "latest"
+  - packCmdBuilderFlags:
+    - -v
+    - --publish
+  # The workspaces declared here will be mounted for each action except if an action overrides it to use a different name
+  workspaces:
+    - name: pack-workspace
+      volumeClaimTemplate:
+        storage: 1Gi
+        accessMode: ReadWriteOnce
+    - name: source-dir
+      volumeClaimTemplate:
+        storage: 1Gi
+        accessMode: ReadWriteOnce
+    - name: data-store
+      volumeSources:
+        - secret: pack-config-toml
+        - secret: gitea-creds # quay-creds, docker-creds, etc
+  actions:
+    - name: git-clone
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3
+      params:
+        - url: "$(params.git-url)"
+        - subdirectory: "."
+      workspaces:
+        - name: output
+          workspace: source-dir
+    - name: fetch-packconfig-registrysecret
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+    - name: list-source-workspace
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+    - name: pack-builder
+      ref: git://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml
+      params:
+        - PACK_SOURCE_DIR: "$(params.source-dir)"
+        - PACK_CLI_IMAGE: "$(params.imageUrl)"
+        - PACK_CLI_IMAGE_VERSION: "$(params.imageTag)"
+        - BUILDER_IMAGE_NAME: "$(params.output-image)"
+        - PACK_BUILDER_TOML: "ubi-builder.toml"
+        - PACK_CMD_FLAGS:
+          - "$(params.packCmdBuilderFlags)"
+
+
+```
+Generated file: 
+```yaml
+# generated/tekton/buildpack/pipelinerun-pack-builder-git-task.yaml
+
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "This Pipeline builds a builder image using the pack CLI."
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "pack-builder-git-task"
+spec:
+  params:
+  - name: "debug"
+    value: "true"
+  - name: "git-url"
+    value: "https://github.com/redhat-buildpacks/ubi-image-builder.git"
+  - name: "source-dir"
+    value: "."
+  - name: "output-image"
+    value: "gitea.cnoe.localtest.me:8443/giteaadmin/ubi-builder"
+  - name: "imageUrl"
+    value: "buildpacksio/pack"
+  - name: "imageTag"
+    value: "latest"
+  - name: "packCmdBuilderFlags"
+    value:
+    - "-v"
+    - "--publish"
+  pipelineSpec:
+    tasks:
+    - name: "git-clone"
+      params:
+      - name: "url"
+        value: "$(params.git-url)"
+      - name: "subdirectory"
+        value: "."
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3"
+        - name: "name"
+          value: "git-clone"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      workspaces:
+      - name: "output"
+        workspace: "source-dir"
+    - name: "fetch-packconfig-registrysecret"
+      runAfter:
+      - "git-clone"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+        - name: "name"
+          value: "fetch-packconfig-registrysecret"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      workspaces:
+      - name: "data-store"
+        workspace: "data-store"
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+    - name: "list-source-workspace"
+      runAfter:
+      - "fetch-packconfig-registrysecret"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+        - name: "name"
+          value: "list-source-workspace"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      workspaces:
+      - name: "source-dir"
+        workspace: "source-dir"
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+    - name: "pack-builder"
+      params:
+      - name: "PACK_SOURCE_DIR"
+        value: "$(params.source-dir)"
+      - name: "PACK_CLI_IMAGE"
+        value: "$(params.imageUrl)"
+      - name: "PACK_CLI_IMAGE_VERSION"
+        value: "$(params.imageTag)"
+      - name: "BUILDER_IMAGE_NAME"
+        value: "$(params.output-image)"
+      - name: "PACK_BUILDER_TOML"
+        value: "ubi-builder.toml"
+      - name: "PACK_CMD_FLAGS"
+        value:
+        - "$(params.packCmdBuilderFlags)"
+      runAfter:
+      - "list-source-workspace"
+      taskRef:
+        params:
+        - name: "git"
+          value: "https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml"
+        - name: "revision"
+          value: "main"
+        - name: "pathInRepo"
+          value: "./"
+        resolver: "git"
+      workspaces:
+      - name: "source-dir"
+        workspace: "source-dir"
+      - name: "pack-workspace"
+        workspace: "pack-workspace"
+  workspaces:
+  - name: "pack-workspace"
+    volumeClaimTemplate:
+      apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      spec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
+  - name: "source-dir"
+    volumeClaimTemplate:
+      apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      spec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
+  - name: "data-store"
+    projected:
+      sources:
+      - secret:
+          name: "pack-config-toml"
+      - secret:
+          name: "gitea-creds"
+
+```
+### This Pipeline builds a builder image using the pack CLI.
+
+Command to be executed: 
+```bash
 java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/pack-builder-cfg.yaml
 ```
 using as configuration: 
