@@ -1,4 +1,3 @@
----
 apiVersion: "appstudio.redhat.com/v1alpha1"
 kind: "Component"
 metadata:
