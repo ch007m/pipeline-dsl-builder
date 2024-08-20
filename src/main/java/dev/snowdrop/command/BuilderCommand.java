@@ -1,7 +1,6 @@
 package dev.snowdrop.command;
 
 import dev.snowdrop.factory.TektonResource;
-import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
@@ -14,7 +13,6 @@ import picocli.CommandLine.Option;
 import java.nio.file.Paths;
 
 import static dev.snowdrop.factory.konflux.component.ComponentBuilder.createComponent;
-import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuild;
 import static dev.snowdrop.factory.konflux.application.ApplicationBuilder.createApplication;
 
 @TopCommand

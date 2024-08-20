@@ -1,4 +1,4 @@
-package dev.snowdrop;
+package dev.snowdrop.snakeyaml;
 
 import dev.snowdrop.model.Configurator;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ public class ConfiguratorTests {
             component:
               enable: false
             domain: build
-
+            
             repository:
               url: https://github.com/ch007m/new-quarkus-app-1
               dockerfilePath: src/main/docker/Dockerfile.jvm
@@ -31,5 +31,4 @@ public class ConfiguratorTests {
         assert cfg != null;
         assertNull(cfg.getRepository());
     }
-
 }

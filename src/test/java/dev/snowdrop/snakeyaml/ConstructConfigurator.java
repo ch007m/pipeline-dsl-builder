@@ -1,4 +1,4 @@
-package dev.snowdrop;
+package dev.snowdrop.snakeyaml;
 
 import dev.snowdrop.model.Configurator;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;

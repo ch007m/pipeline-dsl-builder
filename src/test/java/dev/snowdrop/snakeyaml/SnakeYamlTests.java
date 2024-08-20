@@ -1,8 +1,7 @@
-package dev.snowdrop;
+package dev.snowdrop.snakeyaml;
 
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Job;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;

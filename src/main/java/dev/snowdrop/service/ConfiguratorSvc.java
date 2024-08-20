@@ -1,5 +1,8 @@
 package dev.snowdrop.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -27,6 +30,7 @@ public class ConfiguratorSvc {
 
       // Load the YAML file
       try {
+         //configurator = loadYamlUsingSnake(configFile);
          configurator = loadYaml(configFile);
       } catch(Exception e) {
          e.printStackTrace();
@@ -35,6 +39,37 @@ public class ConfiguratorSvc {
    }
 
    public static Configurator loadYaml(String filePath) {
+      ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+      try {
+         return mapper.readValue(new File(filePath), Configurator.class);
+      } catch (IOException e) {
+         e.printStackTrace();
+         return null;
+      }
+   }
+
+   public static void writeYaml(HasMetadata resource, String outputPath) {
+      try {
+         String fileName = resource.getKind().toLowerCase() + "-" + resource.getMetadata().getName();
+         Path yamlFilePath = Paths.get(outputPath, fileName + ".yaml");
+
+         Files.createDirectories(Paths.get(outputPath));
+         Path pathToYaml = Files.createFile(yamlFilePath);
+
+         // Convert the resource to YAML
+         ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+         mapper.writeValue(pathToYaml.toFile(), resource);
+
+         logger.info("Path of the resource generated: {}", pathToYaml);
+         logger.debug("Generated YAML: \n{}", yamlFilePath);
+
+      } catch (Exception e) {
+         logger.error(e.getMessage());
+      }
+   }
+
+   @Deprecated
+   public static Configurator loadYamlUsingSnake(String filePath) {
       // Create a YAML parser
       Yaml yaml = new Yaml(new Constructor(Configurator.class, new LoaderOptions()));
 
@@ -48,7 +83,8 @@ public class ConfiguratorSvc {
       }
    }
 
-   public static void writeYaml(HasMetadata resource, String outputPath) {
+   @Deprecated
+   public static void writeYamlUsingSnake(HasMetadata resource, String outputPath) {
       try {
          // Convert the resource(run) to YAML
          String yamlResource = Serialization.asYaml(resource);
@@ -64,6 +100,7 @@ public class ConfiguratorSvc {
       }
    }
 
+   @Deprecated
    public static void writeYamlToFile(String outputPath, String fileName, String yamlContent) {
       Path filePath = Paths.get(outputPath, fileName+".yaml");
       try {

@@ -1,4 +1,4 @@
-package dev.snowdrop;
+package dev.snowdrop.snakeyaml;
 
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;

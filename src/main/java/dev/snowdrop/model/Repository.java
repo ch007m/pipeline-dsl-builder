@@ -1,5 +1,7 @@
 package dev.snowdrop.model;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,8 +9,12 @@ import lombok.Setter;
 @Getter
 public class Repository {
    private String url;
-   private String context;
-   private String revision;
+
+   @JsonSetter(nulls = Nulls.SKIP)
+   private String context = DEFAULT_CONTEXT;
+
+   @JsonSetter(nulls = Nulls.SKIP)
+   private String revision = DEFAULT_REVISION;
    private String dockerfileUrl;
    private String dockerfilePath;
 
@@ -28,7 +34,6 @@ public class Repository {
       return this;
    }
 
-   /*
    public void setDockerfilePath(String path) {
       if (path != null) {
          this.dockerfilePath = path;
@@ -37,21 +42,4 @@ public class Repository {
          }
       }
    }
-
-   public void setRevision(String name) {
-      if (name == null || name.isEmpty()) {
-         this.revision = DEFAULT_REVISION;
-      } else {
-         this.revision = name;
-      }
-   }
-
-   public void setContext(String ctx) {
-      if (ctx == null || ctx.isEmpty()) {
-         this.context = DEFAULT_CONTEXT;
-      } else {
-         this.context = ctx;
-      }
-   }
-   */
 }
