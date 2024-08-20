@@ -37,7 +37,6 @@ Generated file:
 ```yaml
 # generated/konflux/buildpack/pipelinerun-buildpack-builder.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -180,46 +179,7 @@ spec:
         workspace: "netrc"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "build-container"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "DOCKERFILE"
-        value: "$(params.dockerfile)"
-      - name: "CONTEXT"
-        value: "$(params.context-path)"
-      - name: "HERMETIC"
-        value: "$(params.hermetic)"
-      - name: "PREFETCH_INPUT"
-        value: "$(params.prefetch-input)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "BUILD_ARGS_FILE"
-        value:
-        - "$(params.build-args[*])"
-      - name: "BUILD_ARGS_FILE"
-        value: "$(params.build-args-file)"
-      runAfter:
-      - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-buildah:0.1@sha256:0cb9100452e9640adbda75a6e23d2cc9c76d2408cbcf3183543b2a7582e39f02"
-        - name: "name"
-          value: "buildah"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "tasks.init.results.build"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "source"
-        workspace: "workspace"
+    - name: "user-build"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -461,7 +421,6 @@ Generated file:
 ```yaml
 # generated/konflux/build/pipelinerun-my-quarkus-1.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -604,46 +563,7 @@ spec:
         workspace: "netrc"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "build-container"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "DOCKERFILE"
-        value: "$(params.dockerfile)"
-      - name: "CONTEXT"
-        value: "$(params.context-path)"
-      - name: "HERMETIC"
-        value: "$(params.hermetic)"
-      - name: "PREFETCH_INPUT"
-        value: "$(params.prefetch-input)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "BUILD_ARGS_FILE"
-        value:
-        - "$(params.build-args[*])"
-      - name: "BUILD_ARGS_FILE"
-        value: "$(params.build-args-file)"
-      runAfter:
-      - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-buildah:0.1@sha256:0cb9100452e9640adbda75a6e23d2cc9c76d2408cbcf3183543b2a7582e39f02"
-        - name: "name"
-          value: "buildah"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "tasks.init.results.build"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "source"
-        workspace: "workspace"
+    - name: "user-build"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -867,7 +787,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-two-actions.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -888,11 +807,7 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-
-            set -e
-            echo "Say Hello"
+          script: "#!/usr/bin/env bash\n\nset -e\necho \"Say Hello\"\n"
     - name: "say-goodbye"
       runAfter:
       - "say-hello"
@@ -900,11 +815,8 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |-
-            #!/usr/bin/env bash
-
-            set -e
-            echo "and say Good bye to all of you !"
+          script: "#!/usr/bin/env bash\n\nset -e\necho \"and say Good bye to all of\
+            \ you !\""
 
 ```
 ### Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
@@ -961,7 +873,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-two-actions-wks.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -982,13 +893,9 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-
-            set -e
-            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
-              echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message
-            fi
+          script: "#!/usr/bin/env bash\n\nset -e\nif [ \"$(workspaces.shared-wks.bound)\"\
+            \ == \"true\" ] ; then\n  echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message\n\
+            fi\n"
       workspaces:
       - name: "shared-wks"
         workspace: "shared-wks"
@@ -999,14 +906,9 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-
-            set -e
-            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
-              cat $(workspaces.shared-wks.path)/message
-            fi
-            echo "Saying Good bye to all of you from action: say-goodbye"
+          script: "#!/usr/bin/env bash\n\nset -e\nif [ \"$(workspaces.shared-wks.bound)\"\
+            \ == \"true\" ] ; then\n  cat $(workspaces.shared-wks.path)/message\n\
+            fi\necho \"Saying Good bye to all of you from action: say-goodbye\"\n"
       workspaces:
       - name: "shared-wks"
         workspace: "shared-wks"
@@ -1060,7 +962,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-fetch-script.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -1079,11 +980,7 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-
-            set -e
-            echo "Say Hello"
+          script: "#!/usr/bin/env bash\n\nset -e\necho \"Say Hello\"\n"
 
 ```
 ### Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye when condition is met
@@ -1126,7 +1023,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-two-actions-when.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -1150,11 +1046,7 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-
-            set -e
-            echo "Say Hello"
+          script: "#!/usr/bin/env bash\n\nset -e\necho \"Say Hello\"\n"
     - name: "say-goodbye"
       runAfter:
       - "say-hello"
@@ -1162,11 +1054,8 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |-
-            #!/usr/bin/env bash
-
-            set -e
-            echo "and say Good bye to all of you !"
+          script: "#!/usr/bin/env bash\n\nset -e\necho \"and say Good bye to all of\
+            \ you !\""
       when:
       - input: "$(params.message)"
         operator: "in"
@@ -1215,7 +1104,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-embedded-script.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -1235,11 +1123,7 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |-
-            #!/usr/bin/env bash
-
-            set -e
-            echo "Say Hello"
+          script: "#!/usr/bin/env bash\n\nset -e\necho \"Say Hello\""
 
 ```
 ### buildpack
@@ -1317,7 +1201,6 @@ Generated file:
 ```yaml
 # generated/tekton/buildpack/pipelinerun-pack-builder-push.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:

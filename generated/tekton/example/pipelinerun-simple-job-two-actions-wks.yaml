@@ -1,4 +1,3 @@
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -19,13 +18,9 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-
-            set -e
-            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
-              echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message
-            fi
+          script: "#!/usr/bin/env bash\n\nset -e\nif [ \"$(workspaces.shared-wks.bound)\"\
+            \ == \"true\" ] ; then\n  echo Hello from action - say-hello > $(workspaces.shared-wks.path)/message\n\
+            fi\n"
       workspaces:
       - name: "shared-wks"
         workspace: "shared-wks"
@@ -36,14 +31,9 @@ spec:
         steps:
         - image: "ubuntu"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-
-            set -e
-            if [ "$(workspaces.shared-wks.bound)" == "true" ] ; then
-              cat $(workspaces.shared-wks.path)/message
-            fi
-            echo "Saying Good bye to all of you from action: say-goodbye"
+          script: "#!/usr/bin/env bash\n\nset -e\nif [ \"$(workspaces.shared-wks.bound)\"\
+            \ == \"true\" ] ; then\n  cat $(workspaces.shared-wks.path)/message\n\
+            fi\necho \"Saying Good bye to all of you from action: say-goodbye\"\n"
       workspaces:
       - name: "shared-wks"
         workspace: "shared-wks"
