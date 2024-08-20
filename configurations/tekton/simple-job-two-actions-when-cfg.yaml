@@ -17,7 +17,7 @@ job:
         echo "Say Hello"
     - name: say-goodbye
       when:
-        - "$(params.say-goodbye): true"
+        - "$(params.message): true"
       script: |
         #!/usr/bin/env bash
         
