@@ -119,7 +119,7 @@ jobs:
           fi
           
           # Print the domain as a subheader
-          printf '%s\n\n' "### $domain" >> SCENARIO.md
+          printf '%s\n\n' "### ${domain^}" >> SCENARIO.md
           
           # Print the files under this type and domain
           for f in ${values[$i]}; do
