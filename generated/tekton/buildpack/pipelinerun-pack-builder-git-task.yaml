@@ -99,13 +99,9 @@ spec:
       - "list-source-workspace"
       taskRef:
         params:
-        - name: "git"
+        - name: "url"
           value: "https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml"
-        - name: "revision"
-          value: "main"
-        - name: "pathInRepo"
-          value: "./"
-        resolver: "git"
+        resolver: "http"
       workspaces:
       - name: "source-dir"
         workspace: "source-dir"
