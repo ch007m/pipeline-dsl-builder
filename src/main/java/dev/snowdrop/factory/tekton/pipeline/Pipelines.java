@@ -34,7 +34,7 @@ public class Pipelines implements JobProvider {
     private static Type TYPE;
 
     @Override
-    public <T> T generate(Configurator cfg) {
+    public <T> T generatePipeline(Configurator cfg) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
         Class<T> type;

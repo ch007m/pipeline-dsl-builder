@@ -1,7 +1,7 @@
 package dev.snowdrop.factory;
 
 public class JobFactory {
-    public static JobProvider withProvider(Type type) {
+    public static JobProvider withType(Type type) {
         switch (type) {
             case KONFLUX:
                 return new dev.snowdrop.factory.konflux.pipeline.Pipelines();

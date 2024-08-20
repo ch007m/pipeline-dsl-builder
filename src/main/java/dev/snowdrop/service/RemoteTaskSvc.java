@@ -187,7 +187,7 @@ public class RemoteTaskSvc {
              GzipCompressorInputStream gis = new GzipCompressorInputStream(fis);
              TarArchiveInputStream tis = new TarArchiveInputStream(gis)) {
             TarArchiveEntry entry;
-            while ((entry = tis.getNextTarEntry()) != null) {
+            while ((entry = tis.getNextEntry()) != null) {
                 File outputFile = new File(blobFile.getParentFile(), entry.getName() + ".json");
                 if (entry.isDirectory()) {
                     outputFile.mkdirs();

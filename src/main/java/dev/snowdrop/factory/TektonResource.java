@@ -28,7 +28,7 @@ public class TektonResource {
         // the provider: tekton vs konflux vs ...
         // return Pipelines.createJob(cfg, actions);
         return JobFactory
-            .withProvider(TYPE)
-            .generate(cfg);
+            .withType(TYPE)
+            .generatePipeline(cfg);
     }
 }

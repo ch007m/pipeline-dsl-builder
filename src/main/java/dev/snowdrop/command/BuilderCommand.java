@@ -15,7 +15,6 @@ import java.nio.file.Paths;
 
 import static dev.snowdrop.factory.konflux.component.ComponentBuilder.createComponent;
 import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createBuild;
-import static dev.snowdrop.factory.konflux.pipeline.Pipelines.createCustomBuild;
 import static dev.snowdrop.factory.konflux.application.ApplicationBuilder.createApplication;
 
 @TopCommand
@@ -88,7 +87,7 @@ public class BuilderCommand implements Runnable {
                         break;
                     case BUILDPACK:
                         // Resource generated: PipelineRun
-                        ConfiguratorSvc.writeYaml(createCustomBuild(cfg), resourcesPath);
+                        ConfiguratorSvc.writeYaml(createBuild(cfg), resourcesPath);
                         break;
                 } // end of switch domain
         } // end of switch providerType

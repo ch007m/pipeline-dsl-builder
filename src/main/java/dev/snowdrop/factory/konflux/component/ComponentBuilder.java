@@ -1,7 +1,7 @@
 package dev.snowdrop.factory.konflux.component;
 
 import dev.snowdrop.konflux.v1alpha1.Component;
-import dev.snowdrop.konflux.v1alpha1.componentspec.source.Git;
+import dev.snowdrop.konflux.v1alpha1.componentspec.source.GitBuilder;
 import dev.snowdrop.model.Configurator;
 
 import java.util.Map;
