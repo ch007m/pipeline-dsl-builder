@@ -358,7 +358,12 @@ public class Pipelines implements JobProvider {
                     } else if (val instanceof Boolean) {
                         paramValue = new ParamValue(Boolean.toString((Boolean) val));
                     } else if (val instanceof List<?>) {
-                        paramValue = new ParamValue((List<String>) val);
+                        List<?> rawList = (List<?>) val;
+                        List<String> stringList = rawList.stream()
+                            .filter(String.class::isInstance)
+                            .map(String.class::cast)
+                            .collect(Collectors.toList());
+                        paramValue = new ParamValue(stringList);
                     } else {
                         paramValue = new ParamValue(String.valueOf(val)); // Default to String representation
                     }
