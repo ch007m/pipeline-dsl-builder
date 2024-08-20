@@ -39,7 +39,7 @@ public class FileUtilSvc {
       }
    }
 
-   public static String fetchScriptFileContent(String fileUrl) throws IOException {
+   public static String fetchUrlRawContent(String fileUrl) throws IOException {
       StringBuilder content = new StringBuilder();
       URL url = new URL(fileUrl);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();

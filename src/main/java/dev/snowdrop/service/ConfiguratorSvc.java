@@ -17,9 +17,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+
+import static java.nio.file.StandardOpenOption.*;
 
 public class ConfiguratorSvc {
 
@@ -49,27 +49,31 @@ public class ConfiguratorSvc {
    }
 
    public static void writeYaml(HasMetadata resource, String outputPath) {
-      try {
-         String fileName = resource.getKind().toLowerCase() + "-" + resource.getMetadata().getName();
-         Path yamlFilePath = Paths.get(outputPath, fileName + ".yaml");
+       Path yamlFilePath = null;
+       try {
+           String fileName = resource.getKind().toLowerCase() + "-" + resource.getMetadata().getName();
+           yamlFilePath = Paths.get(outputPath, fileName + ".yaml");
 
-         Files.createDirectories(Paths.get(outputPath));
-         Path pathToYaml = Files.createFile(yamlFilePath);
+           Files.createDirectories(Paths.get(outputPath));
+           Path pathToYaml = Files.createFile(yamlFilePath);
 
-         // Convert the resource to YAML
-         ObjectMapper mapper = new ObjectMapper(
-             new YAMLFactory()
-                 .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-                 .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
-         );
-         mapper.writeValue(pathToYaml.toFile(), resource);
+           // Convert the resource to YAML
+           ObjectMapper mapper = new ObjectMapper(
+               new YAMLFactory()
+                   .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                   .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
+           );
+           mapper.writeValue(pathToYaml.toFile(), resource);
 
-         logger.info("Path of the resource generated: {}", pathToYaml);
-         logger.debug("Generated YAML: \n{}", yamlFilePath);
+           logger.info("Path of the resource generated: {}", pathToYaml);
+           logger.debug("Generated YAML: \n{}", yamlFilePath);
 
-      } catch (Exception e) {
-         logger.error(e.getMessage());
-      }
+       } catch (FileAlreadyExistsException e) {
+           // TODO
+           logger.warn("File already exists: " + yamlFilePath);
+       } catch (Exception e) {
+           throw new RuntimeException(e);
+       }
    }
 
    @Deprecated

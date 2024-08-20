@@ -21,6 +21,8 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,19 +45,29 @@ public class RemoteTaskSvc {
         String bundlePath = Paths.get(path, BUNDLE_PREFIX, taskName).toString();
         Path tasksPath = Paths.get(bundlePath, "tasks");
 
+        // Create a Tekton task directory to extract the content
+        try {
+            Files.createDirectories(Path.of(bundlePath));
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+
         switch(b.getProtocol()) {
             case "git": {
                 logger.info("Fetching the git url: https://%s", b.getUri());
-                break;
-            }
-            case "bundle": {
-                // Create a Tekton task directory to extract the content
                 try {
-                    Files.createDirectories(Path.of(bundlePath));
-                } catch(IOException ex) {
-                    ex.printStackTrace();
-                }
+                    String taskContent = FileUtilSvc.fetchUrlRawContent(b.getUri());
 
+                    String taskFileName = Paths.get(new URI(b.getUri()).getPath()).getFileName().toString();
+                    Files.write(Paths.get(bundlePath,"tasks",taskFileName), taskContent.getBytes());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            case "bundle": {
                 // Fetch the OCI bundle
                 logger.info("Task directory path: %s", bundlePath);
                 grabOCIBundle(b.getUri(), bundlePath);
@@ -73,7 +85,6 @@ public class RemoteTaskSvc {
 
                         // Extract from the BLOB file the task(s)
                         List<String> jsonFiles = extractTasksFromBlob(new File(blobFile));
-
 
                         // Convert json file to YAML
                         jsonFiles.stream().forEach(jsonFile -> {

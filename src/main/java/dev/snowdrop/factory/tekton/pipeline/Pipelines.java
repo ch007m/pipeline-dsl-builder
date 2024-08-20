@@ -111,7 +111,7 @@ public class Pipelines implements JobProvider {
 
                 if (bundle == null) {
                     //logger.error("Bundle reference was not parsed properly");
-                    throw new RuntimeException("Bundle reference was not parsed properly");
+                    throw new RuntimeException("Bundle reference was not parsed properly using: " + action.getRef());
                 } else {
                     // Fetch the content of the task using the remote URL: Git url, oci bundle, etc
                     fetchExtractTask(bundle, action.getName(), cfg.getOutputPath());
@@ -248,7 +248,7 @@ public class Pipelines implements JobProvider {
             embeddedScript = action.getScript();
         } else if (action.getScriptFileUrl() != null) {
             try {
-                embeddedScript = FileUtilSvc.fetchScriptFileContent(action.getScriptFileUrl());
+                embeddedScript = FileUtilSvc.fetchUrlRawContent(action.getScriptFileUrl());
             } catch (IOException e) {
                 throw new RuntimeException("Cannot fetch the script file: " + action.getScriptFileUrl(), e);
             }
@@ -290,19 +290,12 @@ public class Pipelines implements JobProvider {
         // Generate the Pipeline's task
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
-                .withName(action.getName())
-                .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
-                .withNewTaskRef()
-                  .withResolver("bundles")
-                  .withParams()
-                    .addNewParam().withName("bundle").withValue(new ParamValue(bundle.getUri())).endParam()
-                    // The name of the task to be fetched should be equal to the name of the Action's name !!
-                    .addNewParam().withName("name").withValue(new ParamValue(action.getName())).endParam()
-                    .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
-                  .endTaskRef()
-                .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
-                .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
-                .build();
+            .withName(action.getName())
+            .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
+            .withTaskRef(TaskRefResolver.withReference(bundle, action.getName()))
+            .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
+            .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
+            .build();
             // @formatter:on
         return pipelineTask;
     }
