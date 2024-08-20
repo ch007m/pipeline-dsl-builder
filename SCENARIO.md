@@ -1115,7 +1115,7 @@ job:
         echo "Say Hello"
     - name: say-goodbye
       when:
-        - "$(params.say-goodbye): true"
+        - "$(params.message): true"
       script: |
         #!/usr/bin/env bash
         
@@ -1168,7 +1168,7 @@ spec:
             set -e
             echo "and say Good bye to all of you !"
       when:
-      - input: "$(params.say-goodbye)"
+      - input: "$(params.message)"
         operator: "in"
         values:
         - "true"
