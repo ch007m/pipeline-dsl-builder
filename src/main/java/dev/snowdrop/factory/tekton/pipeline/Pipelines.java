@@ -85,8 +85,8 @@ public class Pipelines implements JobProvider {
             }
 
             List<When> whenList = new ArrayList<>();
-            if (action.getWhen() != null && action.getWhen().size() > 0) {
-                action.getWhen().stream().forEach(w -> {
+            if (action.getWhen() != null && !action.getWhen().isEmpty()) {
+                action.getWhen().forEach(w -> {
                     String operator = "in";
                     String[] res= w.split(":");
                     whenList.add(

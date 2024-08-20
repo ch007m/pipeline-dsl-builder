@@ -18,7 +18,7 @@
         <quarkus.platform.version>3.12.1</quarkus.platform.version>
 
         <snakeyaml.version>2.2</snakeyaml.version>
-        <fabric8.version>6.13.1</fabric8.version>
+        <fabric8.version>6.13.3</fabric8.version>
         <sundrio.version>0.200.0</sundrio.version>
         <lombok.version>1.18.32</lombok.version>
 
@@ -63,17 +63,19 @@
             <artifactId>generator-annotations</artifactId>
             <version>${fabric8.version}</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>io.sundr</groupId>
             <artifactId>sundr-adapter-reflect</artifactId>
             <version>${sundrio.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
+        -->
         <dependency>
             <groupId>io.sundr</groupId>
             <artifactId>builder-annotations</artifactId>
             <version>${sundrio.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -105,11 +107,13 @@
             <artifactId>commons-compress</artifactId>
             <version>1.26.2</version>
         </dependency>
+        <!-- REMOVED AS IMPORTED FROM QUARKUS BOM
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>generator-annotations</artifactId>
             <version>6.12.1</version>
         </dependency>
+        -->
     </dependencies>
 
     <build>
@@ -156,7 +160,9 @@
                 <version>${compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgs>
+                        <arg>-proc:full</arg>
                         <arg>-parameters</arg>
+                        <arg>-Xlint:unchecked</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
