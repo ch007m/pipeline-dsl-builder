@@ -45,6 +45,10 @@ public class Pipelines implements JobProvider {
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
 
+        if (actions.isEmpty()) {
+            throw new RuntimeException("Actions are missing from the configuration");
+        }
+
         Map<Integer, Action> actionOrderMap = Optional.ofNullable(cfg.getJob().getActions())
             .orElse(Collections.emptyList()) // Handle null case by providing an empty list
             .stream()

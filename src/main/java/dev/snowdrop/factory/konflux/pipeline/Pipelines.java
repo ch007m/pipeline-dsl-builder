@@ -25,6 +25,15 @@ public class Pipelines implements JobProvider {
    public <T> T generatePipeline(Configurator cfg) {
       TYPE = Type.valueOf(cfg.getType().toUpperCase());
       Class<T> type;
+
+      if (cfg.getRepository() == null) {
+         throw new RuntimeException("Git repository is missing");
+      } else {
+         // Set default values for the Repository when not defined part of the configuration yaml
+         // TODO: To be improved as it should be defaulted when yaml is parsed to objects
+         cfg.getRepository().setDefaultValues();
+      }
+
       // @formatter:off
       PipelineRun pipeline = new PipelineRunBuilder()
                 .withNewMetadata()

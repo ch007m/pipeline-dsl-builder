@@ -58,38 +58,17 @@ public class BuilderCommand implements Runnable {
         logger.info("#### Pipeline domain selected: {}", cfg.getDomain());
 
         String resourcesPath = Paths.get(cfg.getOutputPath(), cfg.getType(), cfg.getDomain()).toString();
-        Type providerType = Type.valueOf(cfg.getType().toUpperCase());
-        Domain domain = Domain.valueOf(cfg.getDomain().toUpperCase());
 
-        switch (providerType) {
-            case TEKTON:
-                ConfiguratorSvc.writeYaml(TektonResource.create(cfg), resourcesPath);
-                break;
-            case KONFLUX:
-                // Set default values for the Repository when not defined part of the configuration yaml
-                // TODO: To be reviewed to see if we can do that during yaml parsing
-                cfg.getRepository().setDefaultValues();
+        // Use the factory to generate the resources according to the provider and the type
+        ConfiguratorSvc.writeYaml(TektonResource.create(cfg), resourcesPath);
 
-                // TODO: When the konflux switch code will be reviewed and removed, then this code should be moved after.
-                if (cfg.getApplication() != null && cfg.getApplication().isEnable()) {
-                    ConfiguratorSvc.writeYaml(createApplication(cfg), resourcesPath);
-                }
+        // TODO: Is it the best place to create such YAML resources. To be reviewed
+        if (cfg.getApplication() != null && cfg.getApplication().isEnable()) {
+            ConfiguratorSvc.writeYaml(createApplication(cfg), resourcesPath);
+        }
 
-                if (cfg.getComponent() != null &&  cfg.getComponent().isEnable()) {
-                    ConfiguratorSvc.writeYaml(createComponent(cfg), resourcesPath);
-                }
-
-                // TODO: To be reviewed as generated resources still include hard coded values, etc
-                switch (domain) {
-                    case BUILD:
-                        // Resource generated: PipelineRun
-                        ConfiguratorSvc.writeYaml(createBuild(cfg), resourcesPath);
-                        break;
-                    case BUILDPACK:
-                        // Resource generated: PipelineRun
-                        ConfiguratorSvc.writeYaml(createBuild(cfg), resourcesPath);
-                        break;
-                } // end of switch domain
-        } // end of switch providerType
+        if (cfg.getComponent() != null && cfg.getComponent().isEnable()) {
+            ConfiguratorSvc.writeYaml(createComponent(cfg), resourcesPath);
+        }
     } // end of run method
 }
