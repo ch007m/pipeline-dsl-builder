@@ -34,15 +34,13 @@ public class Pipelines implements JobProvider {
     private static Type TYPE;
 
     @Override
-    public <T> T getGenerator(Configurator cfg) {
-        return null;
-    }
-
-    public static <T> T createJob(Configurator cfg, List<Action> actions) {
+    public <T> T generate(Configurator cfg) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
         Class<T> type;
         PipelineTask aTask;
+
+        List<Action> actions = cfg.getJob().getActions();
         List<PipelineTask> tasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();

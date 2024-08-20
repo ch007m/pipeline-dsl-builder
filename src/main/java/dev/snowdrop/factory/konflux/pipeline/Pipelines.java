@@ -17,51 +17,13 @@ import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.factory.konflux.pipeline.Workspaces.KONFLUX_PIPELINERUN_WORKSPACES;
 
 public class Pipelines implements JobProvider {
-   @Override
-   public <T> T getGenerator(Configurator cfg) {
-      return null;
-   }
 
    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
    private static Type TYPE = null;
 
-   public static PipelineRun createBuild(Configurator cfg) {
+   @Override
+   public <T> T generate(Configurator cfg) {
       TYPE = Type.valueOf(cfg.getType().toUpperCase());
-      // @formatter:off
-      PipelineRun pipeline = new PipelineRunBuilder()
-          .withNewMetadata()
-             .withName(cfg.getJob().getName())
-             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
-          .endMetadata()
-          .withNewSpec()
-             .withWorkspaces(KONFLUX_PIPELINERUN_WORKSPACES())
-             .withParams(KONFLUX_PIPELINERUN_PARAMS())
-             .withNewPipelineSpec()
-                .withResults(KONFLUX_PIPELINE_RESULTS())
-                .withFinally(KONFLUX_PIPELINE_FINALLY())
-                .withTasks(
-                    INIT(),
-                    CLONE_REPOSITORY(),
-                    PREFETCH_DEPENDENCIES(),
-                    BUILD_CONTAINER(),
-                    BUILD_SOURCE_IMAGE(),
-                    DEPRECATED_BASE_IMAGE_CHECK(),
-                    CLAIR_SCAN(),
-                    ECOSYSTEM_CERT_PREFLIGHT_CHECKS(),
-                    SAST_SNYK_CHECK(),
-                    CLAMAV_SCAN(),
-                    SBOM_JSON_CHECK()
-                )
-             .endPipelineSpec()
-          .endSpec()
-          .build();
-      // @formatter:on
-      return pipeline;
-   }
-
-   public static PipelineRun createCustomBuild(Configurator cfg) {
-      final Type TYPE = Type.valueOf(cfg.getType().toUpperCase());
       // @formatter:off
       PipelineRun pipeline = new PipelineRunBuilder()
                 .withNewMetadata()
@@ -92,6 +54,42 @@ public class Pipelines implements JobProvider {
                    .endPipelineSpec()
                 .endSpec()
                 .build();
+      // @formatter:on
+      return pipeline;
+   }
+
+   // TODO: To be parked or ...
+      public static PipelineRun createBuild(Configurator cfg) {
+      TYPE = Type.valueOf(cfg.getType().toUpperCase());
+      // @formatter:off
+      PipelineRun pipeline = new PipelineRunBuilder()
+          .withNewMetadata()
+             .withName(cfg.getJob().getName())
+             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
+             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+          .endMetadata()
+          .withNewSpec()
+             .withWorkspaces(KONFLUX_PIPELINERUN_WORKSPACES())
+             .withParams(KONFLUX_PIPELINERUN_PARAMS())
+             .withNewPipelineSpec()
+                .withResults(KONFLUX_PIPELINE_RESULTS())
+                .withFinally(KONFLUX_PIPELINE_FINALLY())
+                .withTasks(
+                    INIT(),
+                    CLONE_REPOSITORY(),
+                    PREFETCH_DEPENDENCIES(),
+                    BUILD_CONTAINER(),
+                    BUILD_SOURCE_IMAGE(),
+                    DEPRECATED_BASE_IMAGE_CHECK(),
+                    CLAIR_SCAN(),
+                    ECOSYSTEM_CERT_PREFLIGHT_CHECKS(),
+                    SAST_SNYK_CHECK(),
+                    CLAMAV_SCAN(),
+                    SBOM_JSON_CHECK()
+                )
+             .endPipelineSpec()
+          .endSpec()
+          .build();
       // @formatter:on
       return pipeline;
    }

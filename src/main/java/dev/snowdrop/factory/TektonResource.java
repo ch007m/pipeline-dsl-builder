@@ -1,6 +1,5 @@
 package dev.snowdrop.factory;
 
-import dev.snowdrop.factory.tekton.pipeline.Pipelines;
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Configurator;
 
@@ -28,6 +27,8 @@ public class TektonResource {
         // TODO: We should create a factory here able to process the job according to
         // the provider: tekton vs konflux vs ...
         // return Pipelines.createJob(cfg, actions);
-        return JobProviderFactory.getProvider(TYPE).getGenerator(cfg);
+        return JobFactory
+            .withProvider(TYPE)
+            .generate(cfg);
     }
 }
