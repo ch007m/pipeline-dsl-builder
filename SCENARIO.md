@@ -37,7 +37,6 @@ Generated file:
 ```yaml
 # generated/konflux/buildpack/pipelinerun-buildpack-builder.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -180,46 +179,7 @@ spec:
         workspace: "netrc"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "build-container"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "DOCKERFILE"
-        value: "$(params.dockerfile)"
-      - name: "CONTEXT"
-        value: "$(params.context-path)"
-      - name: "HERMETIC"
-        value: "$(params.hermetic)"
-      - name: "PREFETCH_INPUT"
-        value: "$(params.prefetch-input)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "BUILD_ARGS_FILE"
-        value:
-        - "$(params.build-args[*])"
-      - name: "BUILD_ARGS_FILE"
-        value: "$(params.build-args-file)"
-      runAfter:
-      - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-buildah:0.1@sha256:0cb9100452e9640adbda75a6e23d2cc9c76d2408cbcf3183543b2a7582e39f02"
-        - name: "name"
-          value: "buildah"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "tasks.init.results.build"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "source"
-        workspace: "workspace"
+    - name: "user-build"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -461,7 +421,6 @@ Generated file:
 ```yaml
 # generated/konflux/build/pipelinerun-my-quarkus-1.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -604,46 +563,7 @@ spec:
         workspace: "netrc"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "build-container"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "DOCKERFILE"
-        value: "$(params.dockerfile)"
-      - name: "CONTEXT"
-        value: "$(params.context-path)"
-      - name: "HERMETIC"
-        value: "$(params.hermetic)"
-      - name: "PREFETCH_INPUT"
-        value: "$(params.prefetch-input)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "BUILD_ARGS_FILE"
-        value:
-        - "$(params.build-args[*])"
-      - name: "BUILD_ARGS_FILE"
-        value: "$(params.build-args-file)"
-      runAfter:
-      - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-buildah:0.1@sha256:0cb9100452e9640adbda75a6e23d2cc9c76d2408cbcf3183543b2a7582e39f02"
-        - name: "name"
-          value: "buildah"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "tasks.init.results.build"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "source"
-        workspace: "workspace"
+    - name: "user-build"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -867,7 +787,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-two-actions.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -961,7 +880,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-two-actions-wks.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -1060,7 +978,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-fetch-script.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -1126,7 +1043,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-two-actions-when.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -1215,7 +1131,6 @@ Generated file:
 ```yaml
 # generated/tekton/example/pipelinerun-simple-job-embedded-script.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
@@ -1317,7 +1232,6 @@ Generated file:
 ```yaml
 # generated/tekton/buildpack/pipelinerun-pack-builder-push.yaml
 
----
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
 metadata:
