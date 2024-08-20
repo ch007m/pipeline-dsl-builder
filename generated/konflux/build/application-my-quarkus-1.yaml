@@ -1,0 +1,11 @@
+---
+apiVersion: "appstudio.redhat.com/v1alpha1"
+kind: "Application"
+metadata:
+  annotations:
+    build.appstudio.openshift.io/request: "configure-pac"
+    image.redhat.com/generate: "{\"visibility\":\"public\"}"
+  name: "my-quarkus-1"
+  namespace: "user1"
+spec:
+  displayName: "my-quarkus-1"
