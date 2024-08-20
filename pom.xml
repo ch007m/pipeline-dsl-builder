@@ -17,8 +17,7 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.12.1</quarkus.platform.version>
 
-        <snakeyaml.version>2.2</snakeyaml.version>
-        <fabric8.version>6.13.3</fabric8.version>
+        <fabric8.version>6.13.0</fabric8.version>
         <sundrio.version>0.200.0</sundrio.version>
         <lombok.version>1.18.32</lombok.version>
 
@@ -56,21 +55,11 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>tekton-client</artifactId>
-            <version>${fabric8.version}</version>
         </dependency>
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>generator-annotations</artifactId>
-            <version>${fabric8.version}</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>io.sundr</groupId>
-            <artifactId>sundr-adapter-reflect</artifactId>
-            <version>${sundrio.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
         <dependency>
             <groupId>io.sundr</groupId>
             <artifactId>builder-annotations</artifactId>
@@ -88,7 +77,10 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>${snakeyaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
 
         <!-- Test -->
