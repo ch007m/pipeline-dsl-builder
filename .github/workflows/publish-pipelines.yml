@@ -127,7 +127,7 @@ jobs:
             fileName=$(cat "$f" | yq -r ".job.name")
             resourceType=$(cat "$f" | yq -r ".job.resourceType")
             
-            printf '%s\n\n' "### $title" >> SCENARIO.md
+            printf '%s\n\n' "#### ${title^}" >> SCENARIO.md
             printf '%s\n' "Command to be executed: " >> SCENARIO.md
             printf '%s\n' "\`\`\`bash" >> SCENARIO.md
             printf '%s\n' "$CMD -o out/flows -c $f" >> SCENARIO.md
