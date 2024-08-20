@@ -48,18 +48,36 @@ public class RemoteTaskSvc {
         // Create a Tekton task directory to extract the content
         try {
             Files.createDirectories(Path.of(bundlePath));
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        switch(b.getProtocol()) {
+        switch (b.getProtocol()) {
             case "git": {
-                logger.info("Fetching the git url: https://%s", b.getUri());
+                logger.info("Fetching the git url: https://{}", b.getUri());
                 try {
                     String taskContent = FileUtilSvc.fetchUrlRawContent(b.getUri());
 
                     String taskFileName = Paths.get(new URI(b.getUri()).getPath()).getFileName().toString();
-                    Files.write(Paths.get(bundlePath,"tasks",taskFileName), taskContent.getBytes());
+                    Files.write(Paths.get(bundlePath, "tasks", taskFileName), taskContent.getBytes());
+                    break;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            case "http": {
+                logger.info("Fetching the url: https://{}", b.getUri());
+                try {
+                    String taskUri = "https://" + b.getUri();
+                    String taskContent = FileUtilSvc.fetchUrlRawContent(taskUri);
+
+                    String taskFileName = Paths.get(new URI(taskUri).getPath()).getFileName().toString();
+                    Files.createDirectories(Paths.get(bundlePath, "tasks"));
+                    Files.write(Paths.get(bundlePath, "tasks", taskFileName), taskContent.getBytes());
+                    break;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (URISyntaxException e) {
@@ -69,7 +87,7 @@ public class RemoteTaskSvc {
 
             case "bundle": {
                 // Fetch the OCI bundle
-                logger.info("Task directory path: %s", bundlePath);
+                logger.info("Task directory path: {}", bundlePath);
                 grabOCIBundle(b.getUri(), bundlePath);
 
                 // Search about Blob layers from extracted OCI bundle
@@ -81,7 +99,7 @@ public class RemoteTaskSvc {
                     List<Manifest.Layer> filteredLayers = filterLayersUsingAnnotation(TASK_DIGEST_ANNOTATION, layers, bundlePath);
 
                     filteredLayers.stream().forEach(layer -> {
-                        String blobFile = Paths.get(bundlePath , "blobs/sha256" , layer.getDigest().substring(7, layer.getDigest().length())).toString();
+                        String blobFile = Paths.get(bundlePath, "blobs/sha256", layer.getDigest().substring(7, layer.getDigest().length())).toString();
 
                         // Extract from the BLOB file the task(s)
                         List<String> jsonFiles = extractTasksFromBlob(new File(blobFile));
@@ -95,8 +113,9 @@ public class RemoteTaskSvc {
                     logger.info("No layers found for the oci bundle !");
                 }
             }
+            break;
             default: {
-                logger.info("Wrong protocol provided and not supported: %s", b.getProtocol());
+                logger.info("Wrong protocol provided and not supported: {}", b.getProtocol());
             }
         }
     }

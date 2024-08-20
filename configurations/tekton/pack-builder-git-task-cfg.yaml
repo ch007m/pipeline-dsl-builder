@@ -45,7 +45,7 @@ job:
     - name: list-source-workspace
       ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
     - name: pack-builder
-      ref: git://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml
+      ref: http://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_IMAGE: "$(params.imageUrl)"

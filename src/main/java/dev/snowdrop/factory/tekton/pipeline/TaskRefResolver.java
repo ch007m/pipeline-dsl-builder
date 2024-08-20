@@ -17,11 +17,25 @@ public class TaskRefResolver {
         switch (refType) {
             case "bundle":
                 return withBundle(b, taskName);
+            case "http":
+                return withHttp(b, taskName);
             case "git":
                 return withGit(b, taskName);
             default:
                 throw new IllegalArgumentException("Unsupported reference type: " + b.getProtocol());
         }
+    }
+
+    private static TaskRef withHttp(Bundle bundle, String taskName) {
+        return new TaskRefBuilder()
+            // @formatter:off
+            .withResolver("http")
+            .withParams()
+               .addNewParam()
+                  .withName("url")
+                  .withValue(new ParamValue("https://" + bundle.getUri())).endParam()
+            .build();
+            // @formatter:on
     }
 
     public static TaskRef withBundle(Bundle bundle, String taskName) {
