@@ -57,7 +57,11 @@ public class ConfiguratorSvc {
          Path pathToYaml = Files.createFile(yamlFilePath);
 
          // Convert the resource to YAML
-         ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+         ObjectMapper mapper = new ObjectMapper(
+             new YAMLFactory()
+                 .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                 .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
+         );
          mapper.writeValue(pathToYaml.toFile(), resource);
 
          logger.info("Path of the resource generated: {}", pathToYaml);
