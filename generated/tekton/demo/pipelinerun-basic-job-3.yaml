@@ -1,0 +1,32 @@
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Such a job will not work as the [*] \"notation\" with\
+      \ array param is not supported in a task's script"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "basic-job-3"
+spec:
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      params:
+      - name: "name"
+        value: "team"
+      - name: "value"
+        value: "Aurea"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
+
+            members=($(params.team[*]))
+
+            for member in "${members[@]}"; do
+              echo "Say hello to: $member"
+            done
