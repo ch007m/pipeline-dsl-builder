@@ -24,6 +24,7 @@ public class Pipelines implements JobProvider {
    @Override
    public <T> T generatePipeline(Configurator cfg) {
       TYPE = Type.valueOf(cfg.getType().toUpperCase());
+      @SuppressWarnings("unchecked")
       Class<T> type;
 
       if (cfg.getRepository() == null) {

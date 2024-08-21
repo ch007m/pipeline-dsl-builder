@@ -36,7 +36,7 @@ public class Pipelines implements JobProvider {
     @Override
     public <T> T generatePipeline(Configurator cfg) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
-
+        @SuppressWarnings("unchecked")
         Class<T> type;
         PipelineTask aTask;
 
@@ -307,7 +307,7 @@ public class Pipelines implements JobProvider {
             binding.withName(wk.getName());
 
             if (wk.getVolumeClaimTemplate() != null) {
-                dev.snowdrop.model.Volume v = wk.getVolumeClaimTemplate();
+                Volume v = wk.getVolumeClaimTemplate();
                 // @formatter:off
                 binding.withVolumeClaimTemplate(
                     new PersistentVolumeClaimBuilder()
