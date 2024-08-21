@@ -1,18 +1,17 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: konflux
-
-# To generate or not the Application and/or Component CR
-application:
-  enable: true
-component:
-  enable: true
-
 domain: build
 namespace: user1
 
 repository:
   url: https://github.com/ch007m/new-quarkus-app-1
   dockerfilePath: src/main/docker/Dockerfile.jvm
+
+# To generate or not the Application and/or Component CR
+application:
+  enable: true
+component:
+  enable: true
 
 job:
   # One of the supported resources: PipelineRun, Pipeline
