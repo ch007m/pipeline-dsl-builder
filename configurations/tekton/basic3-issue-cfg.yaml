@@ -1,5 +1,7 @@
+# Such a job will not work as the [*] "notation"
+# with array param is not supported in a task's script
 job:
-  name: basic-job
+  name: basic-job-3
   actions:
     - name: say-hello
       params:

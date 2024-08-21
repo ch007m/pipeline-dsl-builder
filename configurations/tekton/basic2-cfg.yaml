@@ -1,5 +1,5 @@
 job:
-  name: basic-job
+  name: basic-job-2
   actions:
     - name: say-hello
       params:
