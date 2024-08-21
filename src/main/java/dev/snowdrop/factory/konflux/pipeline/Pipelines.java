@@ -5,6 +5,7 @@ import dev.snowdrop.factory.JobProvider;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Configurator;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1.PipelineRunBuilder;
 //import org.slf4j.Logger;
@@ -22,10 +23,8 @@ public class Pipelines implements JobProvider {
    private static Type TYPE = null;
 
    @Override
-   public <T> T generatePipeline(Configurator cfg) {
+   public HasMetadata generatePipeline(Configurator cfg) {
       TYPE = Type.valueOf(cfg.getType().toUpperCase());
-      @SuppressWarnings("unchecked")
-      Class<T> type;
 
       if (cfg.getRepository() == null) {
          throw new RuntimeException("Git repository is missing");
@@ -68,8 +67,7 @@ public class Pipelines implements JobProvider {
       // @formatter:on
 
       // TODO: Add like with Tekton a switch to handle: Pipeline vs PipelineRun
-      type = (Class<T>) PipelineRun.class;
-      return type.cast(pipeline);
+      return pipeline;
    }
 
    // TODO: To be parked or ...
