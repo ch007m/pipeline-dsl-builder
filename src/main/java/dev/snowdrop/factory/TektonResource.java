@@ -2,12 +2,12 @@ package dev.snowdrop.factory;
 
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Configurator;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 
 import java.util.List;
 
 public class TektonResource {
-    public static <T> T create(Configurator cfg) {
-        Class<T> type;
+    public static HasMetadata create(Configurator cfg) {
         List<Action> actions = cfg.getJob().getActions();
         String domain = cfg.getDomain().toUpperCase();
         Type TYPE = Type.valueOf(cfg.getType().toUpperCase());

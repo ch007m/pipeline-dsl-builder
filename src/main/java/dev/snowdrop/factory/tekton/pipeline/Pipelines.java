@@ -34,10 +34,9 @@ public class Pipelines implements JobProvider {
     private static Type TYPE;
 
     @Override
-    public <T> T generatePipeline(Configurator cfg) {
+    public HasMetadata generatePipeline(Configurator cfg) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
         @SuppressWarnings("unchecked")
-        Class<T> type;
         PipelineTask aTask;
 
         List<Action> actions = cfg.getJob().getActions();
@@ -161,12 +160,10 @@ public class Pipelines implements JobProvider {
 
         switch (tektonResourceType) {
             case "pipelinerun":
-                type = (Class<T>) PipelineRun.class;
-                return type.cast(generatePipelineRun(cfg, tasks, pipelineParams, pipelineWorkspaces));
+                return generatePipelineRun(cfg, tasks, pipelineParams, pipelineWorkspaces);
 
             case "pipeline":
-                type = (Class<T>) Pipeline.class;
-                return type.cast(generatePipeline(cfg, tasks, pipelineWorkspaces));
+                return generatePipeline(cfg, tasks, pipelineWorkspaces);
 
             default:
                 throw new RuntimeException("Invalid type not supported: " + tektonResourceType);

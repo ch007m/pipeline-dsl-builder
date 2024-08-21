@@ -1,7 +1,8 @@
 package dev.snowdrop.factory;
 
 import dev.snowdrop.model.Configurator;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 
 public interface JobProvider {
-    <T> T generatePipeline(Configurator cfg);
+    HasMetadata generatePipeline(Configurator cfg);
 }
