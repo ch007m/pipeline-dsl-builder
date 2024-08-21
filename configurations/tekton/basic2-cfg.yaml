@@ -1,5 +1,9 @@
+type: tekton
+domain: demo
 job:
+  resourceType: PipelineRun
   name: basic-job-2
+  description: Basic job echoing a message using the param teamMember
   actions:
     - name: say-hello
       params:

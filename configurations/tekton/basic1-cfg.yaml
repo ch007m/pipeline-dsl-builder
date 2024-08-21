@@ -1,5 +1,9 @@
+type: tekton
+domain: demo
 job:
+  resourceType: PipelineRun
   name: basic-job-1
+  description: Basic job echoing a message
   actions:
     - name: say-hello
       script: |
