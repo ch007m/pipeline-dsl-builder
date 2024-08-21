@@ -1,0 +1,27 @@
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Basic job echoing a message using the param teamMember"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "basic-job-2"
+spec:
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      params:
+      - name: "name"
+        value: "teamMember"
+      - name: "value"
+        value: "Aurea"
+      taskSpec:
+        steps:
+        - image: "ubuntu"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
+
+            echo $(params.teamMember)
