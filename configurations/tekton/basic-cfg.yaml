@@ -1,6 +1,0 @@
-job:
-  name: basic-job
-  actions:
-    - name: say-hello
-      script: |
-        echo "I say Hello to the team"

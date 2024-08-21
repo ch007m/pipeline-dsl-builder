@@ -1,0 +1,15 @@
+job:
+  name: basic-job
+  actions:
+    - name: say-hello
+      params:
+      - name: team
+        value: Aurea
+      script: |
+        #!/usr/bin/env bash
+        
+        members=($(params.team[*]))
+        
+        for member in "${members[@]}"; do
+          echo "Say hello to: $member"
+        done

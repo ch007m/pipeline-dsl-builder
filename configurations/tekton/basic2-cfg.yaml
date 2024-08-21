@@ -1,0 +1,11 @@
+job:
+  name: basic-job
+  actions:
+    - name: say-hello
+      params:
+        - name: teamMember
+          value: Aurea
+      script: |
+        #!/usr/bin/env bash
+        
+        echo $(params.teamMember)
