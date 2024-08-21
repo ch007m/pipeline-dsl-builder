@@ -1,5 +1,3 @@
-type: tekton
-domain: demo
 job:
   name: basic-job-2
   actions:
