@@ -5,6 +5,7 @@ import dev.snowdrop.model.Configurator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Annotations implements AnnotationsProvider {
@@ -12,7 +13,7 @@ public class Annotations implements AnnotationsProvider {
    public Map<String, String> getPipelineAnnotations(Configurator cfg) {
       Map<String, String> annotations = Map.of(
       "tekton.dev/pipelines.minVersion", "0.60.x",
-      "tekton.dev/displayName", cfg.getJob().getDescription(),
+      "tekton.dev/displayName", Objects.toString(cfg.getJob().getDescription(),""),
       "tekton.dev/platforms", "linux/amd64"
       );
 
