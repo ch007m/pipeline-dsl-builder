@@ -23,10 +23,7 @@ public class Params {
       // TODO: Pass the parameters using the Configurator !!
       params.add(new ParamBuilder().withName("packCmdBuilderFlags")
           .withValue(new ParamValue(List.of(
-              "build",
-              "-B", "quay.io/snowdrop/ubi-builder",
-              "-e", "BP_JVM_VERSION=21",
-              "quarkus-hello:1.0"
+              "build", "quarkus-hello:1.0"
               ))
           ).build());
       //TODO Check from konflux PipelineRun what the value should be

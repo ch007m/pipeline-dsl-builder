@@ -36,7 +36,7 @@ job:
   # TODO: List of the examples should be reviewed !
   actions:
     - name: pack # TODO: To be reviewed as the name of the task is different about the "build-container"
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:81287aa159fbce51d66fd76adb4c823210c59650b6dcc70ca65d2eef21dc6897
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_IMAGE: "$(params.imageUrl)"

@@ -75,7 +75,7 @@ spec:
           value: $(workspaces.pack-workspace.path)
       args:
         - "$(params.PACK_CMD_FLAGS[*])"
-        -
+
     - name: export-images-digest
       image: registry.access.redhat.com/ubi9/buildah:9.3-12@sha256:3b11aae36f6c762e01731952ee6fb8e89c41660ce410e4c30d0bfc6496bca93c
       computeResources: {}
