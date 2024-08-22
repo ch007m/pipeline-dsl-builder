@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
+import static dev.snowdrop.factory.TektonResource.populateTimeOut;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
@@ -381,6 +382,7 @@ public class Pipelines implements JobProvider {
           .withNewSpec()
              .withParams(params)
              .withWorkspaces(pipelineWorkspaces)
+             .withTimeouts(populateTimeOut(cfg.getJob().getTimeout()))
              .withNewPipelineSpec()
                 .withTasks(tasks)
              .endPipelineSpec()

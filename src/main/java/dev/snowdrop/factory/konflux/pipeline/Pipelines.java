@@ -10,6 +10,7 @@ import dev.snowdrop.model.Bundle;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Workspace;
 import dev.snowdrop.service.UriParserSvc;
+import io.fabric8.kubernetes.api.model.Duration;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -22,11 +23,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static dev.snowdrop.factory.TektonResource.populateTimeOut;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
 import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINERUN_PARAMS;
 import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
@@ -130,6 +133,7 @@ public class Pipelines implements JobProvider {
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINERUN_WORKSPACES())
                    .withParams(KONFLUX_PIPELINERUN_PARAMS())
+                   .withTimeouts(populateTimeOut("1h0m0s"))
                    .withNewPipelineSpec()
                       .withResults(KONFLUX_PIPELINE_RESULTS())
                       .withFinally(KONFLUX_PIPELINE_FINALLY())
