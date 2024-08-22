@@ -51,8 +51,10 @@ public class JacksonYamlTests {
             outputPath: null
             application:
               enable: false
+              name: null
             component:
               enable: false
+              name: null
             """;
 
         Application app = new Application();
