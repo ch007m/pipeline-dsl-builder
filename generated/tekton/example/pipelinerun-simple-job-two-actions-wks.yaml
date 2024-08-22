@@ -46,6 +46,8 @@ spec:
       workspaces:
       - name: "shared-wks"
         workspace: "shared-wks"
+  timeouts:
+    pipeline: "300000000000ns"
   workspaces:
   - name: "shared-wks"
     volumeClaimTemplate:
