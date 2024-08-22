@@ -41,9 +41,9 @@ job:
         - name: output
           workspace: source-dir
     - name: fetch-packconfig-registrysecret
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
     - name: list-source-workspace
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
     - name: pack-builder
       ref: http://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml
       params:

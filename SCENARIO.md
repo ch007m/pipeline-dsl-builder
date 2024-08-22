@@ -51,7 +51,7 @@ job:
   # TODO: List of the examples should be reviewed !
   actions:
     - name: build-container #pack-builder
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_IMAGE: "$(params.imageUrl)"
@@ -231,7 +231,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
         - name: "name"
           value: "build-container"
         - name: "kind"
@@ -1117,9 +1117,9 @@ job:
         - name: output
           workspace: source-dir
     - name: fetch-packconfig-registrysecret
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
     - name: list-source-workspace
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
     - name: pack-builder
       ref: http://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml
       params:
@@ -1191,7 +1191,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
         - name: "name"
           value: "fetch-packconfig-registrysecret"
         - name: "kind"
@@ -1208,7 +1208,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
         - name: "name"
           value: "list-source-workspace"
         - name: "kind"
@@ -1331,11 +1331,11 @@ job:
         - name: output
           workspace: source-dir
     - name: fetch-packconfig-registrysecret
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
     - name: list-source-workspace
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
     - name: pack-builder
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_IMAGE: "$(params.imageUrl)"
@@ -1405,7 +1405,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
         - name: "name"
           value: "fetch-packconfig-registrysecret"
         - name: "kind"
@@ -1422,7 +1422,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
         - name: "name"
           value: "list-source-workspace"
         - name: "kind"
@@ -1453,7 +1453,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
         - name: "name"
           value: "pack-builder"
         - name: "kind"
