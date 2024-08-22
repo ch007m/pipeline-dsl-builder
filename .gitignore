@@ -20,3 +20,4 @@ target/
 # Plugin directory
 /.quarkus/cli/plugins/
 /TEMP.md
+/generated/bundle/
