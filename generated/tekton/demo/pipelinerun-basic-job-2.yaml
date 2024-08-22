@@ -25,3 +25,5 @@ spec:
             #!/usr/bin/env bash
 
             echo $(params.teamMember)
+  timeouts:
+    pipeline: "300000000000ns"

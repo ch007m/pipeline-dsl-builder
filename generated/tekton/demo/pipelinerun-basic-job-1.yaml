@@ -20,3 +20,5 @@ spec:
             #!/usr/bin/env bash
 
             echo "Say hello to the team"
+  timeouts:
+    pipeline: "300000000000ns"

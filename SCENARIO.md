@@ -50,7 +50,7 @@ job:
   # - extension: to package an "extension" project
   # TODO: List of the examples should be reviewed !
   actions:
-    - name: pack-builder
+    - name: build-container #pack-builder
       ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
@@ -94,6 +94,8 @@ spec:
     value: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
   - name: "path-context"
     value: "."
+  - name: "build-image-index"
+    value: ""
   pipelineSpec:
     finally:
     - name: "show-sbom"
@@ -209,7 +211,64 @@ spec:
         workspace: "netrc"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "user-build"
+    - name: "build-container"
+      params:
+      - name: "PACK_SOURCE_DIR"
+        value: "$(params.source-dir)"
+      - name: "PACK_CLI_IMAGE"
+        value: "$(params.imageUrl)"
+      - name: "PACK_CLI_IMAGE_VERSION"
+        value: "$(params.imageTag)"
+      - name: "BUILDER_IMAGE_NAME"
+        value: "$(params.output-image)"
+      - name: "PACK_BUILDER_TOML"
+        value: "ubi-builder.toml"
+      - name: "PACK_CMD_FLAGS"
+        value:
+        - "$(params.packCmdBuilderFlags)"
+      runAfter:
+      - "prefetch-dependencies"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"
+        - name: "name"
+          value: "build-container"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+    - name: "build-image-index"
+      params:
+      - name: "IMAGE"
+        value: "$(params.output-image)"
+      - name: "COMMIT_SHA"
+        value: "$(tasks.clone-repository.results.commit)"
+      - name: "IMAGE_EXPIRES_AFTER"
+        value: "$(params.image-expires-after)"
+      - name: "ALWAYS_BUILD_INDEX"
+        value: "$(params.build-image-index)"
+      - name: "IMAGES"
+        value:
+        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:a0ac2ef2107c8d117febbe076c884ef12e0276b0942a47c3906f5f25d128073e"
+        - name: "name"
+          value: "build-image-index"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(tasks.init.results.build)"
+        operator: "in"
+        values:
+        - "true"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -370,6 +429,8 @@ spec:
         operator: "in"
         values:
         - "false"
+  timeouts:
+    pipeline: "3600000000000ns"
   workspaces:
   - name: "workspace"
     volumeClaimTemplate:
@@ -470,6 +531,8 @@ spec:
 
             set -e
             echo "and say Good bye to all of you !"
+  timeouts:
+    pipeline: "300000000000ns"
 
 ```
 #### Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
@@ -574,6 +637,8 @@ spec:
       workspaces:
       - name: "shared-wks"
         workspace: "shared-wks"
+  timeouts:
+    pipeline: "300000000000ns"
   workspaces:
   - name: "shared-wks"
     volumeClaimTemplate:
@@ -647,6 +712,8 @@ spec:
 
             set -e
             echo "Say Hello"
+  timeouts:
+    pipeline: "300000000000ns"
 
 ```
 #### Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye when condition is met
@@ -734,6 +801,8 @@ spec:
         operator: "in"
         values:
         - "true"
+  timeouts:
+    pipeline: "300000000000ns"
 
 ```
 #### Simple example of a Tekton pipeline echoing a message
@@ -801,6 +870,8 @@ spec:
 
             set -e
             echo "Say Hello"
+  timeouts:
+    pipeline: "300000000000ns"
 
 ```
 ### Demo
@@ -873,6 +944,8 @@ spec:
             for member in "${members[@]}"; do
               echo "Say hello to: $member"
             done
+  timeouts:
+    pipeline: "300000000000ns"
 
 ```
 #### Basic job echoing a message
@@ -924,6 +997,8 @@ spec:
             #!/usr/bin/env bash
 
             echo "Say hello to the team"
+  timeouts:
+    pipeline: "300000000000ns"
 
 ```
 #### Basic job echoing a message using the param teamMember
@@ -983,6 +1058,8 @@ spec:
             #!/usr/bin/env bash
 
             echo $(params.teamMember)
+  timeouts:
+    pipeline: "300000000000ns"
 
 ```
 ### Buildpack
@@ -1169,6 +1246,8 @@ spec:
         workspace: "source-dir"
       - name: "pack-workspace"
         workspace: "pack-workspace"
+  timeouts:
+    pipeline: "300000000000ns"
   workspaces:
   - name: "pack-workspace"
     volumeClaimTemplate:
@@ -1385,6 +1464,8 @@ spec:
         workspace: "source-dir"
       - name: "pack-workspace"
         workspace: "pack-workspace"
+  timeouts:
+    pipeline: "300000000000ns"
   workspaces:
   - name: "pack-workspace"
     volumeClaimTemplate:

@@ -21,3 +21,5 @@ spec:
 
             set -e
             echo "Say Hello"
+  timeouts:
+    pipeline: "300000000000ns"
