@@ -124,6 +124,20 @@ public class Pipelines implements JobProvider {
         }
 
         // @formatter:off
+        List<PipelineTask> pipelineTasks = new ArrayList<>();
+        pipelineTasks.add(INIT());
+        pipelineTasks.add(CLONE_REPOSITORY());
+        pipelineTasks.add(PREFETCH_DEPENDENCIES());
+        pipelineTasks.addAll(tasks);
+        pipelineTasks.add(BUILD_IMAGE_INDEX());
+        pipelineTasks.add(BUILD_SOURCE_IMAGE());
+        pipelineTasks.add(DEPRECATED_BASE_IMAGE_CHECK());
+        pipelineTasks.add(CLAIR_SCAN());
+        pipelineTasks.add(ECOSYSTEM_CERT_PREFLIGHT_CHECKS());
+        pipelineTasks.add(SAST_SNYK_CHECK());
+        pipelineTasks.add(CLAMAV_SCAN());
+        pipelineTasks.add(SBOM_JSON_CHECK());
+
         PipelineRun pipeline = new PipelineRunBuilder()
                 .withNewMetadata()
                    .withName(cfg.getJob().getName())
@@ -137,36 +151,7 @@ public class Pipelines implements JobProvider {
                    .withNewPipelineSpec()
                       .withResults(KONFLUX_PIPELINE_RESULTS())
                       .withFinally(KONFLUX_PIPELINE_FINALLY())
-                      .withTasks(
-                         INIT(),
-                         CLONE_REPOSITORY(),
-                         PREFETCH_DEPENDENCIES(),
-                         // We add here the build container action(s) of the user
-                         // TODO
-                         /*
-                          As the list of the tasks to be passed to the Tekton PipelineRun cannot be passed
-                          as a list of objects but instead as a list created according to the following logic:
-
-                          from("git-clone")
-                            .to("t1").runAfter("git-clone")
-                            .to("t2").runAfter("t1")
-                            .to("user-build-task1").runAfter("t2")
-                            .to("user-build-task2").runAfter("user-build-task1")
-                            ...
-                            .to("build-image-index").runAfter("last-user-task => build-user-task2")
-                          ...
-                          then we should find a way to modelize such an Array of PipelineTask
-                          */
-                         tasks.get(0),
-                         BUILD_IMAGE_INDEX(),
-                         BUILD_SOURCE_IMAGE(),
-                         DEPRECATED_BASE_IMAGE_CHECK(),
-                         CLAIR_SCAN(),
-                         ECOSYSTEM_CERT_PREFLIGHT_CHECKS(),
-                         SAST_SNYK_CHECK(),
-                         CLAMAV_SCAN(),
-                         SBOM_JSON_CHECK()
-                      )
+                      .withTasks(pipelineTasks.toArray(new PipelineTask[0]))
                    .endPipelineSpec()
                 .endSpec()
                 .build();
