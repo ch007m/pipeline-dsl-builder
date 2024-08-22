@@ -32,7 +32,7 @@ public class Bundles {
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-ecosystem-cert-preflight-checks","0.1","8838d3e1628dbe61f4851b3640d2e3a9a3079d3ff3da955f4a3e4c2c95a013df"));
 
         // TODO: Create for each task a quay.io repo instead of packaging them in one repository
-        addBundle(new Bundle("quay.io/ch007m","tekton-bundle","latest","af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f"));
+        addBundle(new Bundle("quay.io/ch007m","tekton-bundle","latest","c019b61cf372bcb28515759ebac4b185eccf23290bb628c6050e4b279c4989b0"));
     }
 
     public static void addBundle(Bundle b) {
