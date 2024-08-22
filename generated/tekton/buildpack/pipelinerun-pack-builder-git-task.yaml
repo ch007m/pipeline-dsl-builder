@@ -107,6 +107,8 @@ spec:
         workspace: "source-dir"
       - name: "pack-workspace"
         workspace: "pack-workspace"
+  timeouts:
+    pipeline: "300000000000ns"
   workspaces:
   - name: "pack-workspace"
     volumeClaimTemplate:

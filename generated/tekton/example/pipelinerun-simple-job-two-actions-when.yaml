@@ -43,3 +43,5 @@ spec:
         operator: "in"
         values:
         - "true"
+  timeouts:
+    pipeline: "300000000000ns"

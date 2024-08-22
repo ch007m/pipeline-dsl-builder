@@ -35,3 +35,5 @@ spec:
 
             set -e
             echo "and say Good bye to all of you !"
+  timeouts:
+    pipeline: "300000000000ns"
