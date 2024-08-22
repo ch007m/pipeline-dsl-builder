@@ -23,5 +23,9 @@ public class Job {
    private List<Workspace> workspaces;
    private List<Action> actions;
 
+   @JsonSetter(nulls = Nulls.SKIP)
+   private String timeout = DEFAULT_TIMEOUT;
+
    private static String DEFAULT_RESOURCE_TYPE = "PipelineRun";
+   private static String DEFAULT_TIMEOUT = "0h5m0s";
 }
