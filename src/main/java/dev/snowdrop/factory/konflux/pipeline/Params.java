@@ -41,6 +41,8 @@ public class Params {
       params.add(new ParamBuilder().withName("dockerfile").withValue(new ParamValue("src/main/docker/Dockerfile.jvm")).build());
       params.add(new ParamBuilder().withName("output-image").withValue(new ParamValue("quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}")).build());
       params.add(new ParamBuilder().withName("path-context").withValue(new ParamValue(".")).build());
+      //TODO Check from konflux PR what the value should be
+      params.add(new ParamBuilder().withName("build-image-index").withValue(new ParamValue("")).build());
       return params;
    }
 }

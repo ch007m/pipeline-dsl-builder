@@ -79,6 +79,33 @@ public class Tasks {
       return task;
    }
 
+   public static PipelineTask BUILD_IMAGE_INDEX() {
+      return new PipelineTaskBuilder()
+         .withName("build-image-index")
+         .withRunAfter("build-container")
+         .addNewWhen()
+           .withInput("$(tasks.init.results.build)")
+           .withOperator("in")
+           .withValues("true")
+         .endWhen()
+         .withParams()
+           .addNewParam().withName("IMAGE").withValue(new ParamValue("$(params.output-image)")).endParam()
+           .addNewParam().withName("COMMIT_SHA").withValue(new ParamValue("$(tasks.clone-repository.results.commit)")).endParam()
+           .addNewParam().withName("IMAGE_EXPIRES_AFTER").withValue(new ParamValue("$(params.image-expires-after)")).endParam()
+           .addNewParam().withName("ALWAYS_BUILD_INDEX").withValue(new ParamValue("$(params.build-image-index)")).endParam()
+           .addNewParam().withName("IMAGES").withValue(new ParamValue(List.of("$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"))).endParam()
+         .withNewTaskRef()
+           .withResolver("bundles")
+           .withParams()
+             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/konflux-ci/tekton-catalog","task-build-image-index","0.1"))).endParam()
+             .addNewParam().withName("name").withValue(new ParamValue("build-image-index")).endParam()
+             .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
+         .endTaskRef()
+         .withWorkspaces()
+           .addNewWorkspace().withName("workspace").withWorkspace("workspace").endWorkspace()
+         .build();
+   }
+
    public static PipelineTask BUILD_SOURCE_IMAGE() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("build-source-image")
@@ -286,8 +313,9 @@ public class Tasks {
    }
 
    public static PipelineTask USER_BUILD() {
+      // TODO Convert the config actions to tasks
       PipelineTask task = new PipelineTaskBuilder()
-          .withName("user-build")
+          .withName("build-container")
           .build();
       return task;
    }

@@ -342,7 +342,7 @@ public class Pipelines implements JobProvider {
         return workspaceList;
     }
 
-    private static List<Param> populatePipelineParams(List<Map<String, Object>> params) {
+    public static List<Param> populatePipelineParams(List<Map<String, Object>> params) {
         List<Param> paramList = new ArrayList<>();
         for (Map<String, Object> hash : params) {
             hash.forEach((key, val) -> {

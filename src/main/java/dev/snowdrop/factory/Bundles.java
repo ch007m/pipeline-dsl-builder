@@ -21,6 +21,7 @@ public class Bundles {
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-git-clone","0.1","de0ca8872c791944c479231e21d68379b54877aaf42e5f766ef4a8728970f8b3"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-prefetch-dependencies","0.1","03e8293e6cc7d70a5f899751c6a4c2a25c3e3a6cfa7c437f9beca69638ce6988"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-source-build","0.1","d1fe83481466a3b8ca91ba952f842689c9b9a63183b20fad6927cca10372f08a"));
+        addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-build-image-index","0.1","a0ac2ef2107c8d117febbe076c884ef12e0276b0942a47c3906f5f25d128073e"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-deprecated-image-check","0.4","48f8a4da120a4dec29da6e4faacee81d024324861474e10e0a7fcfcf56677249"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-clair-scan","0.1","07f56dc7b7d77d394c6163f2682b3a72f8bd53e0f43854d848ee0173feb2b25d"));
         addBundle(new Bundle("quay.io/konflux-ci/tekton-catalog","task-sast-snyk-check","0.1","d501cb1ff0f999a478a7fb8811fb501300be3f158aaedee663d230624d74d2b4"));
