@@ -31,7 +31,7 @@ public class Tasks {
    public static PipelineTask CLONE_REPOSITORY() {
       PipelineTask task = new PipelineTaskBuilder()
          .withName("clone-repository")
-         .withRunAfter("git-clone")
+         .withRunAfter("init")
          .addNewWhen()
            .withInput("$(tasks.init.results.build)")
            .withOperator("in")
@@ -73,7 +73,7 @@ public class Tasks {
          .endTaskRef()
          .withWorkspaces()
            .addNewWorkspace().withName("source").withWorkspace("workspace").endWorkspace()
-           .addNewWorkspace().withName("netrc").withWorkspace("netrc").endWorkspace()
+           //.addNewWorkspace().withName("netrc").withWorkspace("netrc").endWorkspace()
            .addNewWorkspace().withName("git-basic-auth").withWorkspace("git-auth").endWorkspace()
          .build();
       return task;

@@ -27,7 +27,7 @@ public class ApplicationBuilder {
         Application application = new dev.snowdrop.konflux.v1alpha1.ApplicationBuilder()
             // @formatter:off
             .withNewMetadata()
-               .withName(cfg.getJob().getName())
+               .withName(cfg.getApplication().getName())
                .withAnnotations(Annotations.get(cfg))
                .withNamespace(cfg.getNamespace())
             .endMetadata()

@@ -13,7 +13,11 @@ public class Labels implements LabelsProvider {
       Map<String, String> labels = Map.of(
          "pipelines.openshift.io/used-by", "build-cloud",
          "pipelines.openshift.io/runtime", "java",
-         "pipelines.openshift.io/strategy", "buildpack"
+         "pipelines.openshift.io/strategy", "buildpack",
+          // TODO: Review the labels list
+          "appstudio.openshift.io/application", "my-quarkus",
+          "appstudio.openshift.io/component", "quarkus-1",
+          "pipelines.appstudio.openshift.io/type", "build"
       );
 
       return labels.entrySet()
@@ -32,7 +36,10 @@ public class Labels implements LabelsProvider {
       Map<String, String> labels = Map.of(
          "pipelines.openshift.io/used-by", "build-cloud",
          "pipelines.openshift.io/runtime", "java",
-         "pipelines.openshift.io/strategy", cfg.getDomain()
+         "pipelines.openshift.io/strategy", cfg.getDomain(),
+         "pipelines.appstudio.openshift.io/type", "build",
+         "appstudio.openshift.io/application", cfg.getApplication().getName(),
+         "appstudio.openshift.io/component", cfg.getComponent().getName()
       );
 
       return labels.entrySet()

@@ -7,4 +7,5 @@ import lombok.Setter;
 @Getter
 public class Application {
     private boolean enable;
+    private String name;
 }

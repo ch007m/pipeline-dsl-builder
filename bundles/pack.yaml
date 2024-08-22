@@ -3,17 +3,17 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   annotations:
-    tekton.dev/pipelines.minVersion: "0.50.0"
+    tekton.dev/pipelines.minVersion: 0.50.0
     tekton.dev/categories: Image build
     tekton.dev/tags: image-build
-    tekton.dev/displayName: "pack builder"
+    tekton.dev/displayName: "pack"
     tekton.dev/platforms: "linux/amd64"
   labels:
     app.kubernetes.io/version: '0.1'
-  name: pack-builder
+  name: pack
 spec:
   description: >-
-    pack client building the builder image - https://buildpacks.io/docs/tools/pack/cli/pack_builder/
+    Buildpack pack client - https://buildpacks.io/docs/tools/pack/
   params:
     - name: PACK_EXPERIMENTAL
       default: "false"
@@ -27,37 +27,29 @@ spec:
       default: latest
       description: Pack client version
       type: string
-    - name: BUILDER_IMAGE_NAME
-      description: The name of the builder image to create.
-      type: string
-    - name: PACK_BUILDER_TOML
-      default: builder.toml
-      description: The builder toml file to use for the pack builder create command.
+    - name: PACK_SOURCE_DIR
+      default: .
+      description: Directory containing the source files to build.
       type: string
     - name: PACK_CMD_FLAGS
       default: []
       description: The Arguments to be passed to the pack command.
       type: array
-    - name: PACK_SOURCE_DIR
-      default: .
-      description: Directory containing the source files to build.
-      type: string
-  workspaces:
-    - name: source-dir
-      optional: false
-    - name: pack-workspace
-      optional: false
-      mountPath: /workspace
+
   results:
+    # Needed to run on Konflux
     - description: Digest of the image just built
       name: IMAGE_DIGEST
     - description: Image repository where the built image was pushed
       name: IMAGE_URL
-    # Needed to run on Konflux
-    - description: Digests of the base images used for build
-      name: BASE_IMAGES_DIGESTS
-    - description: The Java dependencies that came from community sources such as Maven central.
-      name: JAVA_COMMUNITY_DEPENDENCIES
+    - name: BASE_IMAGES_DIGESTS
+      description: Digests of the base images used for build
+    - name: JAVA_COMMUNITY_DEPENDENCIES
+      description: The Java dependencies that came from community sources such as Maven central.
+  workspaces:
+    - name: source-dir
+    - name: pack-workspace
+      mountPath: /workspace
   steps:
     - name: list-workspace-files
       image: "quay.io/centos/centos:latest"
@@ -82,13 +74,8 @@ spec:
         - name: PACK_HOME
           value: $(workspaces.pack-workspace.path)
       args:
-        - builder
-        - create
-        - "$(params.BUILDER_IMAGE_NAME)"
-        - --config
-        - "$(params.PACK_BUILDER_TOML)"
         - "$(params.PACK_CMD_FLAGS[*])"
-
+        -
     - name: export-images-digest
       image: registry.access.redhat.com/ubi9/buildah:9.3-12@sha256:3b11aae36f6c762e01731952ee6fb8e89c41660ce410e4c30d0bfc6496bca93c
       computeResources: {}
@@ -109,4 +96,3 @@ spec:
   volumes:
     - name: varlibcontainers
       emptyDir: {}
-

@@ -3,7 +3,15 @@
 
 Package tasks in an OCI bundle and push them on quay
 ```bash
-tkn bundle push quay.io/ch007m/tekton-bundle:latest \
+REG_USERNAME="ch007m+dabou"
+REG_PASSWORD="KTT2EFOYCTXPQ7AYNBBFL7LXGI691UWS9TZ0MIR8B8ORWPSJCRA84SGJN7WVHGGP"
+
+# podman login -u $REG_USERNAME -p $REG_PASSWORD quay.io
+
+tkn bundle \
+  --remote-username $REG_USERNAME \
+  --remote-password $REG_PASSWORD \
+  push quay.io/ch007m/tekton-bundle:latest \
   -f bundles/fetch-packconfig-registrysecret.yaml \
   -f bundles/list-source-workspace.yaml \
   -f bundles/pack-builder.yaml

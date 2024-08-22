@@ -8,9 +8,7 @@ import dev.snowdrop.factory.tekton.pipeline.TaskRefResolver;
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Bundle;
 import dev.snowdrop.model.Configurator;
-import dev.snowdrop.model.Workspace;
 import dev.snowdrop.service.UriParserSvc;
-import io.fabric8.kubernetes.api.model.Duration;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1.*;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -32,6 +30,7 @@ import java.util.stream.Stream;
 import static dev.snowdrop.factory.TektonResource.populateTimeOut;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
 import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINERUN_PARAMS;
+import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINE_PARAMS;
 import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.factory.konflux.pipeline.Workspaces.KONFLUX_PIPELINERUN_WORKSPACES;
@@ -129,6 +128,7 @@ public class Pipelines implements JobProvider {
                    .withName(cfg.getJob().getName())
                    .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
                    .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+                   .withNamespace(cfg.getNamespace())
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(KONFLUX_PIPELINERUN_WORKSPACES())
@@ -137,6 +137,7 @@ public class Pipelines implements JobProvider {
                    .withNewPipelineSpec()
                       .withResults(KONFLUX_PIPELINE_RESULTS())
                       .withFinally(KONFLUX_PIPELINE_FINALLY())
+                      .withParams(KONFLUX_PIPELINE_PARAMS())
                       .withTasks(
                          INIT(),
                          CLONE_REPOSITORY(),
@@ -183,9 +184,12 @@ public class Pipelines implements JobProvider {
         // Generate the Pipeline's task
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
-            .withName(action.getName())
+            .withName("build-container") // TODO: Find a way to avoid to hard code it here
             .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
-            // TODO: Include needed workspaces
+            // TODO: Avoid to hard code
+            .withWorkspaces()
+              .addNewWorkspace().withName("source-dir").withWorkspace("workspace").endWorkspace()
+              .addNewWorkspace().withName("pack-workspace").withWorkspace("workspace").endWorkspace()
             .withTaskRef(TaskRefResolver.withReference(bundle, action.getName()))
             .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
             .build();

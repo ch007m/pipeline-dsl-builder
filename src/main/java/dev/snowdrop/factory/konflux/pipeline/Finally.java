@@ -40,6 +40,9 @@ public class Finally {
             .addNewParam().withName("git-url").withValue(new ParamValue("$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)")).endParam()
             .addNewParam().withName("image-url").withValue(new ParamValue("$(params.output-image)")).endParam()
             .addNewParam().withName("build-task-status").withValue(new ParamValue("$(tasks.build-container.status)")).endParam()
+         .withWorkspaces()
+              // TODO: Fix hard coded values
+              .addNewWorkspace().withName("workspace").withWorkspace("workspace").endWorkspace()
          .build());
 
       return finallyTasks;
