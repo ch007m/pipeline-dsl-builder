@@ -3,10 +3,8 @@
 
 Package tasks in an OCI bundle and push them on quay
 ```bash
-REG_USERNAME="ch007m+dabou"
+REG_USERNAME="yyyyyyy"
 REG_PASSWORD="xxxxxxxxx"
-
-# podman login -u $REG_USERNAME -p $REG_PASSWORD quay.io
 
 tkn bundle \
   --remote-username $REG_USERNAME \
