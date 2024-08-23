@@ -45,7 +45,8 @@ public class Bundles {
         Bundle b = bundles.get(key);
         if (b != null) {
             return String.format("%s/%s:%s@sha256:%s", b.getRegistry(), b.getName(), b.getVersion(), b.getSha256());
+        } else {
+            throw new RuntimeException("Could not find bundle : " + String.format("%s/%s:%s@sha256:%s", b.getRegistry(), b.getName(), b.getVersion(), b.getSha256()));
         }
-        return "Bundle not found";
     }
 }
