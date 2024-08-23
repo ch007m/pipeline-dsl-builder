@@ -1,10 +1,8 @@
-package dev.snowdrop.factory.konflux.component;
+package dev.snowdrop.factory.konflux.builder;
 
-import dev.snowdrop.konflux.v1alpha1.Component;
-import dev.snowdrop.konflux.v1alpha1.componentspec.source.GitBuilder;
+import dev.snowdrop.dsl.konflux.v1alpha1.Component;
+import dev.snowdrop.dsl.konflux.v1alpha1.componentspec.source.GitBuilder;
 import dev.snowdrop.model.Configurator;
-
-import java.util.Map;
 
 /*
 New YAML example: https://github.com/konflux-ci/konflux-ci/blob/main/test/resources/demo-users/user/ns2/application-and-component.yaml
@@ -40,12 +38,12 @@ spec:
 public class ComponentBuilder {
 
     public static Component createComponent(Configurator cfg) {
-        Component component = new dev.snowdrop.konflux.v1alpha1.ComponentBuilder()
+        Component component = new dev.snowdrop.dsl.konflux.v1alpha1.ComponentBuilder()
             // @formatter:off
             .withNewMetadata()
                 .withName(cfg.getComponent().getName())
                 .withNamespace(cfg.getNamespace())
-                .withAnnotations(Annotations.get(cfg))
+                .withAnnotations(Annotations.getComponentAnnotations(cfg))
             .endMetadata()
             .withNewSpec()
                .withApplication(cfg.getJob().getName())

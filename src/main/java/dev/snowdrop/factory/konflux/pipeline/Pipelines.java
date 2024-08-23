@@ -1,19 +1,16 @@
 package dev.snowdrop.factory.konflux.pipeline;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.JobProvider;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.factory.tekton.pipeline.TaskRefResolver;
-import dev.snowdrop.model.Action;
-import dev.snowdrop.model.Bundle;
-import dev.snowdrop.model.Configurator;
+import dev.snowdrop.model.*;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1.*;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
@@ -21,20 +18,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.*;
-import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static dev.snowdrop.factory.TektonResource.populateTimeOut;
+import static dev.snowdrop.factory.TektonResource.*;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
 import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINERUN_PARAMS;
 import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINE_PARAMS;
 import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.factory.konflux.pipeline.Workspaces.KONFLUX_PIPELINERUN_WORKSPACES;
-import static dev.snowdrop.factory.tekton.pipeline.Pipelines.populatePipelineParams;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
@@ -50,6 +44,8 @@ public class Pipelines implements JobProvider {
         PipelineTask aTask;
         List<Action> actions = cfg.getJob().getActions();
         List<PipelineTask> tasks = new ArrayList<>();
+        List<Param> pipelineParams = new ArrayList<>();
+        List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
 
         if (cfg.getRepository() == null) {
             throw new RuntimeException("Git repository is missing");
@@ -58,6 +54,22 @@ public class Pipelines implements JobProvider {
         if (actions.isEmpty()) {
             throw new RuntimeException("Actions are missing from the configuration");
         }
+
+        List<Workspace> wks = cfg.getJob().getWorkspaces();
+        if (Optional.ofNullable(wks).map(List::size).orElse(0) > 0) {
+            pipelineWorkspaces = populatePipelineWorkspaces(wks);
+        }
+
+        List<Map<String, Object>> params = cfg.getJob().getParams();
+        if (params != null && !params.isEmpty()) {
+            pipelineParams = populatePipelineParams(cfg.getJob().getParams());
+        }
+
+        // Create a HashMap of the job workspaces using as's key the workspace's name
+        Map<String, Workspace> jobWorkspacesMap = Optional.ofNullable(cfg.getJob().getWorkspaces())
+            .orElse(Collections.emptyList())
+            .stream()
+            .collect(Collectors.toMap(Workspace::getName, name -> name));
 
         for (Action action : actions) {
 
@@ -69,6 +81,13 @@ public class Pipelines implements JobProvider {
             } else {
                 // TODO: Find a way to get the id of the previous's konflux task
                 runAfter = "prefetch-dependencies";
+            }
+
+            List<When> whenList = populateWhenList(action);
+
+            if (action.getScript() != null || action.getScriptFileUrl() != null) {
+                aTask = createTaskWithEmbeddedScript(action, runAfter, whenList, jobWorkspacesMap);
+                tasks.add(aTask);
             }
 
             if (action.getRef() != null) {
@@ -98,11 +117,9 @@ public class Pipelines implements JobProvider {
                             .collect(Collectors.toList());
 
                         result.forEach(file -> {
-                            Constructor constructor = new Constructor(Task.class, new LoaderOptions());
-                            Yaml yaml = new Yaml(constructor);
+                            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                             try {
-                                Path yamlPath = Path.of(file);
-                                Task task = yaml.load(Files.readString(yamlPath));
+                                Task task = mapper.readValue(Path.of(file).toFile(), Task.class);
 
                                 // The task name should be the same as the fileName and will be used as key
                                 String taskName = task.getMetadata().getName();

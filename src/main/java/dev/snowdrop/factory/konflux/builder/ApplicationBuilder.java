@@ -1,10 +1,8 @@
-package dev.snowdrop.factory.konflux.application;
+package dev.snowdrop.factory.konflux.builder;
 
-import dev.snowdrop.factory.konflux.component.Annotations;
-import dev.snowdrop.konflux.v1alpha1.Application;
+import dev.snowdrop.dsl.konflux.v1alpha1.Application;
 import dev.snowdrop.model.Configurator;
 
-import java.util.Map;
 /*
 New YAML example: https://github.com/konflux-ci/konflux-ci/blob/main/test/resources/demo-users/user/ns2/application-and-component.yaml
 
@@ -24,11 +22,11 @@ spec:
 public class ApplicationBuilder {
 
     public static Application createApplication(Configurator cfg) {
-        Application application = new dev.snowdrop.konflux.v1alpha1.ApplicationBuilder()
+        Application application = new dev.snowdrop.dsl.konflux.v1alpha1.ApplicationBuilder()
             // @formatter:off
             .withNewMetadata()
                .withName(cfg.getApplication().getName())
-               .withAnnotations(Annotations.get(cfg))
+               .withAnnotations(Annotations.getApplicationAnnotations(cfg))
                .withNamespace(cfg.getNamespace())
             .endMetadata()
             .withNewSpec()

@@ -126,8 +126,8 @@
                     <enumUppercase>true</enumUppercase>
                     <source>src/main/crds</source>
                     <packageOverrides>
-                        <com.redhat.appstudio.v1alpha1>dev.snowdrop.konflux.v1alpha1</com.redhat.appstudio.v1alpha1>
-                        <dev.tekton.pipelinesascode.v1alpha1>dev.snowdrop.tekton.v1alpha1</dev.tekton.pipelinesascode.v1alpha1>
+                        <com.redhat.appstudio.v1alpha1>dev.snowdrop.dsl.konflux.v1alpha1</com.redhat.appstudio.v1alpha1>
+                        <dev.tekton.pipelinesascode.v1alpha1>dev.snowdrop.dsl.tekton.v1alpha1</dev.tekton.pipelinesascode.v1alpha1>
                     </packageOverrides>
                 </configuration>
             </plugin>

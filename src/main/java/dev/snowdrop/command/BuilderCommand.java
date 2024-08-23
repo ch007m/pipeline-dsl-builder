@@ -12,8 +12,8 @@ import picocli.CommandLine.Option;
 
 import java.nio.file.Paths;
 
-import static dev.snowdrop.factory.konflux.component.ComponentBuilder.createComponent;
-import static dev.snowdrop.factory.konflux.application.ApplicationBuilder.createApplication;
+import static dev.snowdrop.factory.konflux.builder.ComponentBuilder.createComponent;
+import static dev.snowdrop.factory.konflux.builder.ApplicationBuilder.createApplication;
 
 @TopCommand
 @Command(name = "builder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline(run)s")
