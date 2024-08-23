@@ -9,8 +9,8 @@ metadata:
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.appstudio.openshift.io/type: "build"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
