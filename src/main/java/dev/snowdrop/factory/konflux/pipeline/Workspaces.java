@@ -14,6 +14,7 @@ import java.util.List;
 
 public class Workspaces {
 
+   @Deprecated
    public static List<PipelineWorkspaceDeclaration> KONFLUX_PIPELINE_WORKSPACES() {
       List<PipelineWorkspaceDeclaration> wks = new ArrayList<>();
       wks.add(new PipelineWorkspaceDeclarationBuilder().withName("workspace").build());

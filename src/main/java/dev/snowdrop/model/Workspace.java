@@ -12,6 +12,7 @@ public class Workspace {
     private String workspace;
     private Volume volumeClaimTemplate;
     private List<Volume> volumeSources;
+    private Secret secret;
 
     public Workspace name(String name) {
         this.name = name;

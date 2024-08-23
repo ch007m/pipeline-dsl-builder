@@ -21,7 +21,16 @@ job:
   name: quarkus-1-on-push
   description: PipelineRun performing a build of a Quarkus application using pack CLI
 
-  # Remark : As the Pipelin(run) resource of konflux already defines mandatory steps to perform actions as listed here - it is then not needed
+  workspaces:
+  - name: workspace
+    volumeClaimTemplate:
+      storage: 1Gi
+      accessMode: ReadWriteOnce
+  - name: git-auth
+    secret:
+      name: "{{ git_auth_secret }}"
+
+  # Remark : As the Pipeline(run) resource of konflux already defines mandatory steps to perform actions as listed here - it is then not needed
   # to detail them here except the actions that you want to include part of the build process
 
   # The actions to be executed should match/map the name ofg the Task declared in an OCI Bundle or Git repository url
@@ -37,6 +46,11 @@ job:
   actions:
     - name: pack # TODO: To be reviewed as the name of the task is different about the "build-container"
       ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      workspaces:
+        - name: source-dir
+          workspace: workspace
+        - name: pack-workspace
+          workspace: workspace
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_IMAGE: "$(params.imageUrl)"

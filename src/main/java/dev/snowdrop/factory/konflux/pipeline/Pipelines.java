@@ -133,7 +133,7 @@ public class Pipelines implements JobProvider {
                     }
 
                     // Generate the Task
-                    aTask = createTaskUsingRef(action, runAfter, bundle, taskRefMap);
+                    aTask = createTaskUsingRef(action, runAfter, bundle, jobWorkspacesMap, taskRefMap);
                     tasks.add(aTask);
                 }
             }
@@ -162,8 +162,8 @@ public class Pipelines implements JobProvider {
                    .withNamespace(cfg.getNamespace())
                 .endMetadata()
                 .withNewSpec()
-                   .withWorkspaces(KONFLUX_PIPELINERUN_WORKSPACES())
-                   .withParams(KONFLUX_PIPELINERUN_PARAMS())
+                   .withWorkspaces(pipelineWorkspaces)
+                   .withParams(KONFLUX_PIPELINERUN_PARAMS()) // Use pipelineParams
                    .withTimeouts(populateTimeOut("1h0m0s"))
                    .withNewPipelineSpec()
                       .withResults(KONFLUX_PIPELINE_RESULTS())
@@ -179,19 +179,16 @@ public class Pipelines implements JobProvider {
         return pipeline;
     }
 
-    private static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Task> taskRefMap) {
+    private static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
         // List of workspaces defined for the referenced's task
-        // List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
+        List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
 
         // Generate the Pipeline's task
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
             .withName("build-container") // TODO: Find a way to avoid to hard code it here
             .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
-            // TODO: Avoid to hard code
-            .withWorkspaces()
-              .addNewWorkspace().withName("source-dir").withWorkspace("workspace").endWorkspace()
-              .addNewWorkspace().withName("pack-workspace").withWorkspace("workspace").endWorkspace()
+            .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
             .withTaskRef(TaskRefResolver.withReference(bundle, action.getName()))
             .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
             .build();
