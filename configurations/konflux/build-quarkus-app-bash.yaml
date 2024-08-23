@@ -1,0 +1,111 @@
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: konflux
+domain: build
+namespace: user-ns1
+
+repository:
+  url: https://github.com/ch007m/new-quarkus-app-1
+  dockerfilePath: src/main/docker/Dockerfile.jvm
+
+# To generate the Application and/or Component CR
+application:
+  name: my-quarkus
+  enable: false
+component:
+  name: quarkus-1
+  enable: false
+
+job:
+  resourceType: PipelineRun
+  name: quarkus-1-on-push
+  description: PipelineRun performing a build of a Quarkus application using a bash script
+
+  workspaces:
+  - name: workspace
+    volumeClaimTemplate:
+      storage: 1Gi
+      accessMode: ReadWriteOnce
+  - name: git-auth
+    secret:
+      name: "{{ git_auth_secret }}"
+
+  results:
+    - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+    - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    - BASE_IMAGES_DIGESTS: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+    #- JAVA_COMMUNITY_DEPENDENCIES: "$(tasks.build-container.results.JAVA_COMMUNITY_DEPENDENCIES)"
+    - CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
+    - CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
+  
+  params:
+    - git-url: "{{source_url}}"
+    - revision: "{{revision}}"
+    - output-image: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
+    - image-expires-after: "5d"
+    - build-image-index: ""
+    # We need the following parameters when defined part of the PipelineSpec with default value and used by a task
+    - build-source-image: false
+    - prefetch-input: ""
+
+    # Buildpack params
+    - source-dir: "source"
+    - imageUrl: "buildpacksio/pack"
+    - imageTag: "latest"
+    - packCmdBuilderFlags:
+       - build
+       - -B
+       - quay.io/snowdrop/ubi-builder
+       - -e
+       - BP_JVM_VERSION=21
+       - quarkus-hello:1.0
+
+  actions:
+    - name: build-container
+      params:
+        - PACK_SOURCE_DIR: "$(params.source-dir)"
+        - PACK_CLI_VERSION: "v0.35.1"
+        #- PACK_CMD_FLAGS:
+        #    - "$(params.packCmdBuilderFlags)"
+      results:
+        - IMAGE_URL: "Image repository where the built image was pushed"
+        - IMAGE_DIGEST: "Digest of the image just built"
+        - BASE_IMAGES_DIGESTS: "Digests of the base images used for build"
+
+      args:
+        - "$(params.packCmdBuilderFlags)"
+
+      script: |
+        #!/usr/bin/env bash
+        set -e
+        
+        echo "Installing pack ..."
+        curl -sSL "https://github.com/buildpacks/pack/releases/download/$(params.PACK_CLI_VERSION)/pack-$(params.PACK_CLI_VERSION)-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
+        
+        echo "Checking pack ..."
+        pack --version
+
+        # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
+        
+        echo "Getting the arguments ..."
+        for cmd_arg in "$@"; do
+          CLI_ARGS+=("$cmd_arg")
+        done
+        
+        echo "Here are the arguments to be passed to the pack CLI"
+        for i in "$CLI_ARGS[@]"; do
+          echo "arg: $i"
+        done
+        
+        echo "Building the image ..."
+        pack "${CLI_ARGS[@]}"
+        
+        echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
+        echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
+        echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
+        
+
+        
+        
+        
+
+
