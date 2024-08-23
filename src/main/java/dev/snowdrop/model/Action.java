@@ -3,6 +3,7 @@ package dev.snowdrop.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +20,14 @@ public class Action {
     private List<Map<String, Object>> params;
     private List<Workspace> workspaces;
     private List<String> when;
+    private List<Map<String, String>> results;
 
     public static final String STEP_SCRIPT_IMAGE = "centos";
+    public static Map<String, String> IMAGES = new HashMap<>();
+
+    static {
+        IMAGES.put(STEP_SCRIPT_IMAGE, "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17");
+    }
 
     public Action() {
         instanceCounter++;

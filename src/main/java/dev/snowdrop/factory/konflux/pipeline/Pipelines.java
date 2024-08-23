@@ -53,7 +53,7 @@ public class Pipelines implements JobProvider {
             throw new RuntimeException("Actions are missing from the configuration");
         }
 
-        List<Result> results = cfg.getJob().getResults();
+        List<Map<String, String>> results = cfg.getJob().getResults();
         if (Optional.ofNullable(results).map(List::size).orElse(0) > 0) {
             pipelineResults = populatePipelineResults(results);
         }
@@ -87,9 +87,10 @@ public class Pipelines implements JobProvider {
             }
 
             List<When> whenList = populateWhenList(action);
+            List<TaskResult> taskResults = populateTaskResults(action.getResults());
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action, runAfter, whenList, jobWorkspacesMap);
+                aTask = createTaskWithEmbeddedScript(action, runAfter, whenList, jobWorkspacesMap, taskResults);
                 tasks.add(aTask);
             }
 

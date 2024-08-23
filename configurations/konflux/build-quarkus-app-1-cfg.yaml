@@ -30,6 +30,14 @@ job:
     secret:
       name: "{{ git_auth_secret }}"
 
+  results:
+    - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+    - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    - BASE_IMAGES_DIGESTS: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+    - JAVA_COMMUNITY_DEPENDENCIES: "$(tasks.build-container.results.JAVA_COMMUNITY_DEPENDENCIES)"
+    - CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
+    - CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
+
   params:
     - git-url: "{{source_url}}"
     - revision: "{{revision}}"

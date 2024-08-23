@@ -15,6 +15,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static dev.snowdrop.model.Action.STEP_SCRIPT_IMAGE;
+
 public class TektonResource {
 
     private static final Logger logger = LoggerFactory.getLogger(TektonResource.class);
@@ -37,7 +39,7 @@ public class TektonResource {
             .generatePipeline(cfg);
     }
 
-    public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<When> when, Map<String, Workspace> jobWorkspacesMap) {
+    public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<When> when, Map<String, Workspace> jobWorkspacesMap, List<TaskResult> results) {
         String embeddedScript;
 
         if (action.getScript() != null) {
@@ -69,10 +71,11 @@ public class TektonResource {
             .withTaskSpec(
                 new EmbeddedTaskBuilder()
                     .addNewStep()
-                    .withName("run-script")
-                    .withImage(action.STEP_SCRIPT_IMAGE)
-                    .withScript(embeddedScript)
+                      .withName("run-script")
+                      .withImage(action.IMAGES.get(STEP_SCRIPT_IMAGE))
+                      .withScript(embeddedScript)
                     .endStep()
+                    .withResults(results)
                     .build())
             .build();
         // @formatter:on
@@ -250,15 +253,32 @@ public class TektonResource {
         return paramList;
     }
 
-    public static List<PipelineResult> populatePipelineResults(List<Result> results) {
+    public static List<PipelineResult> populatePipelineResults(List<Map<String, String>> results) {
         List<PipelineResult> pipelineResultList = new ArrayList<>();
-        results.forEach(result -> {
-            pipelineResultList.add(new PipelineResultBuilder()
-                .withName(result.getName())
-                .withValue(new ParamValue(result.getValue()))
-                .build());
-        });
+
+        for (Map<String, String> aMap : results) {
+            aMap.forEach((key, val) -> {
+                pipelineResultList.add(new PipelineResultBuilder()
+                    .withName(key)
+                    .withValue(new ParamValue(val))
+                    .build());
+            });
+        }
         return pipelineResultList;
+    }
+
+    public static List<TaskResult> populateTaskResults(List<Map<String, String>> results) {
+        List<TaskResult> taskResultList = new ArrayList<>();
+
+        for (Map<String, String> aMap : results) {
+            aMap.forEach((key, val) -> {
+                taskResultList.add(new TaskResultBuilder()
+                    .withName(key)
+                    .withDescription(val)
+                    .build());
+            });
+        }
+        return taskResultList;
     }
 
     public static TimeoutFields populateTimeOut(String timeOut) {

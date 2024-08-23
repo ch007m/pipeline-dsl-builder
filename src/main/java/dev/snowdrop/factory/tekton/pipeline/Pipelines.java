@@ -56,7 +56,7 @@ public class Pipelines implements JobProvider {
             throw new RuntimeException("Missing tekton resource type");
         }
 
-        List<Result> results = cfg.getJob().getResults();
+        List<Map<String, String>> results = cfg.getJob().getResults();
         if (Optional.ofNullable(results).map(List::size).orElse(0) > 0) {
             pipelineResults = populatePipelineResults(results);
         }
@@ -91,6 +91,7 @@ public class Pipelines implements JobProvider {
             }
 
             List<When> whenList = populateWhenList(action);
+            List<TaskResult> taskResults = populateTaskResults(action.getResults());
 
             if (action.getRef() != null) {
                 // Create a Bundle using the action reference
@@ -142,14 +143,14 @@ public class Pipelines implements JobProvider {
             }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action, runAfter, whenList, jobWorkspacesMap);
+                aTask = createTaskWithEmbeddedScript(action, runAfter, whenList, jobWorkspacesMap, taskResults);
                 tasks.add(aTask);
             }
         }
 
         switch (tektonResourceType) {
             case "pipelinerun":
-                return generatePipelineRun(cfg, tasks, pipelineParams, pipelineWorkspaces);
+                return generatePipelineRun(cfg, tasks, pipelineParams, pipelineWorkspaces, pipelineResults);
 
             case "pipeline":
                 return generatePipeline(cfg, tasks, pipelineWorkspaces);
