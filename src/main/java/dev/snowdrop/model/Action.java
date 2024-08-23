@@ -1,5 +1,6 @@
 package dev.snowdrop.model;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 public class Action {
     static int instanceCounter = 0;
     private Integer id = 0;
+    private boolean isFinally = false;
     private String name;
     private String ref;
     private String script;
@@ -33,6 +35,16 @@ public class Action {
     public Action() {
         instanceCounter++;
         id = Integer.valueOf(instanceCounter);
+    }
+
+    public boolean isFinally() {
+        return isFinally;
+    }
+
+    // Custom setter with non-standard naming
+    @JsonSetter("finally")
+    public void isFinally(boolean isFinally) {
+        this.isFinally = isFinally;
     }
 
 }

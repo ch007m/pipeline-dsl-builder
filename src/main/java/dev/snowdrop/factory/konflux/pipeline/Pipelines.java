@@ -41,6 +41,7 @@ public class Pipelines implements JobProvider {
         PipelineTask aTask;
         List<Action> actions = cfg.getJob().getActions();
         List<PipelineTask> tasks = new ArrayList<>();
+        List<PipelineTask> finallyTasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
         List<PipelineResult> pipelineResults = new ArrayList<>();
@@ -92,11 +93,18 @@ public class Pipelines implements JobProvider {
             }
             
             List<When> whenList = populateWhenList(action);
-            List<TaskResult> taskResults = populateTaskResults(action.getResults());
+            List<TaskResult> taskResults = new ArrayList<>();
+            if (action.getResults() != null && action.getResults().size() > 0 ) {
+                taskResults = populateTaskResults(action.getResults());
+            }
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
                 aTask = createTaskWithEmbeddedScript(action, runAfter, args, whenList, jobWorkspacesMap, taskResults);
-                tasks.add(aTask);
+                if (action.isFinally()) {
+                    finallyTasks.add(aTask);
+                } else {
+                    tasks.add(aTask);
+                }
             }
 
             if (action.getRef() != null) {
@@ -143,7 +151,11 @@ public class Pipelines implements JobProvider {
 
                     // Generate the Task
                     aTask = createTaskUsingRef(action, runAfter, bundle, jobWorkspacesMap, taskRefMap);
-                    tasks.add(aTask);
+                    if (action.isFinally()) {
+                        finallyTasks.add(aTask);
+                    } else {
+                        tasks.add(aTask);
+                    }
                 }
             }
         }
@@ -176,8 +188,7 @@ public class Pipelines implements JobProvider {
                    .withTimeouts(populateTimeOut("1h0m0s"))
                    .withNewPipelineSpec()
                       .withResults(pipelineResults)
-                      .withFinally(KONFLUX_PIPELINE_FINALLY())
-                      //.withParams(KONFLUX_PIPELINESPEC_PARAMS())
+                      .withFinally(finallyTasks)
                       .withTasks(pipelineTasks.toArray(new PipelineTask[0]))
                    .endPipelineSpec()
                 .endSpec()
@@ -194,6 +205,11 @@ public class Pipelines implements JobProvider {
     private static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
         // List of workspaces defined for the referenced's task
         List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
+
+        if (action.isFinally()) {
+            // No need to define a runAfter for finally. To be checked of course !
+            runAfter = null;
+        }
 
         // Generate the Pipeline's task
         PipelineTask pipelineTask = new PipelineTaskBuilder()

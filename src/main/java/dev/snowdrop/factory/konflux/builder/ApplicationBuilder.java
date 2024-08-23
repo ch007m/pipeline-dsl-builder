@@ -30,7 +30,7 @@ public class ApplicationBuilder {
                .withNamespace(cfg.getNamespace())
             .endMetadata()
             .withNewSpec()
-               .withDisplayName(cfg.getJob().getName())
+               .withDisplayName(cfg.getApplication().getName() != null ? cfg.getApplication().getName() : cfg.getJob().getName())
             .endSpec()
             // @formatter:on
             .build();

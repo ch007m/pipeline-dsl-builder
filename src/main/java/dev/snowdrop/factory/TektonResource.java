@@ -54,6 +54,11 @@ public class TektonResource {
             throw new RuntimeException("No embedded script configured");
         }
 
+        if (action.isFinally()) {
+            // No need to define a runAfter for finally. To be checked of course !
+            runAfter = null;
+        }
+
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
             .withName(action.getName())
