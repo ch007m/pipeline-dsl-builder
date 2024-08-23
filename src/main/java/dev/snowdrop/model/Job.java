@@ -22,6 +22,7 @@ public class Job {
    private List<Map<String, Object>> params;
    private List<Workspace> workspaces;
    private List<Action> actions;
+   private List<Result> results;
 
    @JsonSetter(nulls = Nulls.SKIP)
    private String timeout = DEFAULT_TIMEOUT;

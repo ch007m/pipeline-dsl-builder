@@ -40,6 +40,7 @@ public class Pipelines implements JobProvider {
         List<PipelineTask> tasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
+        List<PipelineResult> pipelineResults = new ArrayList<>();
 
         if (actions.isEmpty()) {
             throw new RuntimeException("Actions are missing from the configuration");
@@ -53,6 +54,11 @@ public class Pipelines implements JobProvider {
         String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
         if (tektonResourceType == null) {
             throw new RuntimeException("Missing tekton resource type");
+        }
+
+        List<Result> results = cfg.getJob().getResults();
+        if (Optional.ofNullable(results).map(List::size).orElse(0) > 0) {
+            pipelineResults = populatePipelineResults(results);
         }
 
         List<Workspace> wks = cfg.getJob().getWorkspaces();
@@ -170,7 +176,7 @@ public class Pipelines implements JobProvider {
         return pipelineTask;
     }
 
-    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks, List<Param> params, List<WorkspaceBinding> pipelineWorkspaces) {
+    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks, List<Param> params, List<WorkspaceBinding> pipelineWorkspaces, List<PipelineResult> pipelineResults) {
         // @formatter:off
         PipelineRun pipelineRun = new PipelineRunBuilder()
           .withNewMetadata()
@@ -184,6 +190,7 @@ public class Pipelines implements JobProvider {
              .withWorkspaces(pipelineWorkspaces)
              .withTimeouts(populateTimeOut(cfg.getJob().getTimeout()))
              .withNewPipelineSpec()
+                .withResults(pipelineResults)
                 .withTasks(tasks)
              .endPipelineSpec()
           .endSpec()

@@ -43,6 +43,7 @@ public class Pipelines implements JobProvider {
         List<PipelineTask> tasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
+        List<PipelineResult> pipelineResults = new ArrayList<>();
 
         if (cfg.getRepository() == null) {
             throw new RuntimeException("Git repository is missing");
@@ -50,6 +51,11 @@ public class Pipelines implements JobProvider {
 
         if (actions.isEmpty()) {
             throw new RuntimeException("Actions are missing from the configuration");
+        }
+
+        List<Result> results = cfg.getJob().getResults();
+        if (Optional.ofNullable(results).map(List::size).orElse(0) > 0) {
+            pipelineResults = populatePipelineResults(results);
         }
 
         List<Workspace> wks = cfg.getJob().getWorkspaces();
@@ -163,7 +169,7 @@ public class Pipelines implements JobProvider {
                    .withParams(pipelineParams)
                    .withTimeouts(populateTimeOut("1h0m0s"))
                    .withNewPipelineSpec()
-                      .withResults(KONFLUX_PIPELINE_RESULTS())
+                      .withResults(pipelineResults)
                       .withFinally(KONFLUX_PIPELINE_FINALLY())
                       //.withParams(KONFLUX_PIPELINESPEC_PARAMS())
                       .withTasks(pipelineTasks.toArray(new PipelineTask[0]))
