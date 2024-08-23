@@ -4,11 +4,11 @@ metadata:
   annotations:
     build.appstudio.openshift.io/request: "configure-pac"
     image.redhat.com/generate: "{\"visibility\":\"public\"}"
-  name: "my-quarkus-1"
-  namespace: "user1"
+  name: "quarkus-1"
+  namespace: "user-ns1"
 spec:
-  application: "my-quarkus-1"
-  componentName: "my-quarkus-1"
+  application: "image-builder"
+  componentName: "image-builder"
   source:
     git:
       context: "."
