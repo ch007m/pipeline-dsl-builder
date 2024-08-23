@@ -24,11 +24,9 @@ import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.TektonResource.*;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
-import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINERUN_PARAMS;
-import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINE_PARAMS;
+import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINESPEC_PARAMS;
 import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
-import static dev.snowdrop.factory.konflux.pipeline.Workspaces.KONFLUX_PIPELINERUN_WORKSPACES;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
@@ -163,12 +161,12 @@ public class Pipelines implements JobProvider {
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(pipelineWorkspaces)
-                   .withParams(KONFLUX_PIPELINERUN_PARAMS()) // Use pipelineParams
+                   .withParams(pipelineParams)
                    .withTimeouts(populateTimeOut("1h0m0s"))
                    .withNewPipelineSpec()
                       .withResults(KONFLUX_PIPELINE_RESULTS())
                       .withFinally(KONFLUX_PIPELINE_FINALLY())
-                      .withParams(KONFLUX_PIPELINE_PARAMS())
+                      //.withParams(KONFLUX_PIPELINESPEC_PARAMS())
                       .withTasks(pipelineTasks.toArray(new PipelineTask[0]))
                    .endPipelineSpec()
                 .endSpec()
@@ -179,6 +177,9 @@ public class Pipelines implements JobProvider {
         return pipeline;
     }
 
+    // TODO: This method should be replaced with the common one of the TektonResource class
+    // That will be possible when we will find a way to swap the name as for konflux, the name should be "build-container"
+    // to insert it within the list
     private static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
         // List of workspaces defined for the referenced's task
         List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
@@ -186,7 +187,7 @@ public class Pipelines implements JobProvider {
         // Generate the Pipeline's task
         PipelineTask pipelineTask = new PipelineTaskBuilder()
             // @formatter:off
-            .withName("build-container") // TODO: Find a way to avoid to hard code it here
+            .withName("build-container")
             .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
             .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
             .withTaskRef(TaskRefResolver.withReference(bundle, action.getName()))

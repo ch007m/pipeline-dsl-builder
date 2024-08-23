@@ -7,7 +7,7 @@ repository:
   url: https://github.com/ch007m/new-quarkus-app-1
   dockerfilePath: src/main/docker/Dockerfile.jvm
 
-# To generate or not the Application and/or Component CR
+# To generate the Application and/or Component CR
 application:
   name: my-quarkus
   enable: true
@@ -29,6 +29,28 @@ job:
   - name: git-auth
     secret:
       name: "{{ git_auth_secret }}"
+
+  params:
+    - git-url: "{{source_url}}"
+    - revision: "{{revision}}"
+    - output-image: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
+    - image-expires-after: "5d"
+    - build-image-index: ""
+    # We need the following parameters when defined part of the PipelineSpec with default value and used by a task
+    - build-source-image: false
+    - prefetch-input: ""
+
+    # Buildpack params
+    - source-dir: "source"
+    - imageUrl: "buildpacksio/pack"
+    - imageTag: "latest"
+    - packCmdBuilderFlags:
+       - build
+       - -B
+       - quay.io/snowdrop/ubi-builder
+       - -e
+       - BP_JVM_VERSION=21
+       - quarkus-hello:1.0
 
   # Remark : As the Pipeline(run) resource of konflux already defines mandatory steps to perform actions as listed here - it is then not needed
   # to detail them here except the actions that you want to include part of the build process

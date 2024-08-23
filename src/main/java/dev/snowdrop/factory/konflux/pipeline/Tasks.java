@@ -275,6 +275,7 @@ public class Tasks {
       return task;
    }
 
+   @Deprecated
    public static PipelineTask BUILD_CONTAINER() {
       // @formatter:off
       PipelineTask task = new PipelineTaskBuilder()
@@ -309,21 +310,6 @@ public class Tasks {
              .endWorkspace()
           .build();
       // @formatter:on
-      return task;
-   }
-
-   public static PipelineTask USER_BUILD() {
-      // TODO Convert the config actions to tasks
-      PipelineTask task = new PipelineTaskBuilder()
-          .withName("build-container")
-          .build();
-      return task;
-   }
-
-   public static PipelineTask BUILDPACKS_BUILDER() {
-      PipelineTask task = new PipelineTaskBuilder()
-         .withName("buildpacks-builder")
-         .build();
       return task;
    }
 
