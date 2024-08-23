@@ -20,7 +20,7 @@ public class Action {
     private List<Workspace> workspaces;
     private List<String> when;
 
-    public static final String STEP_SCRIPT_IMAGE = "ubuntu";
+    public static final String STEP_SCRIPT_IMAGE = "centos";
 
     public Action() {
         instanceCounter++;
