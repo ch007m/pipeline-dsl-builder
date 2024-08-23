@@ -15,7 +15,7 @@ spec:
     - name: "say-hello"
       taskSpec:
         steps:
-        - image: "ubuntu"
+        - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
           script: |-
             #!/usr/bin/env bash

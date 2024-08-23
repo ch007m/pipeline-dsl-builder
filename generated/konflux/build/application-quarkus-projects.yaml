@@ -3,7 +3,7 @@ kind: "Application"
 metadata:
   annotations:
     application.thumbnail: "10"
-  name: "my-quarkus"
+  name: "quarkus-projects"
   namespace: "user-ns1"
 spec:
-  displayName: "my-quarkus"
+  displayName: "quarkus-projects"
