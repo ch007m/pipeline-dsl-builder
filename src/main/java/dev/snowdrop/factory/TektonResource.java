@@ -135,7 +135,7 @@ public class TektonResource {
                         .build();
                     wksPipelineTask.add(wuBuilder.build());
                 } else {
-                    throw new RuntimeException("The following workspace has not defined at the job's level: " + k);
+                    throw new RuntimeException("The following workspace has not been defined at the job's level: " + k);
                 }
             });
 
@@ -248,6 +248,17 @@ public class TektonResource {
             );
         }
         return paramList;
+    }
+
+    public static List<PipelineResult> populatePipelineResults(List<Result> results) {
+        List<PipelineResult> pipelineResultList = new ArrayList<>();
+        results.forEach(result -> {
+            pipelineResultList.add(new PipelineResultBuilder()
+                .withName(result.getName())
+                .withValue(new ParamValue(result.getValue()))
+                .build());
+        });
+        return pipelineResultList;
     }
 
     public static TimeoutFields populateTimeOut(String timeOut) {
