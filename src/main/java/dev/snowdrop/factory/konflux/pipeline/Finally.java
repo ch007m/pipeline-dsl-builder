@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static dev.snowdrop.factory.Bundles.getBundleURL;
+import static dev.snowdrop.factory.konflux.Variables.KONFLUX_TEKTON_QUAY_CATALOG;
 
 public class Finally {
 
@@ -18,7 +19,7 @@ public class Finally {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/konflux-ci/tekton-catalog","task-show-sbom","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-show-sbom","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("show-sbom")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -31,7 +32,7 @@ public class Finally {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL("quay.io/konflux-ci/tekton-catalog","task-summary","0.2"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-summary","0.2"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("summary")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
