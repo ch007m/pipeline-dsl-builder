@@ -43,7 +43,7 @@ public class ComponentBuilder {
         Component component = new dev.snowdrop.konflux.v1alpha1.ComponentBuilder()
             // @formatter:off
             .withNewMetadata()
-                .withName(cfg.getJob().getName())
+                .withName(cfg.getComponent().getName())
                 .withNamespace(cfg.getNamespace())
                 .withAnnotations(Annotations.get(cfg))
             .endMetadata()

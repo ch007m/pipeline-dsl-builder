@@ -124,7 +124,7 @@ public class SnakeYamlTests {
                 - url: "$(params.git-url)"
                 - subdirectory: "."
             - name: tool
-              ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+              ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
               params:
                 - CMD_ARGS:
                   - "$(params.cmdArgs)"

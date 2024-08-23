@@ -1,7 +1,7 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: konflux
 domain: build
-namespace: user1
+namespace: user-ns1
 
 repository:
   url: https://github.com/ch007m/new-quarkus-app-1
@@ -9,15 +9,17 @@ repository:
 
 # To generate or not the Application and/or Component CR
 application:
+  name: my-quarkus
   enable: true
 component:
+  name: quarkus-1
   enable: true
 
 job:
   # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
-  name: my-quarkus-1
-  description: PipelineRun performing a pack build
+  name: quarkus-1-on-push
+  description: PipelineRun performing a build of a Quarkus application using pack CLI
 
   # Remark : As the Pipelin(run) resource of konflux already defines mandatory steps to perform actions as listed here - it is then not needed
   # to detail them here except the actions that you want to include part of the build process
@@ -33,14 +35,12 @@ job:
   # - extension: to package an "extension" project
   # TODO: List of the examples should be reviewed !
   actions:
-    - name: build-container #pack-builder
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:af13b94347457df001742f8449de9edb381e90b0d174da598ddd15cf493e340f
+    - name: pack # TODO: To be reviewed as the name of the task is different about the "build-container"
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_IMAGE: "$(params.imageUrl)"
         - PACK_CLI_IMAGE_VERSION: "$(params.imageTag)"
-        - BUILDER_IMAGE_NAME: "$(params.output-image)"
-        - PACK_BUILDER_TOML: "ubi-builder.toml"
         - PACK_CMD_FLAGS:
           - "$(params.packCmdBuilderFlags)"
 
