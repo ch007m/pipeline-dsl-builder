@@ -1,6 +1,7 @@
 package dev.snowdrop.factory;
 
 import dev.snowdrop.model.*;
+import dev.snowdrop.model.ConfigMap;
 import dev.snowdrop.model.Secret;
 import dev.snowdrop.model.Volume;
 import dev.snowdrop.service.FileUtilSvc;
@@ -206,6 +207,15 @@ public class TektonResource {
                 Secret secret = wk.getSecret();
                 binding.withSecret(new SecretVolumeSourceBuilder()
                     .withSecretName(secret.getName())
+                    .build());
+                workspaceList.add(binding.build());
+            }
+
+            // If volume is a ConfigMap
+            if (wk.getConfigMap() != null) {
+                ConfigMap cm = wk.getConfigMap();
+                binding.withSecret(new SecretVolumeSourceBuilder()
+                    .withSecretName(cm.getName())
                     .build());
                 workspaceList.add(binding.build());
             }

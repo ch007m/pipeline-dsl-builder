@@ -13,6 +13,7 @@ public class Workspace {
     private Volume volumeClaimTemplate;
     private List<Volume> volumeSources;
     private Secret secret;
+    private ConfigMap configMap;
 
     public Workspace name(String name) {
         this.name = name;
