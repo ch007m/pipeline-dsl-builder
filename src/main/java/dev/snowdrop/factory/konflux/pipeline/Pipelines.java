@@ -86,11 +86,16 @@ public class Pipelines implements JobProvider {
                 runAfter = "prefetch-dependencies";
             }
 
+            List<String> argList = new ArrayList<>();
+            if (action.getArgs() != null && action.getArgs().size() > 0 ) {
+                argList = action.getArgs();
+            }
+            
             List<When> whenList = populateWhenList(action);
             List<TaskResult> taskResults = populateTaskResults(action.getResults());
 
             if (action.getScript() != null || action.getScriptFileUrl() != null) {
-                aTask = createTaskWithEmbeddedScript(action, runAfter, whenList, jobWorkspacesMap, taskResults);
+                aTask = createTaskWithEmbeddedScript(action, runAfter, argList, whenList, jobWorkspacesMap, taskResults);
                 tasks.add(aTask);
             }
 

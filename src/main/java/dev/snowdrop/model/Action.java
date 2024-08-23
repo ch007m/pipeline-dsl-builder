@@ -19,6 +19,7 @@ public class Action {
     private String runAfter;
     private List<Map<String, Object>> params;
     private List<Workspace> workspaces;
+    private List<String> args;
     private List<String> when;
     private List<Map<String, String>> results;
 

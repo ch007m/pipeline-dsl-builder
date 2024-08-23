@@ -39,7 +39,7 @@ public class TektonResource {
             .generatePipeline(cfg);
     }
 
-    public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<When> when, Map<String, Workspace> jobWorkspacesMap, List<TaskResult> results) {
+    public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<String> args, List<When> when, Map<String, Workspace> jobWorkspacesMap, List<TaskResult> results) {
         String embeddedScript;
 
         if (action.getScript() != null) {
@@ -72,6 +72,7 @@ public class TektonResource {
                 new EmbeddedTaskBuilder()
                     .addNewStep()
                       .withName("run-script")
+                      .withArgs(args)
                       .withImage(action.IMAGES.get(STEP_SCRIPT_IMAGE))
                       .withScript(embeddedScript)
                     .endStep()
