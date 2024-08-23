@@ -14,6 +14,8 @@ public class Results {
       // From build-container
       rs.add(new PipelineResultBuilder().withName("IMAGE_URL").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_URL)")).build());
       rs.add(new PipelineResultBuilder().withName("IMAGE_DIGEST").withValue(new ParamValue("$(tasks.build-container.results.IMAGE_DIGEST)")).build());
+      rs.add(new PipelineResultBuilder().withName("BASE_IMAGES_DIGESTS").withValue(new ParamValue("$(tasks.build-container.results.BASE_IMAGES_DIGESTS)")).build());
+
       rs.add(new PipelineResultBuilder().withName("JAVA_COMMUNITY_DEPENDENCIES").withValue(new ParamValue("$(tasks.build-container.results.JAVA_COMMUNITY_DEPENDENCIES)")).build());
       // From clone-repository
       rs.add(new PipelineResultBuilder().withName("CHAINS-GIT_URL").withValue(new ParamValue("$(tasks.clone-repository.results.url)")).build());

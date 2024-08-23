@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.TektonResource.*;
 import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
-import static dev.snowdrop.factory.konflux.pipeline.Params.KONFLUX_PIPELINESPEC_PARAMS;
 import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
