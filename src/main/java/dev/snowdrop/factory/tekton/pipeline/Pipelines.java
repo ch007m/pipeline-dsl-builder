@@ -177,23 +177,6 @@ public class Pipelines implements JobProvider {
         }
     }
 
-    private static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
-        // List of workspaces defined for the referenced's task
-        List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
-
-        // Generate the Pipeline's task
-        PipelineTask pipelineTask = new PipelineTaskBuilder()
-            // @formatter:off
-            .withName(action.getName())
-            .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
-            .withTaskRef(TaskRefResolver.withReference(bundle, action.getName()))
-            .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
-            .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
-            .build();
-            // @formatter:on
-        return pipelineTask;
-    }
-
     public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks, List<Param> params, List<WorkspaceBinding> pipelineWorkspaces, List<PipelineResult> pipelineResults) {
         // @formatter:off
         PipelineRun pipelineRun = new PipelineRunBuilder()

@@ -77,24 +77,34 @@ public class Pipelines implements JobProvider {
 
         for (Action action : actions) {
 
-            // Check if there is a runAfter defined for the action, otherwise
-            // set the value to "prefetch-dependencies"
+            /* Check if there is a runAfter defined for the action, otherwise
+               set the value to "prefetch-dependencies"
+
+               TODO: Find a way to get the id of the previous's konflux task => git-clone
+
+                Skip this step for finally tasks as not needed
+             */
             String runAfter = null;
-            if (action.getRunAfter() != null) {
-                runAfter = action.getRunAfter();
-            } else {
-                // TODO: Find a way to get the id of the previous's konflux task
-                runAfter = "prefetch-dependencies";
+            if (!action.isFinally()) {
+                /* TODO: Find a way to set the action's name to the name that konlfux is looking for
+                   this name is until now: build-container
+                   Keep the action name when task is finally */
+                action.setName("build-container");
+                if (action.getRunAfter() != null) {
+                    runAfter = action.getRunAfter();
+                } else {
+                    runAfter = "prefetch-dependencies";
+                }
             }
 
             List<String> args = new ArrayList<>();
-            if (action.getArgs() != null && action.getArgs().size() > 0 ) {
+            if (action.getArgs() != null && action.getArgs().size() > 0) {
                 args = action.getArgs();
             }
-            
+
             List<When> whenList = populateWhenList(action);
             List<TaskResult> taskResults = new ArrayList<>();
-            if (action.getResults() != null && action.getResults().size() > 0 ) {
+            if (action.getResults() != null && action.getResults().size() > 0) {
                 taskResults = populateTaskResults(action.getResults());
             }
 
@@ -197,30 +207,5 @@ public class Pipelines implements JobProvider {
 
         // TODO: Add like with Tekton a switch to handle: Pipeline vs PipelineRun
         return pipeline;
-    }
-
-    // TODO: This method should be replaced with the common one of the TektonResource class
-    // That will be possible when we will find a way to swap the name as for konflux, the name should be "build-container"
-    // to insert it within the list
-    private static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
-        // List of workspaces defined for the referenced's task
-        List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
-
-        if (action.isFinally()) {
-            // No need to define a runAfter for finally. To be checked of course !
-            runAfter = null;
-        }
-
-        // Generate the Pipeline's task
-        PipelineTask pipelineTask = new PipelineTaskBuilder()
-            // @formatter:off
-            .withName("build-container")
-            .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
-            .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
-            .withTaskRef(TaskRefResolver.withReference(bundle, action.getName()))
-            .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
-            .build();
-        // @formatter:on
-        return pipelineTask;
     }
 }
