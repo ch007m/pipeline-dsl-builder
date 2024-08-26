@@ -7,6 +7,14 @@ repository:
   url: https://github.com/ch007m/new-quarkus-app-1
   dockerfilePath: src/main/docker/Dockerfile.jvm
 
+# To generate the Application and/or Component CR
+application:
+  name: my-quarkus
+  enable: false
+component:
+  name: quarkus-1
+  enable: false
+
 job:
   resourceType: PipelineRun
   name: quarkus-1-on-push

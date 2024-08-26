@@ -12,7 +12,7 @@ application:
   name: my-quarkus
   enable: false
 component:
-  name: quarkus-app
+  name: quarkus-1
   enable: false
 
 job:
