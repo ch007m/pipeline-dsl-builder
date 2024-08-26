@@ -219,7 +219,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-sast-snyk-check","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-sast-snyk-check","0.2"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("sast-snyk-check")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()

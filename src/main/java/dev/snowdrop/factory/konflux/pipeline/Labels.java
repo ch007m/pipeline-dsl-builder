@@ -38,8 +38,8 @@ public class Labels implements LabelsProvider {
          "pipelines.openshift.io/runtime", "java",
          "pipelines.openshift.io/strategy", cfg.getDomain(),
          "pipelines.appstudio.openshift.io/type", "build",
-         "appstudio.openshift.io/application", cfg.getApplication().getName(),
-         "appstudio.openshift.io/component", cfg.getComponent().getName()
+         "appstudio.openshift.io/application", cfg.getApplication() != null && cfg.getApplication().getName() != null ? cfg.getApplication().getName() : cfg.getJob().getName(),
+         "appstudio.openshift.io/component", cfg.getComponent() != null && cfg.getComponent().getName() != null ? cfg.getComponent().getName() : cfg.getJob().getName()
       );
 
       return labels.entrySet()
