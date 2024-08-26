@@ -12,13 +12,13 @@ application:
   name: my-quarkus
   enable: false
 component:
-  name: quarkus-1
+  name: quarkus-app
   enable: false
 
 job:
   # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
-  name: quarkus-1-on-push
+  name: quarkus-app-on-push
   description: PipelineRun performing a build of a Quarkus application using pack CLI
 
   workspaces:
