@@ -86,10 +86,6 @@ public class Pipelines implements JobProvider {
              */
             String runAfter = null;
             if (!action.isFinally()) {
-                /* TODO: Find a way to set the action's name to the name that konlfux is looking for
-                   this name is until now: build-container
-                   Keep the action name when task is finally */
-                action.setName("build-container");
                 if (action.getRunAfter() != null) {
                     runAfter = action.getRunAfter();
                 } else {
@@ -170,12 +166,22 @@ public class Pipelines implements JobProvider {
             }
         }
 
+        /* TODO: Find a way to set the action's name to the name that konflux is looking for: build-container
+           and develop a mechanism able to name our tasks as: build-container, build-container-1, etc
+           and set konflux to use the last name as step to be used to runAfter
+        */
+        tasks.stream().map(t-> {
+            t.setName("build-container");
+            return t;
+        }).collect(Collectors.toList());
+
         // @formatter:off
         List<PipelineTask> pipelineTasks = new ArrayList<>();
         pipelineTasks.add(INIT());
         pipelineTasks.add(CLONE_REPOSITORY());
         pipelineTasks.add(PREFETCH_DEPENDENCIES());
-        pipelineTasks.addAll(tasks);
+        // To be reviewed to pass an array instead of just a task
+        pipelineTasks.add(tasks.get(0));
         pipelineTasks.add(BUILD_IMAGE_INDEX());
         pipelineTasks.add(BUILD_SOURCE_IMAGE());
         pipelineTasks.add(DEPRECATED_BASE_IMAGE_CHECK());

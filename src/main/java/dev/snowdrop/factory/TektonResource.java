@@ -92,7 +92,16 @@ public class TektonResource {
 
     public static PipelineTask createTaskUsingRef(Action action, String runAfter, Bundle bundle, Map<String, Workspace> jobWorkspacesMap, Map<String, Task> taskRefMap) {
         // List of workspaces defined for the referenced's task
-        List<WorkspaceDeclaration> taskWorkspaces = taskRefMap.get(action.getName()).getSpec().getWorkspaces();
+        List<WorkspaceDeclaration> taskWorkspaces = new ArrayList<>();
+        if (taskRefMap.get(action.getName()) != null) {
+            Task wks = taskRefMap.get(action.getName());
+            if (wks.getSpec() != null && wks.getSpec().getWorkspaces() != null) {
+                taskWorkspaces = wks.getSpec().getWorkspaces();
+            } else {
+                logger.info("No workspaces declared for the task: " + action.getName());
+            }
+        }
+
 
         // Generate the Pipeline's task
         PipelineTask pipelineTask = new PipelineTaskBuilder()
