@@ -45,4 +45,9 @@ job:
         - PACK_BUILDER_TOML: "ubi-builder.toml"
         - PACK_CMD_FLAGS:
           - "$(params.packCmdBuilderFlags)"
+      workspaces:
+        - name: source-dir
+          workspace: workspace
+        - name: pack-workspace
+          workspace: workspace
 
