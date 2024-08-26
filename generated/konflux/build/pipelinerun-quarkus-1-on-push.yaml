@@ -13,8 +13,8 @@ metadata:
     pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
-    appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-1"
+    appstudio.openshift.io/component: "quarkus-1-on-push"
+    appstudio.openshift.io/application: "quarkus-1-on-push"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
@@ -23,14 +23,16 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "dockerfile"
-    value: "src/main/docker/Dockerfile.jvm"
   - name: "output-image"
     value: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
-  - name: "path-context"
-    value: "."
   - name: "image-expires-after"
     value: "5d"
+  - name: "build-image-index"
+    value: ""
+  - name: "build-source-image"
+    value: "false"
+  - name: "prefetch-input"
+    value: ""
   - name: "source-dir"
     value: "source"
   - name: "imageUrl"
@@ -45,8 +47,6 @@ spec:
     - "-e"
     - "BP_JVM_VERSION=21"
     - "quarkus-hello:1.0"
-  - name: "build-image-index"
-    value: ""
   pipelineSpec:
     finally:
     - name: "show-sbom"
@@ -62,7 +62,7 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-    - name: "show-summary"
+    - name: "summary"
       params:
       - name: "pipelinerun-name"
         value: "$(context.pipelineRun.name)"
@@ -84,86 +84,13 @@ spec:
       workspaces:
       - name: "workspace"
         workspace: "workspace"
-    params:
-    - description: "Source Repository URL"
-      name: "git-url"
-      type: "string"
-    - default: ""
-      description: "Revision of the Source Repository"
-      name: "revision"
-      type: "string"
-    - description: "Fully Qualified Output Image"
-      name: "output-image"
-      type: "string"
-    - default: "."
-      description: "The path to your source code"
-      name: "path-context"
-      type: "string"
-    - default: "Dockerfile"
-      description: "Path to the Dockerfile"
-      name: "dockerfile"
-      type: "string"
-    - default: "false"
-      description: "Force rebuild image"
-      name: "rebuild"
-      type: "string"
-    - default: "false"
-      description: "Skip checks against built image"
-      name: "skip-checks"
-      type: "string"
-    - default: "false"
-      description: "Execute the build with network isolation"
-      name: "hermetic"
-      type: "string"
-    - default: ""
-      description: "Build dependencies to be prefetched by Cachi2"
-      name: "prefetch-input"
-      type: "string"
-    - default: "false"
-      description: "Java build"
-      name: "java"
-      type: "string"
-    - default: ""
-      description: "Image tag expiration time, time values could be something like\
-        \ 1h, 2d, 3w for hours, days, and weeks, respectively."
-      name: "image-expires-after"
-      type: "string"
-    - default: "false"
-      description: "Build a source image"
-      name: "build-source-image"
-      type: "string"
-    - default: []
-      description: "Array of --build-arg values (\"arg=value\" strings) for buildah"
-      name: "build-args"
-      type: "array"
-    - default: ""
-      description: "Path to a file with build arguments for buildah, see https://www.mankier.com/1/buildah-build#--build-arg-file"
-      name: "build-args-file"
-      type: "string"
-    - default: "true"
-      description: "A boolean indicating whether we would like to execute a step"
-      name: "enable-sbom"
-      type: "string"
-    - default: "table"
-      description: "Format to be used to export/show the SBOM. Format available for\
-        \ grype are 'json table cyclonedx cyclonedx-json sarif template'"
-      name: "grype-sbom-format"
-      type: "string"
-    - default: "true"
-      description: "Skip optional checks, set false if you want to run optional checks"
-      name: "skip-optional"
-      type: "string"
-    - default: ""
-      description: "Snyk Token Secret Name"
-      name: "snyk-secret"
-      type: "string"
     results:
     - name: "IMAGE_URL"
       value: "$(tasks.build-container.results.IMAGE_URL)"
     - name: "IMAGE_DIGEST"
       value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-    - name: "JAVA_COMMUNITY_DEPENDENCIES"
-      value: "$(tasks.build-container.results.JAVA_COMMUNITY_DEPENDENCIES)"
+    - name: "BASE_IMAGES_DIGESTS"
+      value: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
     - name: "CHAINS-GIT_URL"
       value: "$(tasks.clone-repository.results.url)"
     - name: "CHAINS-GIT_COMMIT"
@@ -238,31 +165,54 @@ spec:
         workspace: "git-auth"
     - name: "build-container"
       params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
-      - name: "PACK_CLI_IMAGE"
-        value: "$(params.imageUrl)"
-      - name: "PACK_CLI_IMAGE_VERSION"
-        value: "$(params.imageTag)"
-      - name: "PACK_CMD_FLAGS"
-        value:
-        - "$(params.packCmdBuilderFlags)"
+      - name: "JAM_VERSION"
+        value: "v2.7.3"
       runAfter:
       - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
-        - name: "name"
-          value: "pack"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "workspace"
-      - name: "pack-workspace"
-        workspace: "workspace"
+      taskSpec:
+        results:
+        - description: "Image repository where the built image was pushed"
+          name: "IMAGE_URL"
+        - description: "Digest of the image just built"
+          name: "IMAGE_DIGEST"
+        - description: "Digests of the base images used for build"
+          name: "BASE_IMAGES_DIGESTS"
+        steps:
+        - args:
+          - "$(params.packCmdBuilderFlags)"
+          image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: "#!/usr/bin/env bash\nset -e\n\nfunction util::tools::os() {\n \
+            \ case \"$(uname)\" in\n  \"Darwin\")\n  echo \"${1:-darwin}\"\n  ;;\n\
+            \  \n  \"Linux\")\n  echo \"linux\"\n  ;;\n  \n  *)\n  util::print::error\
+            \ \"Unknown OS \\\"$(uname)\\\"\"\n  exit 1\n  esac\n}\n\nfunction util::tools::arch()\
+            \ {\n  case \"$(uname -m)\" in\n    arm64|aarch64)\n      echo \"arm64\"\
+            \n      ;;\n\n    amd64|x86_64)\n      if [[ \"${1:-}\" == \"--blank-amd64\"\
+            \ ]]; then\n        echo \"\"\n      elif [[ \"${1:-}\" == \"--uname-format-amd64\"\
+            \ ]]; then\n        echo \"x86_64\"\n      else\n        echo \"amd64\"\
+            \n      fi\n      ;;\n\n    *)\n      util::print::error \"Unknown Architecture\
+            \ \\\"$(uname -m)\\\"\"\n      exit 1\n  esac\n}\n\noutputDir=\"/usr/local/bin/\"\
+            \ncurl_args=(\n  \"--fail\"\n  \"--silent\"\n  \"--location\"\n  \"--output\"\
+            \ \"${outputDir}/jam\"\n)\n\nos=$(util::tools::os)\narch=$(util::tools::arch)\n\
+            \necho \"Installing jam $(params.JAM_VERSION)\"\ncurl \"https://github.com/paketo-buildpacks/jam/releases/download/$(params.JAM_VERSION)/jam-${os}-${arch}\"\
+            \ \\\n  \"${curl_args[@]}\"\nchmod +x ${outputDir}/jam\njam version\n\n\
+            stack_dirpath=\".\"\ncat <<EOF > ${stack_dirpath}/stack.toml\nid = \"\
+            io.buildpacks.stacks.ubi8\"\nhomepage = \"https://github.com/paketo-community/ubi-base-stack\"\
+            \nmaintainer = \"Paketo Community\"\n\nplatforms = [\"linux/amd64\"]\n\
+            \n[build]\n  description = \"base build ubi8 image to support buildpacks\"\
+            \n  dockerfile = \"./build.Dockerfile\"\n  gid = 1000\n  shell = \"/bin/bash\"\
+            \n  uid = 1002\n\n  [build.args]\n\n[run]\n  description = \"base run\
+            \ ubi8 image to support buildpacks\"\n  dockerfile = \"./run.Dockerfile\"\
+            \n  gid = 1000\n  shell = \"/bin/bash\"\n  uid = 1001\n\n  [run.args]\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/build.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/run.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\nargs=(\n  --config \"${stack_dirpath}/stack.toml\"\n  --build-output\
+            \ \"${build_dirpath}/build.oci\"\n  --run-output \"${build_dirpath}/run.oci\"\
+            \n)\njam create-stack \"${args[@]}\"\n        \necho -n \"URL of the image\
+            \ build is : quarkus-hello:1.0\" | tee \"$(results.IMAGE_URL.path)\"\n\
+            echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
+            \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
+            \n"
     - name: "build-image-index"
       params:
       - name: "IMAGE"
