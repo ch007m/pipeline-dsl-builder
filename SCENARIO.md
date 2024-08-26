@@ -24,6 +24,14 @@ repository:
   url: https://github.com/ch007m/new-quarkus-app-1
   dockerfilePath: src/main/docker/Dockerfile.jvm
 
+# To generate the Application and/or Component CR
+application:
+  name: my-quarkus
+  enable: false
+component:
+  name: quarkus-1
+  enable: false
+
 job:
   resourceType: PipelineRun
   name: quarkus-1-on-push
@@ -229,8 +237,8 @@ metadata:
     pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
-    appstudio.openshift.io/application: "quarkus-1-on-push"
-    appstudio.openshift.io/component: "quarkus-1-on-push"
+    appstudio.openshift.io/application: "my-quarkus"
+    appstudio.openshift.io/component: "quarkus-1"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
@@ -663,7 +671,7 @@ application:
   name: my-quarkus
   enable: false
 component:
-  name: quarkus-app
+  name: quarkus-1
   enable: false
 
 job:
@@ -761,7 +769,7 @@ metadata:
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-app"
+    appstudio.openshift.io/component: "quarkus-1"
   name: "quarkus-app-on-push"
   namespace: "user-ns1"
 spec:
@@ -1131,12 +1139,12 @@ repository:
   dockerfilePath: src/main/docker/Dockerfile.jvm
 
 # To generate the Application and/or Component CR
-#application:
-#  name: quarkus-projects
-#  enable: true
-#component:
-#  name: quarkus-app-1
-#  enable: true
+application:
+  name: my-quarkus
+  enable: false
+component:
+  name: quarkus-1
+  enable: false
 
 job:
   resourceType: PipelineRun
@@ -1270,8 +1278,8 @@ metadata:
     pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
-    appstudio.openshift.io/application: "quarkus-1-on-push"
-    appstudio.openshift.io/component: "quarkus-1-on-push"
+    appstudio.openshift.io/application: "my-quarkus"
+    appstudio.openshift.io/component: "quarkus-1"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
