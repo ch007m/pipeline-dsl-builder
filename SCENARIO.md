@@ -639,6 +639,537 @@ spec:
       secretName: "{{ git_auth_secret }}"
 
 ```
+#### PipelineRun performing a build of a Quarkus application using pack CLI
+
+Command to be executed: 
+```bash
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/konflux/build-quarkus-app-cfg.yaml
+```
+using as configuration: 
+```yaml
+# configurations/konflux/build-quarkus-app-cfg.yaml
+
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: konflux
+domain: build
+namespace: user-ns1
+
+repository:
+  url: https://github.com/ch007m/new-quarkus-app-1
+  dockerfilePath: src/main/docker/Dockerfile.jvm
+
+# To generate the Application and/or Component CR
+application:
+  name: my-quarkus
+  enable: false
+component:
+  name: quarkus-1
+  enable: false
+
+job:
+  # One of the supported resources: PipelineRun, Pipeline
+  resourceType: PipelineRun
+  name: quarkus-1-on-push
+  description: PipelineRun performing a build of a Quarkus application using pack CLI
+
+  workspaces:
+  - name: workspace
+    volumeClaimTemplate:
+      storage: 1Gi
+      accessMode: ReadWriteOnce
+  - name: git-auth
+    secret:
+      name: "{{ git_auth_secret }}"
+
+  results:
+    - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+    - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    - BASE_IMAGES_DIGESTS: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+
+    - CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
+    - CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
+
+  params:
+    - git-url: "{{source_url}}"
+    - revision: "{{revision}}"
+    - output-image: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
+    - image-expires-after: "5d"
+    - build-image-index: ""
+    # We need the following parameters when used within the Pipeline: when condition, etc
+    - build-source-image: false
+    - prefetch-input: ""
+
+    # Buildpack params
+    - source-dir: "source"
+    - imageUrl: "buildpacksio/pack"
+    - imageTag: "latest"
+    - packCmdBuilderFlags:
+       - build
+       - -B
+       - quay.io/snowdrop/ubi-builder
+       - -e
+       - BP_JVM_VERSION=21
+       - quarkus-hello:1.0
+
+  # Remark : As the Pipeline(run) resource of konflux already defines mandatory steps to perform actions as listed here - it is then not needed
+  # to detail them here except the actions that you want to include part of the build process
+
+  # The actions to be executed should match/map the name ofg the Task declared in an OCI Bundle or Git repository url
+  # Examples:
+  # - pack: to build an image using the Pack CLI
+  # - build: to build an application using a builder image
+  # - pack-builder: to create a builder image using pack CLI
+  # - stack: to create a base stack image build or run
+  # - meta/composite: to package the buildpacks of a "meta/composite" buildpack project
+  # - buildpack: to package a "buildpack" project
+  # - extension: to package an "extension" project
+  #
+  actions:
+    - name: pack # TODO: To be reviewed as the name of the task is different about the "build-container"
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      workspaces:
+        - name: source-dir
+          workspace: workspace
+        - name: pack-workspace
+          workspace: workspace
+      params:
+        - PACK_SOURCE_DIR: "$(params.source-dir)"
+        - PACK_CLI_IMAGE: "$(params.imageUrl)"
+        - PACK_CLI_IMAGE_VERSION: "$(params.imageTag)"
+        - PACK_CMD_FLAGS:
+          - "$(params.packCmdBuilderFlags)"
+
+
+```
+Generated file: 
+```yaml
+# generated/konflux/build/pipelinerun-quarkus-1-on-push.yaml
+
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
+      \ == 'main'"
+    build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
+    build.appstudio.redhat.com/commit_sha: "{{revision}}"
+    build.appstudio.redhat.com/target_branch: "{{target_branch}}"
+  labels:
+    pipelines.appstudio.openshift.io/type: "build"
+    pipelines.openshift.io/strategy: "build"
+    pipelines.openshift.io/used-by: "build-cloud"
+    pipelines.openshift.io/runtime: "java"
+    appstudio.openshift.io/application: "quarkus-1-on-push"
+    appstudio.openshift.io/component: "quarkus-1-on-push"
+  name: "quarkus-1-on-push"
+  namespace: "user-ns1"
+spec:
+  params:
+  - name: "git-url"
+    value: "{{source_url}}"
+  - name: "revision"
+    value: "{{revision}}"
+  - name: "output-image"
+    value: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
+  - name: "image-expires-after"
+    value: "5d"
+  - name: "build-image-index"
+    value: ""
+  - name: "build-source-image"
+    value: "false"
+  - name: "prefetch-input"
+    value: ""
+  - name: "source-dir"
+    value: "source"
+  - name: "imageUrl"
+    value: "buildpacksio/pack"
+  - name: "imageTag"
+    value: "latest"
+  - name: "packCmdBuilderFlags"
+    value:
+    - "build"
+    - "-B"
+    - "quay.io/snowdrop/ubi-builder"
+    - "-e"
+    - "BP_JVM_VERSION=21"
+    - "quarkus-hello:1.0"
+  pipelineSpec:
+    finally:
+    - name: "show-sbom"
+      params:
+      - name: "IMAGE_URL"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b"
+        - name: "name"
+          value: "show-sbom"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+    - name: "summary"
+      params:
+      - name: "pipelinerun-name"
+        value: "$(context.pipelineRun.name)"
+      - name: "git-url"
+        value: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+      - name: "image-url"
+        value: "$(params.output-image)"
+      - name: "build-task-status"
+        value: "$(tasks.build-container.status)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b"
+        - name: "name"
+          value: "summary"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
+    results:
+    - name: "IMAGE_URL"
+      value: "$(tasks.build-container.results.IMAGE_URL)"
+    - name: "IMAGE_DIGEST"
+      value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    - name: "BASE_IMAGES_DIGESTS"
+      value: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+    - name: "CHAINS-GIT_URL"
+      value: "$(tasks.clone-repository.results.url)"
+    - name: "CHAINS-GIT_COMMIT"
+      value: "$(tasks.clone-repository.results.commit)"
+    tasks:
+    - name: "init"
+      params:
+      - name: "image-url"
+        value: "$(params.output-image"
+      - name: "rebuild"
+        value: "$(params.rebuild"
+      - name: "skip-checks"
+        value: "$(params.skip-checks"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:092c113b614f6551113f17605ae9cb7e822aa704d07f0e37ed209da23ce392cc"
+        - name: "name"
+          value: "init"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+    - name: "clone-repository"
+      params:
+      - name: "url"
+        value: "$(params.git-url)"
+      runAfter:
+      - "init"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:0bb1be8363557e8e07ec34a3c5daaaaa23c9d533f0bb12f00dc604d00de50814"
+        - name: "name"
+          value: "git-clone"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(tasks.init.results.build)"
+        operator: "in"
+        values:
+        - "true"
+      workspaces:
+      - name: "output"
+        workspace: "workspace"
+      - name: "basic-auth"
+        workspace: "git-auth"
+    - name: "prefetch-dependencies"
+      params:
+      - name: "input"
+        value: "$(params.prefetch-input)"
+      runAfter:
+      - "clone-repository"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:058a59f72997c9cf1be20978eb6a145d8d4d436c6098f2460bd96766bb363b20"
+        - name: "name"
+          value: "prefetch-dependencies"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.prefetch-input)"
+        operator: "notin"
+        values:
+        - ""
+      workspaces:
+      - name: "source"
+        workspace: "workspace"
+      - name: "git-basic-auth"
+        workspace: "git-auth"
+    - name: "build-container"
+      params:
+      - name: "JAM_VERSION"
+        value: "v2.7.3"
+      runAfter:
+      - "prefetch-dependencies"
+      taskSpec:
+        results:
+        - description: "Image repository where the built image was pushed"
+          name: "IMAGE_URL"
+        - description: "Digest of the image just built"
+          name: "IMAGE_DIGEST"
+        - description: "Digests of the base images used for build"
+          name: "BASE_IMAGES_DIGESTS"
+        steps:
+        - args:
+          - "$(params.packCmdBuilderFlags)"
+          image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: "#!/usr/bin/env bash\nset -e\n\nfunction util::tools::os() {\n \
+            \ case \"$(uname)\" in\n  \"Darwin\")\n  echo \"${1:-darwin}\"\n  ;;\n\
+            \  \n  \"Linux\")\n  echo \"linux\"\n  ;;\n  \n  *)\n  util::print::error\
+            \ \"Unknown OS \\\"$(uname)\\\"\"\n  exit 1\n  esac\n}\n\nfunction util::tools::arch()\
+            \ {\n  case \"$(uname -m)\" in\n    arm64|aarch64)\n      echo \"arm64\"\
+            \n      ;;\n\n    amd64|x86_64)\n      if [[ \"${1:-}\" == \"--blank-amd64\"\
+            \ ]]; then\n        echo \"\"\n      elif [[ \"${1:-}\" == \"--uname-format-amd64\"\
+            \ ]]; then\n        echo \"x86_64\"\n      else\n        echo \"amd64\"\
+            \n      fi\n      ;;\n\n    *)\n      util::print::error \"Unknown Architecture\
+            \ \\\"$(uname -m)\\\"\"\n      exit 1\n  esac\n}\n\noutputDir=\"/usr/local/bin/\"\
+            \ncurl_args=(\n  \"--fail\"\n  \"--silent\"\n  \"--location\"\n  \"--output\"\
+            \ \"${outputDir}/jam\"\n)\n\nos=$(util::tools::os)\narch=$(util::tools::arch)\n\
+            \necho \"Installing jam $(params.JAM_VERSION)\"\ncurl \"https://github.com/paketo-buildpacks/jam/releases/download/$(params.JAM_VERSION)/jam-${os}-${arch}\"\
+            \ \\\n  \"${curl_args[@]}\"\nchmod +x ${outputDir}/jam\njam version\n\n\
+            stack_dirpath=\".\"\ncat <<EOF > ${stack_dirpath}/stack.toml\nid = \"\
+            io.buildpacks.stacks.ubi8\"\nhomepage = \"https://github.com/paketo-community/ubi-base-stack\"\
+            \nmaintainer = \"Paketo Community\"\n\nplatforms = [\"linux/amd64\"]\n\
+            \n[build]\n  description = \"base build ubi8 image to support buildpacks\"\
+            \n  dockerfile = \"./build.Dockerfile\"\n  gid = 1000\n  shell = \"/bin/bash\"\
+            \n  uid = 1002\n\n  [build.args]\n\n[run]\n  description = \"base run\
+            \ ubi8 image to support buildpacks\"\n  dockerfile = \"./run.Dockerfile\"\
+            \n  gid = 1000\n  shell = \"/bin/bash\"\n  uid = 1001\n\n  [run.args]\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/build.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/run.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\nargs=(\n  --config \"${stack_dirpath}/stack.toml\"\n  --build-output\
+            \ \"${build_dirpath}/build.oci\"\n  --run-output \"${build_dirpath}/run.oci\"\
+            \n)\njam create-stack \"${args[@]}\"\n        \necho -n \"URL of the image\
+            \ build is : quarkus-hello:1.0\" | tee \"$(results.IMAGE_URL.path)\"\n\
+            echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
+            \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
+            \n"
+    - name: "build-image-index"
+      params:
+      - name: "IMAGE"
+        value: "$(params.output-image)"
+      - name: "COMMIT_SHA"
+        value: "$(tasks.clone-repository.results.commit)"
+      - name: "IMAGE_EXPIRES_AFTER"
+        value: "$(params.image-expires-after)"
+      - name: "ALWAYS_BUILD_INDEX"
+        value: "$(params.build-image-index)"
+      - name: "IMAGES"
+        value:
+        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
+        - name: "name"
+          value: "build-image-index"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(tasks.init.results.build)"
+        operator: "in"
+        values:
+        - "true"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
+    - name: "build-source-image"
+      params:
+      - name: "BINARY_IMAGE"
+        value: "$(params.output-image)"
+      - name: "BASE_IMAGES"
+        value: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-source-build:0.1@sha256:21cb5ebaff7a9216903cf78933dc4ec4dd6283a52636b16590a5f52ceb278269"
+        - name: "name"
+          value: "source-build"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.build-source-image)"
+        operator: "in"
+        values:
+        - "true"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
+    - name: "deprecated-image-check"
+      params:
+      - name: "IMAGE_URL"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      - name: "IMAGE_DIGEST"
+        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+      - name: "BASE_IMAGES_DIGESTS"
+        value: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.4@sha256:d98fa9daf5ee12dfbf00880b83d092d01ce9994d79836548d2f82748bb0c64a2"
+        - name: "name"
+          value: "deprecated-image-check"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.skip-checks)"
+        operator: "in"
+        values:
+        - "false"
+    - name: "clair-scan"
+      params:
+      - name: "image-digest"
+        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+      - name: "image-url"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.1@sha256:baea4be429cf8d91f7c758378cea42819fe324f25a7f957bf9805409cab6d123"
+        - name: "name"
+          value: "clair-scan"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.skip-checks)"
+        operator: "in"
+        values:
+        - "false"
+    - name: "ecosystem-cert-preflight-checks"
+      params:
+      - name: "image-url"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1@sha256:5131cce0f93d0b728c7bcc0d6cee4c61d4c9f67c6d619c627e41e3c9775b497d"
+        - name: "name"
+          value: "ecosystem-cert-preflight-checks"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.skip-checks)"
+        operator: "in"
+        values:
+        - "false"
+    - name: "sast-snyk-check"
+      params:
+      - name: "image-digest"
+        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+      - name: "image-url"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check:0.2@sha256:82c42d27c9c59db6cf6c235e89f7b37f5cdfc75d0d361ca0ee91ae703ba72301"
+        - name: "name"
+          value: "sast-snyk-check"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.skip-checks)"
+        operator: "in"
+        values:
+        - "true"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
+    - name: "clamav-scan"
+      params:
+      - name: "image-digest"
+        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+      - name: "image-url"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1@sha256:7bb17b937c9342f305468e8a6d0a22493e3ecde58977bd2ffc8b50e2fa234d58"
+        - name: "name"
+          value: "clamav-scan"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.skip-checks)"
+        operator: "in"
+        values:
+        - "false"
+    - name: "sbom-json-check"
+      params:
+      - name: "IMAGE_URL"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      - name: "IMAGE_DIGEST"
+        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+      runAfter:
+      - "build-container"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1@sha256:2c5de51ec858fc8d47e41c65b20c83fdac249425d67ed6d1058f9f3e0b574500"
+        - name: "name"
+          value: "sbom-json-check"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      when:
+      - input: "$(params.skip-checks)"
+        operator: "in"
+        values:
+        - "false"
+  timeouts:
+    pipeline: "3600000000000ns"
+  workspaces:
+  - name: "workspace"
+    volumeClaimTemplate:
+      apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      spec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
+  - name: "git-auth"
+    secret:
+      secretName: "{{ git_auth_secret }}"
+
+```
 #### PipelineRun performing a build of a Quarkus application using a bash script
 
 Command to be executed: 
