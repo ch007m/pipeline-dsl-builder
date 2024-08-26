@@ -7,14 +7,6 @@ repository:
   url: https://github.com/ch007m/new-quarkus-app-1
   dockerfilePath: src/main/docker/Dockerfile.jvm
 
-# To generate the Application and/or Component CR
-application:
-  name: quarkus-projects
-  enable: true
-component:
-  name: quarkus-app-1
-  enable: true
-
 job:
   resourceType: PipelineRun
   name: quarkus-1-on-push
@@ -75,18 +67,12 @@ job:
         - git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
         - image-url: "$(params.output-image)"
         - build-task-status: "$(tasks.build-container.status)"
-      #workspace:
-      #  - name: "workspace"
-      #    workspace: "workspace"    
 
     # Tasks
     - name: build-container
       params:
-        - PACK_SOURCE_DIR: "$(params.source-dir)"
-        - PACK_CLI_VERSION: "v0.35.1"
         - JAM_VERSION: "v2.7.3"
-        #- PACK_CMD_FLAGS:
-        #    - "$(params.packCmdBuilderFlags)"
+
       results:
         - IMAGE_URL: "Image repository where the built image was pushed"
         - IMAGE_DIGEST: "Digest of the image just built"
@@ -195,28 +181,7 @@ job:
           --run-output "${build_dirpath}/run.oci"
         )
         jam create-stack "${args[@]}"
-        
-        echo "Installing pack ..."
-        curl -sSL "https://github.com/buildpacks/pack/releases/download/$(params.PACK_CLI_VERSION)/pack-$(params.PACK_CLI_VERSION)-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
-        
-        echo "Checking pack ..."
-        pack --version
-
-        # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
-        
-        echo "Getting the arguments ..."
-        for cmd_arg in "$@"; do
-          CLI_ARGS+=("$cmd_arg")
-        done
-        
-        echo "Here are the arguments to be passed to the pack CLI"
-        for i in "$CLI_ARGS[@]"; do
-          echo "arg: $i"
-        done
-        
-        echo "Building the image ..."
-        pack "${CLI_ARGS[@]}"
-        
+                
         echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
         echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
         echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
