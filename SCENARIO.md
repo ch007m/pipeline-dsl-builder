@@ -229,8 +229,8 @@ metadata:
     pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
-    appstudio.openshift.io/component: "quarkus-1-on-push"
     appstudio.openshift.io/application: "quarkus-1-on-push"
+    appstudio.openshift.io/component: "quarkus-1-on-push"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
@@ -798,8 +798,8 @@ metadata:
     pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
-    appstudio.openshift.io/component: "quarkus-1-on-push"
     appstudio.openshift.io/application: "quarkus-1-on-push"
+    appstudio.openshift.io/component: "quarkus-1-on-push"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
