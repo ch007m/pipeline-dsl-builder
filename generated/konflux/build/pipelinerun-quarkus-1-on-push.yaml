@@ -220,7 +220,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:d56ee97a3801f13c363d98bd5fe775b19a29a227e39d5214e9092598c6f881a1"
+          value: "quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:058a59f72997c9cf1be20978eb6a145d8d4d436c6098f2460bd96766bb363b20"
         - name: "name"
           value: "prefetch-dependencies"
         - name: "kind"
@@ -281,7 +281,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:a0ac2ef2107c8d117febbe076c884ef12e0276b0942a47c3906f5f25d128073e"
+          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
         - name: "name"
           value: "build-image-index"
         - name: "kind"
@@ -397,7 +397,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check:0.1@sha256:82c42d27c9c59db6cf6c235e89f7b37f5cdfc75d0d361ca0ee91ae703ba72301"
+          value: "quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check:0.2@sha256:82c42d27c9c59db6cf6c235e89f7b37f5cdfc75d0d361ca0ee91ae703ba72301"
         - name: "name"
           value: "sast-snyk-check"
         - name: "kind"
