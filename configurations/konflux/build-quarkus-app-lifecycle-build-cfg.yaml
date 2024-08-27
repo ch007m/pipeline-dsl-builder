@@ -1,0 +1,71 @@
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: konflux
+domain: build
+namespace: user-ns1
+
+repository:
+  url: https://github.com/ch007m/new-quarkus-app-1
+  dockerfilePath: src/main/docker/Dockerfile.jvm
+
+# To generate the Konflux Application and/or Component CR
+application:
+  name: my-quarkus
+  enable: false
+component:
+  name: quarkus-1
+  enable: false
+
+job:
+  # One of the supported resources: PipelineRun, Pipeline
+  resourceType: PipelineRun
+  name: quarkus-app-on-push
+  description: PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
+
+  workspaces:
+  - name: workspace
+    volumeClaimTemplate:
+      storage: 1Gi
+      accessMode: ReadWriteOnce
+  - name: git-auth
+    secret:
+      name: "{{ git_auth_secret }}"
+
+  results:
+    - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+    - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    - BASE_IMAGES_DIGESTS: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+
+    - CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
+    - CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
+
+  params:
+    - git-url: "{{source_url}}"
+    - revision: "{{revision}}"
+    - output-image: "quay.io/ch007m/my-quarkus:{{revision}}"
+    - image-expires-after: "5d"
+    - build-image-index: ""
+    # We need the following parameters when used within the Pipeline: when condition, etc
+    - build-source-image: false
+    - prefetch-input: ""
+    # Buildpack params
+
+  actions:
+    - name: buildpacks-phases
+      ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-phases/01/buildpacks-phases.yaml
+      workspaces:
+        - name: source
+          workspace: workspace
+      params:
+        - APP_IMAGE: $(params.output-image)
+        - SOURCE_SUBPATH: "source"
+        - CNB_LOG_LEVEL: "info"
+        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
+        - CNB_LIFECYCLE_IMAGE: buildpacksio/lifecycle:0.20.1
+        - CNB_PLATFORM_API: "0.14"
+        - CNB_EXPERIMENTAL_MODE: "false"
+        - CNB_BUILD_IMAGE: paketocommunity/build-ubi-base:latest
+        - CNB_RUN_IMAGE: paketocommunity/run-ubi-base:latest
+        - CNB_GROUP_ID: 1000 # see: https://github.com/paketo-community/ubi-base-stack/blob/main/stack/stack.toml#L10-L12
+        - CNB_USER_ID: 1002
+        - CNB_ENV_VARS:
+          - BP_JVM_VERSION=21
