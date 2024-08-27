@@ -13,8 +13,8 @@ metadata:
     pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
-    appstudio.openshift.io/application: "quarkus-1-on-push"
-    appstudio.openshift.io/component: "quarkus-1-on-push"
+    appstudio.openshift.io/application: "my-quarkus"
+    appstudio.openshift.io/component: "quarkus-1"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
@@ -163,7 +163,7 @@ spec:
         workspace: "workspace"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "build-container"
+    - name: "jam"
       params:
       - name: "JAM_VERSION"
         value: "v2.7.3"
@@ -196,8 +196,8 @@ spec:
             \ \"${outputDir}/jam\"\n)\n\nos=$(util::tools::os)\narch=$(util::tools::arch)\n\
             \necho \"Installing jam $(params.JAM_VERSION)\"\ncurl \"https://github.com/paketo-buildpacks/jam/releases/download/$(params.JAM_VERSION)/jam-${os}-${arch}\"\
             \ \\\n  \"${curl_args[@]}\"\nchmod +x ${outputDir}/jam\njam version\n\n\
-            stack_dirpath=\".\"\ncat <<EOF > ${stack_dirpath}/stack.toml\nid = \"\
-            io.buildpacks.stacks.ubi8\"\nhomepage = \"https://github.com/paketo-community/ubi-base-stack\"\
+            echo \"This is a test demo - 1\"\n\nstack_dirpath=\".\"\ncat <<EOF > ${stack_dirpath}/stack.toml\n\
+            id = \"io.buildpacks.stacks.ubi8\"\nhomepage = \"https://github.com/paketo-community/ubi-base-stack\"\
             \nmaintainer = \"Paketo Community\"\n\nplatforms = [\"linux/amd64\"]\n\
             \n[build]\n  description = \"base build ubi8 image to support buildpacks\"\
             \n  dockerfile = \"./build.Dockerfile\"\n  gid = 1000\n  shell = \"/bin/bash\"\
