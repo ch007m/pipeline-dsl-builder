@@ -76,7 +76,7 @@ job:
         - build-task-status: "$(tasks.build-container.status)"
 
     # Tasks
-    - name: build-container
+    - name: jam
       params:
         - JAM_VERSION: "v2.7.3"
 

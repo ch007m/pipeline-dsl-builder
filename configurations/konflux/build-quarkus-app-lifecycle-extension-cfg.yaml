@@ -41,7 +41,7 @@ job:
   params:
     - git-url: "{{source_url}}"
     - revision: "{{revision}}"
-    - output-image: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
+    - output-image: "quay.io/ch007m/my-quarkus:{{revision}}"
     - image-expires-after: "5d"
     - build-image-index: ""
     # We need the following parameters when used within the Pipeline: when condition, etc
@@ -50,21 +50,28 @@ job:
     # Buildpack params
 
   actions:
-    - name: buildpacks-phases # TODO: To be reviewed as the name of the task is different about the "build-container"
-      ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-phases/01/buildpacks-phases.yaml
+    - name: buildpacks-extension-check
+      ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-extension-check/01/buildpacks-extension-check.yaml
+      params:
+        - builderImage: paketocommunity/builder-ubi-base:latest
+        - credentialsHome: /tekton/creds-secrets/
+
+    - name: buildpacks-extension-phases
+      ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-extension-phases/01/buildpacks-extension-phases.yaml
       workspaces:
         - name: source
           workspace: workspace
       params:
         - APP_IMAGE: $(params.output-image)
-        - SOURCE_SUBPATH: "."
-        - CNB_LOG_LEVEL: "debug"
-        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base
+        - SOURCE_SUBPATH: "source"
+        - CNB_LOG_LEVEL: "info"
+        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
         - CNB_LIFECYCLE_IMAGE: buildpacksio/lifecycle:0.20.1
-        - CNB_EXPERIMENTAL_MODE: "true"
+        - CNB_PLATFORM_API: "0.14"
+        - CNB_EXPERIMENTAL_MODE: "false"
         - CNB_BUILD_IMAGE: paketocommunity/build-ubi-base:latest
         - CNB_RUN_IMAGE: paketocommunity/run-ubi-base:latest
+        - CNB_USER_ID: $(tasks.buildpacks-extension-check.results.uid)
+        - CNB_GROUP_ID: $(tasks.buildpacks-extension-check.results.gid)
         - CNB_ENV_VARS:
-          - BP_NATIVE_IMAGE=false
           - BP_JVM_VERSION=21
-

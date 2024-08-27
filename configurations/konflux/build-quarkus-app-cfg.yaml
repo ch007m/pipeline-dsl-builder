@@ -74,7 +74,7 @@ job:
   # - extension: to package an "extension" project
   #
   actions:
-    - name: pack # TODO: To be reviewed as the name of the task is different about the "build-container"
+    - name: pack
       ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
       workspaces:
         - name: source-dir

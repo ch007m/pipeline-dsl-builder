@@ -77,7 +77,7 @@ job:
         - build-task-status: "$(tasks.build-container.status)"
 
     # Tasks
-    - name: build-container
+    - name: pack
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_VERSION: "v0.35.1"
