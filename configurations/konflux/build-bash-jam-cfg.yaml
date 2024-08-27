@@ -147,6 +147,8 @@ job:
         chmod +x ${outputDir}/jam
         jam version
         
+        echo "This is a test demo - 1"
+        
         stack_dirpath="."
         cat <<EOF > ${stack_dirpath}/stack.toml
         id = "io.buildpacks.stacks.ubi8"

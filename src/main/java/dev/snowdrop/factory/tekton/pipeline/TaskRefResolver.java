@@ -56,11 +56,11 @@ public class TaskRefResolver {
             // @formatter:off
             .withResolver("git")
             .withParams()
-               .addNewParam().withName(bundle.getProtocol()).withValue(new ParamValue(bundle.getUri())).endParam()
+               .addNewParam().withName("url").withValue(new ParamValue(bundle.getUri())).endParam()
                // TODO: Find a way to get the revision/branch
                .addNewParam().withName("revision").withValue(new ParamValue("main")).endParam()
                // TODO: Find a way to get the pathInRepo
-               .addNewParam().withName("pathInRepo").withValue(new ParamValue("./")).endParam()
+               //.addNewParam().withName("pathInRepo").withValue(new ParamValue("./")).endParam()
             .build();
             // @formatter:on
     }

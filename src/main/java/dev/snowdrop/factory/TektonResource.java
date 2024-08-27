@@ -112,7 +112,7 @@ public class TektonResource {
             .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
             .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
             .build();
-        // @formatter:on
+            // @formatter:on
         return pipelineTask;
     }
 

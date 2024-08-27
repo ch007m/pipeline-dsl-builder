@@ -54,11 +54,12 @@ public class RemoteTaskSvc {
 
         switch (b.getProtocol()) {
             case "git": {
-                logger.info("Fetching the git url: https://{}", b.getUri());
+                logger.info("Fetching the git url: {}", b.getUri());
                 try {
                     String taskContent = FileUtilSvc.fetchUrlRawContent(b.getUri());
-
                     String taskFileName = Paths.get(new URI(b.getUri()).getPath()).getFileName().toString();
+
+                    Files.createDirectories(tasksPath);
                     Files.write(Paths.get(bundlePath, "tasks", taskFileName), taskContent.getBytes());
                     break;
                 } catch (IOException e) {
