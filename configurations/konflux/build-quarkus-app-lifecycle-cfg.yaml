@@ -51,7 +51,7 @@ job:
 
   actions:
     - name: buildpacks-phases # TODO: To be reviewed as the name of the task is different about the "build-container"
-      ref: git://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-phases/01/buildpacks-phases.yaml
+      ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-phases/01/buildpacks-phases.yaml
       workspaces:
         - name: source
           workspace: workspace

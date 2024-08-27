@@ -13,7 +13,7 @@ public class UriParserSvc {
 
     public static Bundle extract(String uriToParse) {
         Bundle b = null;
-        String regex = "(bundle|git|http)://(.+)";
+        String regex = "(bundle|git|url)://(.+)";
 
         // Compile the regex pattern
         Pattern pattern = Pattern.compile(regex);

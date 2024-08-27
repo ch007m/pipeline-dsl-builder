@@ -17,7 +17,7 @@ public class TaskRefResolver {
         switch (refType) {
             case "bundle":
                 return withBundle(b, taskName);
-            case "http":
+            case "url":
                 return withHttp(b, taskName);
             case "git":
                 return withGit(b, taskName);
@@ -33,7 +33,7 @@ public class TaskRefResolver {
             .withParams()
                .addNewParam()
                   .withName("url")
-                  .withValue(new ParamValue("https://" + bundle.getUri())).endParam()
+                  .withValue(new ParamValue(bundle.getUri())).endParam()
             .build();
             // @formatter:on
     }
@@ -60,7 +60,7 @@ public class TaskRefResolver {
                // TODO: Find a way to get the revision/branch
                .addNewParam().withName("revision").withValue(new ParamValue("main")).endParam()
                // TODO: Find a way to get the pathInRepo
-               //.addNewParam().withName("pathInRepo").withValue(new ParamValue("./")).endParam()
+               .addNewParam().withName("pathInRepo").withValue(new ParamValue(".")).endParam()
             .build();
             // @formatter:on
     }

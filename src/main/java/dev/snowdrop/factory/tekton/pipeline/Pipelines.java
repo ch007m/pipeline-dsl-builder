@@ -103,10 +103,14 @@ public class Pipelines implements JobProvider {
             }
 
             if (action.getRef() != null) {
-                // Create a Bundle using the action reference
-                // bundle://<REGISTRY>/<ORG>/<BUNDLE_TASK-NAME>:<VERSION>@sha256:<SHA256>
-                // or
-                // git://<GIT_URL>/<TASK>.yaml
+                /* Create a Bundle using the action reference
+                   bundle://<REGISTRY>/<ORG>/<BUNDLE_TASK-NAME>:<VERSION>@sha256:<SHA256>
+                   or
+                   git://<GIT_URL>/<TASK>.yaml
+                   or
+                   url://https://<RAW_GIT_URL>/<TASK>.yaml
+                 */
+
                 Bundle bundle = UriParserSvc.extract(action.getRef());
 
                 if (bundle == null) {

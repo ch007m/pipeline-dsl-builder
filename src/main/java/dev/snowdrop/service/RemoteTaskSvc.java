@@ -69,10 +69,10 @@ public class RemoteTaskSvc {
                 }
             }
 
-            case "http": {
-                logger.info("Fetching the url: https://{}", b.getUri());
+            case "url": {
+                logger.info("Fetching the url: {}", b.getUri());
                 try {
-                    String taskUri = "https://" + b.getUri();
+                    String taskUri = b.getUri();
                     String taskContent = FileUtilSvc.fetchUrlRawContent(taskUri);
 
                     String taskFileName = Paths.get(new URI(taskUri).getPath()).getFileName().toString();
