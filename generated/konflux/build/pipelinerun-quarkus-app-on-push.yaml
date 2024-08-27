@@ -9,8 +9,8 @@ metadata:
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.appstudio.openshift.io/type: "build"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
@@ -153,38 +153,6 @@ spec:
       - name: "source-dir"
         workspace: "workspace"
       - name: "pack-workspace"
-        workspace: "workspace"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
         workspace: "workspace"
     - name: "build-source-image"
       params:

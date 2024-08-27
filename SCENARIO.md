@@ -439,38 +439,6 @@ spec:
             echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
             \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
             \n"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -766,8 +734,8 @@ metadata:
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.appstudio.openshift.io/type: "build"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
@@ -910,38 +878,6 @@ spec:
       - name: "source-dir"
         workspace: "workspace"
       - name: "pack-workspace"
-        workspace: "workspace"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
         workspace: "workspace"
     - name: "build-source-image"
       params:
@@ -1218,8 +1154,8 @@ metadata:
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.appstudio.openshift.io/type: "build"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
@@ -1362,38 +1298,6 @@ spec:
       - name: "source-dir"
         workspace: "workspace"
       - name: "pack-workspace"
-        workspace: "workspace"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
         workspace: "workspace"
     - name: "build-source-image"
       params:
@@ -1932,38 +1836,6 @@ spec:
             echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
             \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
             \n"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -2142,7 +2014,7 @@ spec:
       secretName: "{{ git_auth_secret }}"
 
 ```
-#### PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
+#### PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
 Command to be executed: 
 ```bash
@@ -2164,16 +2036,15 @@ repository:
 # To generate the Konflux Application and/or Component CR
 application:
   name: my-quarkus
-  enable: false
+  enable: true
 component:
-  name: quarkus-1
-  enable: false
+  name: my-quarkus-app
+  enable: true
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
   name: quarkus-app-on-push
-  description: PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
+  description: PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
   workspaces:
   - name: workspace
@@ -2198,12 +2069,30 @@ job:
     - output-image: "quay.io/ch007m/my-quarkus:{{revision}}"
     - image-expires-after: "5d"
     - build-image-index: ""
+    - skip-checks: "false"
     # We need the following parameters when used within the Pipeline: when condition, etc
     - build-source-image: false
     - prefetch-input: ""
     # Buildpack params
 
   actions:
+    # Finally
+    - name: show-sbom
+      finally: true
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
+      params:
+        - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+
+    - name: summary # Konflux uses as name show-summary !!
+      finally: true
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
+      params:
+        - pipelinerun-name: "$(context.pipelineRun.name)"
+        - git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+        - image-url: "$(params.output-image)"
+        - build-task-status: "$(tasks.build-container.status)"
+
+    # Our build and check tasks
     - name: buildpacks-extension-check
       ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-extension-check/01/buildpacks-extension-check.yaml
       params:
@@ -2219,10 +2108,9 @@ job:
         - APP_IMAGE: $(params.output-image)
         - SOURCE_SUBPATH: "source"
         - CNB_LOG_LEVEL: "info"
-        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
         - CNB_LIFECYCLE_IMAGE: buildpacksio/lifecycle:0.20.1
         - CNB_PLATFORM_API: "0.14"
-        - CNB_EXPERIMENTAL_MODE: "false"
+        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
         - CNB_BUILD_IMAGE: paketocommunity/build-ubi-base:latest
         - CNB_RUN_IMAGE: paketocommunity/run-ubi-base:latest
         - CNB_USER_ID: $(tasks.buildpacks-extension-check.results.uid)
@@ -2245,8 +2133,8 @@ metadata:
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
-    pipelines.openshift.io/strategy: "build"
     pipelines.appstudio.openshift.io/type: "build"
+    pipelines.openshift.io/strategy: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
@@ -2389,38 +2277,6 @@ spec:
       - name: "source-dir"
         workspace: "workspace"
       - name: "pack-workspace"
-        workspace: "workspace"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
         workspace: "workspace"
     - name: "build-source-image"
       params:
