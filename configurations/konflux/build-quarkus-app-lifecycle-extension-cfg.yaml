@@ -43,6 +43,7 @@ job:
     - output-image: "quay.io/ch007m/my-quarkus:{{revision}}"
     - image-expires-after: "5d"
     - build-image-index: ""
+    - skip-checks: "false"
     # We need the following parameters when used within the Pipeline: when condition, etc
     - build-source-image: false
     - prefetch-input: ""
