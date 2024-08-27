@@ -18,7 +18,7 @@ public class Bundles {
     // TODO: Find a way to generate such a Map using the content published within this oci
     // conftest pull --policy './temp' oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
     private static void initBundles() {
-        addBundle(new Bundle(KONFLUX_TEKTON_QUAY_CATALOG,"task-buildah", "0.1","f1aba019735496f9f7a7366b6cef8daa29ac5b36ecfc8a449669d736fb97295a" ));
+        addBundle(new Bundle(KONFLUX_TEKTON_QUAY_CATALOG,"task-buildah", "0.1","ref: url:https" ));
         addBundle(new Bundle(KONFLUX_TEKTON_QUAY_CATALOG,"task-init","0.2","092c113b614f6551113f17605ae9cb7e822aa704d07f0e37ed209da23ce392cc"));
         addBundle(new Bundle(KONFLUX_TEKTON_QUAY_CATALOG,"task-git-clone","0.1","0bb1be8363557e8e07ec34a3c5daaaaa23c9d533f0bb12f00dc604d00de50814"));
         addBundle(new Bundle(KONFLUX_TEKTON_QUAY_CATALOG,"task-prefetch-dependencies","0.1","058a59f72997c9cf1be20978eb6a145d8d4d436c6098f2460bd96766bb363b20"));

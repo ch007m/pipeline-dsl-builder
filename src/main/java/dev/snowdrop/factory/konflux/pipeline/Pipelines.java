@@ -180,7 +180,10 @@ public class Pipelines implements JobProvider {
         pipelineTasks.addAll(tasks);
         // To be reviewed to pass an array instead of just a task
         //pipelineTasks.add(tasks.get(0));
-        pipelineTasks.add(BUILD_IMAGE_INDEX());
+
+        // This task fails as it cannot be bind to the workspace: workspace
+        // pipelineTasks.add(BUILD_IMAGE_INDEX());
+
         pipelineTasks.add(BUILD_SOURCE_IMAGE());
         pipelineTasks.add(DEPRECATED_BASE_IMAGE_CHECK());
         pipelineTasks.add(CLAIR_SCAN());

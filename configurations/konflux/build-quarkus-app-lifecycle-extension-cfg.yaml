@@ -10,16 +10,15 @@ repository:
 # To generate the Konflux Application and/or Component CR
 application:
   name: my-quarkus
-  enable: false
+  enable: true
 component:
-  name: quarkus-1
-  enable: false
+  name: my-quarkus-app
+  enable: true
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
   name: quarkus-app-on-push
-  description: PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
+  description: PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
   workspaces:
   - name: workspace
@@ -50,6 +49,23 @@ job:
     # Buildpack params
 
   actions:
+    # Finally
+    - name: show-sbom
+      finally: true
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
+      params:
+        - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+
+    - name: summary # Konflux uses as name show-summary !!
+      finally: true
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
+      params:
+        - pipelinerun-name: "$(context.pipelineRun.name)"
+        - git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+        - image-url: "$(params.output-image)"
+        - build-task-status: "$(tasks.build-container.status)"
+
+    # Our build and check tasks
     - name: buildpacks-extension-check
       ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-extension-check/01/buildpacks-extension-check.yaml
       params:
@@ -65,10 +81,9 @@ job:
         - APP_IMAGE: $(params.output-image)
         - SOURCE_SUBPATH: "source"
         - CNB_LOG_LEVEL: "info"
-        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
         - CNB_LIFECYCLE_IMAGE: buildpacksio/lifecycle:0.20.1
         - CNB_PLATFORM_API: "0.14"
-        - CNB_EXPERIMENTAL_MODE: "false"
+        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
         - CNB_BUILD_IMAGE: paketocommunity/build-ubi-base:latest
         - CNB_RUN_IMAGE: paketocommunity/run-ubi-base:latest
         - CNB_USER_ID: $(tasks.buildpacks-extension-check.results.uid)
