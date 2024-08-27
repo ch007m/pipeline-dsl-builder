@@ -14,7 +14,7 @@ metadata:
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-app"
+    appstudio.openshift.io/component: "quarkus-1"
   name: "quarkus-app-on-push"
   namespace: "user-ns1"
 spec:
