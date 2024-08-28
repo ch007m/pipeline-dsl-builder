@@ -4,10 +4,7 @@ import dev.snowdrop.command.BuilderCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +14,26 @@ public class FileUtilSvc {
 
    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
    private static final String SCRIPTS_PATH = "scripts/";
+
+   public static String readFileFromResources(String filePath) {
+      ClassLoader classLoader = FileUtilSvc.class.getClassLoader();
+      try {
+         InputStream inputStream = classLoader.getResourceAsStream(filePath);
+         if (inputStream == null) {
+            throw new IOException("File not found: " + filePath);
+         }
+
+         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+         StringBuilder content = new StringBuilder();
+         String line;
+         while ((line = reader.readLine()) != null) {
+            content.append(line).append(System.lineSeparator());
+         }
+         return content.toString().trim();
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
+   }
 
    public static String loadFileAsString(String fileName) {
       String scriptPath = SCRIPTS_PATH + fileName;

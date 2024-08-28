@@ -10,10 +10,12 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 import static dev.snowdrop.factory.konflux.builder.ComponentBuilder.createComponent;
 import static dev.snowdrop.factory.konflux.builder.ApplicationBuilder.createApplication;
+import static dev.snowdrop.service.FileUtilSvc.readFileFromResources;
 
 @TopCommand
 @Command(name = "builder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline(run)s")
@@ -32,7 +34,13 @@ public class BuilderCommand implements Runnable {
         logger.info("#### Configuration path: {}", configuration);
         logger.debug("#### Output path: {}", outputPath);
 
-        // Parse and validate the configuration
+        // Load the default configuration
+        String resourcesConfigurationPath = "dev/snowdrop/configuration/konflux-default-pipeline.yaml";
+        String configYaml = readFileFromResources(resourcesConfigurationPath);
+        Configurator defaultCfg = ConfiguratorSvc.LoadConfiguration(configYaml);
+        logger.info("#### Default configuration loaded: {}", resourcesConfigurationPath);
+
+        // Parse and validate the user's configuration file
         Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);
 
         // Set the outputPath to the configurator object

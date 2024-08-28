@@ -1,10 +1,13 @@
 package dev.snowdrop.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import dev.snowdrop.model.jackson.BundleDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
+@JsonDeserialize(using = BundleDeserializer.class)
 public class Bundle {
    private String name;
    private String version;
@@ -12,6 +15,7 @@ public class Bundle {
    private String registry;
    private String protocol;
    private String uri;
+   private String resolver;
 
    public Bundle() {}
 

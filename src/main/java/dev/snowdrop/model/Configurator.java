@@ -8,6 +8,8 @@ import dev.snowdrop.model.konflux.Component;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 import static dev.snowdrop.factory.Type.TEKTON;
 import static dev.snowdrop.model.Domain.DEMO;
 
@@ -26,6 +28,7 @@ public class Configurator {
    private String outputPath;
    private Application application;
    private Component component;
+   private List<Bundle> bundles;
 
    private static String DEFAULT_TYPE = String.valueOf(TEKTON).toLowerCase();
    private static String DEFAULT_DOMAIN = String.valueOf(DEMO).toLowerCase();
