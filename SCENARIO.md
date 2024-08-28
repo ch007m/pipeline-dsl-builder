@@ -29,7 +29,7 @@ application:
   name: my-quarkus
   enable: false
 component:
-  name: quarkus-1
+  name: my-quarkus-app
   enable: false
 
 job:
@@ -235,12 +235,12 @@ metadata:
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
-    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/strategy: "build"
+    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-1"
+    appstudio.openshift.io/component: "my-quarkus-app"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
@@ -389,7 +389,7 @@ spec:
         workspace: "workspace"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "jam"
+    - name: "build-container"
       params:
       - name: "JAM_VERSION"
         value: "v2.7.3"
@@ -439,38 +439,6 @@ spec:
             echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
             \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
             \n"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -673,13 +641,13 @@ application:
   name: my-quarkus
   enable: false
 component:
-  name: quarkus-1
+  name: my-quarkus-app
   enable: false
 
 job:
   # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
-  name: quarkus-app-on-push
+  name: quarkus-1-on-push
   description: PipelineRun performing a build of a Quarkus application using pack CLI
 
   workspaces:
@@ -753,7 +721,7 @@ job:
 ```
 Generated file: 
 ```yaml
-# generated/konflux/build/pipelinerun-quarkus-app-on-push.yaml
+# generated/konflux/build/pipelinerun-quarkus-1-on-push.yaml
 
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
@@ -771,8 +739,8 @@ metadata:
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-1"
-  name: "quarkus-app-on-push"
+    appstudio.openshift.io/component: "my-quarkus-app"
+  name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
   params:
@@ -805,6 +773,42 @@ spec:
     - "BP_JVM_VERSION=21"
     - "quarkus-hello:1.0"
   pipelineSpec:
+    finally:
+    - name: "show-sbom"
+      params:
+      - name: "IMAGE_URL"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b"
+        - name: "name"
+          value: "show-sbom"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+    - name: "summary"
+      params:
+      - name: "pipelinerun-name"
+        value: "$(context.pipelineRun.name)"
+      - name: "git-url"
+        value: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+      - name: "image-url"
+        value: "$(params.output-image)"
+      - name: "build-task-status"
+        value: "$(tasks.build-container.status)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b"
+        - name: "name"
+          value: "summary"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
     results:
     - name: "IMAGE_URL"
       value: "$(tasks.build-container.results.IMAGE_URL)"
@@ -886,63 +890,54 @@ spec:
         workspace: "git-auth"
     - name: "build-container"
       params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
-      - name: "PACK_CLI_IMAGE"
-        value: "$(params.imageUrl)"
-      - name: "PACK_CLI_IMAGE_VERSION"
-        value: "$(params.imageTag)"
-      - name: "PACK_CMD_FLAGS"
-        value:
-        - "$(params.packCmdBuilderFlags)"
+      - name: "JAM_VERSION"
+        value: "v2.7.3"
       runAfter:
       - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
-        - name: "name"
-          value: "pack"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "workspace"
-      - name: "pack-workspace"
-        workspace: "workspace"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
+      taskSpec:
+        results:
+        - description: "Image repository where the built image was pushed"
+          name: "IMAGE_URL"
+        - description: "Digest of the image just built"
+          name: "IMAGE_DIGEST"
+        - description: "Digests of the base images used for build"
+          name: "BASE_IMAGES_DIGESTS"
+        steps:
+        - args:
+          - "$(params.packCmdBuilderFlags)"
+          image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: "#!/usr/bin/env bash\nset -e\n\nfunction util::tools::os() {\n \
+            \ case \"$(uname)\" in\n  \"Darwin\")\n  echo \"${1:-darwin}\"\n  ;;\n\
+            \  \n  \"Linux\")\n  echo \"linux\"\n  ;;\n  \n  *)\n  util::print::error\
+            \ \"Unknown OS \\\"$(uname)\\\"\"\n  exit 1\n  esac\n}\n\nfunction util::tools::arch()\
+            \ {\n  case \"$(uname -m)\" in\n    arm64|aarch64)\n      echo \"arm64\"\
+            \n      ;;\n\n    amd64|x86_64)\n      if [[ \"${1:-}\" == \"--blank-amd64\"\
+            \ ]]; then\n        echo \"\"\n      elif [[ \"${1:-}\" == \"--uname-format-amd64\"\
+            \ ]]; then\n        echo \"x86_64\"\n      else\n        echo \"amd64\"\
+            \n      fi\n      ;;\n\n    *)\n      util::print::error \"Unknown Architecture\
+            \ \\\"$(uname -m)\\\"\"\n      exit 1\n  esac\n}\n\noutputDir=\"/usr/local/bin/\"\
+            \ncurl_args=(\n  \"--fail\"\n  \"--silent\"\n  \"--location\"\n  \"--output\"\
+            \ \"${outputDir}/jam\"\n)\n\nos=$(util::tools::os)\narch=$(util::tools::arch)\n\
+            \necho \"Installing jam $(params.JAM_VERSION)\"\ncurl \"https://github.com/paketo-buildpacks/jam/releases/download/$(params.JAM_VERSION)/jam-${os}-${arch}\"\
+            \ \\\n  \"${curl_args[@]}\"\nchmod +x ${outputDir}/jam\njam version\n\n\
+            echo \"This is a test demo - 1\"\n\nstack_dirpath=\".\"\ncat <<EOF > ${stack_dirpath}/stack.toml\n\
+            id = \"io.buildpacks.stacks.ubi8\"\nhomepage = \"https://github.com/paketo-community/ubi-base-stack\"\
+            \nmaintainer = \"Paketo Community\"\n\nplatforms = [\"linux/amd64\"]\n\
+            \n[build]\n  description = \"base build ubi8 image to support buildpacks\"\
+            \n  dockerfile = \"./build.Dockerfile\"\n  gid = 1000\n  shell = \"/bin/bash\"\
+            \n  uid = 1002\n\n  [build.args]\n\n[run]\n  description = \"base run\
+            \ ubi8 image to support buildpacks\"\n  dockerfile = \"./run.Dockerfile\"\
+            \n  gid = 1000\n  shell = \"/bin/bash\"\n  uid = 1001\n\n  [run.args]\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/build.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/run.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\nargs=(\n  --config \"${stack_dirpath}/stack.toml\"\n  --build-output\
+            \ \"${build_dirpath}/build.oci\"\n  --run-output \"${build_dirpath}/run.oci\"\
+            \n)\njam create-stack \"${args[@]}\"\n        \necho -n \"URL of the image\
+            \ build is : quarkus-hello:1.0\" | tee \"$(results.IMAGE_URL.path)\"\n\
+            echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
+            \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
+            \n"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -1145,13 +1140,13 @@ application:
   name: my-quarkus
   enable: false
 component:
-  name: quarkus-1
+  name: my-quarkus-app
   enable: false
 
 job:
   # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
-  name: quarkus-app-on-push
+  name: quarkus-1-on-push
   description: PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
 
   workspaces:
@@ -1205,7 +1200,7 @@ job:
 ```
 Generated file: 
 ```yaml
-# generated/konflux/build/pipelinerun-quarkus-app-on-push.yaml
+# generated/konflux/build/pipelinerun-quarkus-1-on-push.yaml
 
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
@@ -1223,8 +1218,8 @@ metadata:
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-1"
-  name: "quarkus-app-on-push"
+    appstudio.openshift.io/component: "my-quarkus-app"
+  name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
   params:
@@ -1257,6 +1252,42 @@ spec:
     - "BP_JVM_VERSION=21"
     - "quarkus-hello:1.0"
   pipelineSpec:
+    finally:
+    - name: "show-sbom"
+      params:
+      - name: "IMAGE_URL"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b"
+        - name: "name"
+          value: "show-sbom"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+    - name: "summary"
+      params:
+      - name: "pipelinerun-name"
+        value: "$(context.pipelineRun.name)"
+      - name: "git-url"
+        value: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+      - name: "image-url"
+        value: "$(params.output-image)"
+      - name: "build-task-status"
+        value: "$(tasks.build-container.status)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b"
+        - name: "name"
+          value: "summary"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
     results:
     - name: "IMAGE_URL"
       value: "$(tasks.build-container.results.IMAGE_URL)"
@@ -1338,63 +1369,54 @@ spec:
         workspace: "git-auth"
     - name: "build-container"
       params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
-      - name: "PACK_CLI_IMAGE"
-        value: "$(params.imageUrl)"
-      - name: "PACK_CLI_IMAGE_VERSION"
-        value: "$(params.imageTag)"
-      - name: "PACK_CMD_FLAGS"
-        value:
-        - "$(params.packCmdBuilderFlags)"
+      - name: "JAM_VERSION"
+        value: "v2.7.3"
       runAfter:
       - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
-        - name: "name"
-          value: "pack"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "workspace"
-      - name: "pack-workspace"
-        workspace: "workspace"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
+      taskSpec:
+        results:
+        - description: "Image repository where the built image was pushed"
+          name: "IMAGE_URL"
+        - description: "Digest of the image just built"
+          name: "IMAGE_DIGEST"
+        - description: "Digests of the base images used for build"
+          name: "BASE_IMAGES_DIGESTS"
+        steps:
+        - args:
+          - "$(params.packCmdBuilderFlags)"
+          image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: "#!/usr/bin/env bash\nset -e\n\nfunction util::tools::os() {\n \
+            \ case \"$(uname)\" in\n  \"Darwin\")\n  echo \"${1:-darwin}\"\n  ;;\n\
+            \  \n  \"Linux\")\n  echo \"linux\"\n  ;;\n  \n  *)\n  util::print::error\
+            \ \"Unknown OS \\\"$(uname)\\\"\"\n  exit 1\n  esac\n}\n\nfunction util::tools::arch()\
+            \ {\n  case \"$(uname -m)\" in\n    arm64|aarch64)\n      echo \"arm64\"\
+            \n      ;;\n\n    amd64|x86_64)\n      if [[ \"${1:-}\" == \"--blank-amd64\"\
+            \ ]]; then\n        echo \"\"\n      elif [[ \"${1:-}\" == \"--uname-format-amd64\"\
+            \ ]]; then\n        echo \"x86_64\"\n      else\n        echo \"amd64\"\
+            \n      fi\n      ;;\n\n    *)\n      util::print::error \"Unknown Architecture\
+            \ \\\"$(uname -m)\\\"\"\n      exit 1\n  esac\n}\n\noutputDir=\"/usr/local/bin/\"\
+            \ncurl_args=(\n  \"--fail\"\n  \"--silent\"\n  \"--location\"\n  \"--output\"\
+            \ \"${outputDir}/jam\"\n)\n\nos=$(util::tools::os)\narch=$(util::tools::arch)\n\
+            \necho \"Installing jam $(params.JAM_VERSION)\"\ncurl \"https://github.com/paketo-buildpacks/jam/releases/download/$(params.JAM_VERSION)/jam-${os}-${arch}\"\
+            \ \\\n  \"${curl_args[@]}\"\nchmod +x ${outputDir}/jam\njam version\n\n\
+            echo \"This is a test demo - 1\"\n\nstack_dirpath=\".\"\ncat <<EOF > ${stack_dirpath}/stack.toml\n\
+            id = \"io.buildpacks.stacks.ubi8\"\nhomepage = \"https://github.com/paketo-community/ubi-base-stack\"\
+            \nmaintainer = \"Paketo Community\"\n\nplatforms = [\"linux/amd64\"]\n\
+            \n[build]\n  description = \"base build ubi8 image to support buildpacks\"\
+            \n  dockerfile = \"./build.Dockerfile\"\n  gid = 1000\n  shell = \"/bin/bash\"\
+            \n  uid = 1002\n\n  [build.args]\n\n[run]\n  description = \"base run\
+            \ ubi8 image to support buildpacks\"\n  dockerfile = \"./run.Dockerfile\"\
+            \n  gid = 1000\n  shell = \"/bin/bash\"\n  uid = 1001\n\n  [run.args]\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/build.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/run.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\nargs=(\n  --config \"${stack_dirpath}/stack.toml\"\n  --build-output\
+            \ \"${build_dirpath}/build.oci\"\n  --run-output \"${build_dirpath}/run.oci\"\
+            \n)\njam create-stack \"${args[@]}\"\n        \necho -n \"URL of the image\
+            \ build is : quarkus-hello:1.0\" | tee \"$(results.IMAGE_URL.path)\"\n\
+            echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
+            \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
+            \n"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -1597,7 +1619,7 @@ application:
   name: my-quarkus
   enable: false
 component:
-  name: quarkus-1
+  name: my-quarkus-app
   enable: false
 
 job:
@@ -1728,12 +1750,12 @@ metadata:
     build.appstudio.redhat.com/commit_sha: "{{revision}}"
     build.appstudio.redhat.com/target_branch: "{{target_branch}}"
   labels:
-    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/strategy: "build"
+    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-1"
+    appstudio.openshift.io/component: "my-quarkus-app"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
@@ -1882,7 +1904,7 @@ spec:
         workspace: "workspace"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "jam"
+    - name: "build-container"
       params:
       - name: "JAM_VERSION"
         value: "v2.7.3"
@@ -1932,38 +1954,6 @@ spec:
             echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
             \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
             \n"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
@@ -2142,7 +2132,7 @@ spec:
       secretName: "{{ git_auth_secret }}"
 
 ```
-#### PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
+#### PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
 Command to be executed: 
 ```bash
@@ -2164,16 +2154,15 @@ repository:
 # To generate the Konflux Application and/or Component CR
 application:
   name: my-quarkus
-  enable: false
+  enable: true
 component:
-  name: quarkus-1
-  enable: false
+  name: my-quarkus-app
+  enable: true
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
-  name: quarkus-app-on-push
-  description: PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
+  name: quarkus-1-on-push
+  description: PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
   workspaces:
   - name: workspace
@@ -2198,12 +2187,40 @@ job:
     - output-image: "quay.io/ch007m/my-quarkus:{{revision}}"
     - image-expires-after: "5d"
     - build-image-index: ""
+    - skip-checks: "true"
     # We need the following parameters when used within the Pipeline: when condition, etc
     - build-source-image: false
     - prefetch-input: ""
+    # SBOM Grype
+    - grype-version: v0.79.6
+    - grype-sbom-format: table
+
     # Buildpack params
 
   actions:
+    # Finally
+    - name: show-sbom
+      finally: true
+      # ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
+      # params:
+      #   - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: url://https://raw.githubusercontent.com/tektoncd/catalog/main/task/grype/0.1/grype.yaml
+      params:
+        - GRYPE_IMAGE: anchore/grype:$(params.grype-version)
+        - ARGS:
+            - $(tasks.build-container.results.IMAGE_URL)
+            - -o $(params.grype-sbom-format)
+
+    - name: summary # Konflux uses as name show-summary !!
+      finally: true
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
+      params:
+        - pipelinerun-name: "$(context.pipelineRun.name)"
+        - git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+        - image-url: "$(params.output-image)"
+        - build-task-status: "$(tasks.build-container.status)"
+
+    # Our build and check tasks
     - name: buildpacks-extension-check
       ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/buildpacks-extension-check/01/buildpacks-extension-check.yaml
       params:
@@ -2219,10 +2236,9 @@ job:
         - APP_IMAGE: $(params.output-image)
         - SOURCE_SUBPATH: "source"
         - CNB_LOG_LEVEL: "info"
-        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
         - CNB_LIFECYCLE_IMAGE: buildpacksio/lifecycle:0.20.1
         - CNB_PLATFORM_API: "0.14"
-        - CNB_EXPERIMENTAL_MODE: "false"
+        - CNB_BUILDER_IMAGE: paketocommunity/builder-ubi-base:latest
         - CNB_BUILD_IMAGE: paketocommunity/build-ubi-base:latest
         - CNB_RUN_IMAGE: paketocommunity/run-ubi-base:latest
         - CNB_USER_ID: $(tasks.buildpacks-extension-check.results.uid)
@@ -2232,7 +2248,7 @@ job:
 ```
 Generated file: 
 ```yaml
-# generated/konflux/build/pipelinerun-quarkus-app-on-push.yaml
+# generated/konflux/build/pipelinerun-quarkus-1-on-push.yaml
 
 apiVersion: "tekton.dev/v1"
 kind: "PipelineRun"
@@ -2250,8 +2266,8 @@ metadata:
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-1"
-  name: "quarkus-app-on-push"
+    appstudio.openshift.io/component: "my-quarkus-app"
+  name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
   params:
@@ -2284,6 +2300,42 @@ spec:
     - "BP_JVM_VERSION=21"
     - "quarkus-hello:1.0"
   pipelineSpec:
+    finally:
+    - name: "show-sbom"
+      params:
+      - name: "IMAGE_URL"
+        value: "$(tasks.build-container.results.IMAGE_URL)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b"
+        - name: "name"
+          value: "show-sbom"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+    - name: "summary"
+      params:
+      - name: "pipelinerun-name"
+        value: "$(context.pipelineRun.name)"
+      - name: "git-url"
+        value: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+      - name: "image-url"
+        value: "$(params.output-image)"
+      - name: "build-task-status"
+        value: "$(tasks.build-container.status)"
+      taskRef:
+        params:
+        - name: "bundle"
+          value: "quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b"
+        - name: "name"
+          value: "summary"
+        - name: "kind"
+          value: "task"
+        resolver: "bundles"
+      workspaces:
+      - name: "workspace"
+        workspace: "workspace"
     results:
     - name: "IMAGE_URL"
       value: "$(tasks.build-container.results.IMAGE_URL)"
@@ -2365,63 +2417,54 @@ spec:
         workspace: "git-auth"
     - name: "build-container"
       params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
-      - name: "PACK_CLI_IMAGE"
-        value: "$(params.imageUrl)"
-      - name: "PACK_CLI_IMAGE_VERSION"
-        value: "$(params.imageTag)"
-      - name: "PACK_CMD_FLAGS"
-        value:
-        - "$(params.packCmdBuilderFlags)"
+      - name: "JAM_VERSION"
+        value: "v2.7.3"
       runAfter:
       - "prefetch-dependencies"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
-        - name: "name"
-          value: "pack"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "workspace"
-      - name: "pack-workspace"
-        workspace: "workspace"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
+      taskSpec:
+        results:
+        - description: "Image repository where the built image was pushed"
+          name: "IMAGE_URL"
+        - description: "Digest of the image just built"
+          name: "IMAGE_DIGEST"
+        - description: "Digests of the base images used for build"
+          name: "BASE_IMAGES_DIGESTS"
+        steps:
+        - args:
+          - "$(params.packCmdBuilderFlags)"
+          image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: "#!/usr/bin/env bash\nset -e\n\nfunction util::tools::os() {\n \
+            \ case \"$(uname)\" in\n  \"Darwin\")\n  echo \"${1:-darwin}\"\n  ;;\n\
+            \  \n  \"Linux\")\n  echo \"linux\"\n  ;;\n  \n  *)\n  util::print::error\
+            \ \"Unknown OS \\\"$(uname)\\\"\"\n  exit 1\n  esac\n}\n\nfunction util::tools::arch()\
+            \ {\n  case \"$(uname -m)\" in\n    arm64|aarch64)\n      echo \"arm64\"\
+            \n      ;;\n\n    amd64|x86_64)\n      if [[ \"${1:-}\" == \"--blank-amd64\"\
+            \ ]]; then\n        echo \"\"\n      elif [[ \"${1:-}\" == \"--uname-format-amd64\"\
+            \ ]]; then\n        echo \"x86_64\"\n      else\n        echo \"amd64\"\
+            \n      fi\n      ;;\n\n    *)\n      util::print::error \"Unknown Architecture\
+            \ \\\"$(uname -m)\\\"\"\n      exit 1\n  esac\n}\n\noutputDir=\"/usr/local/bin/\"\
+            \ncurl_args=(\n  \"--fail\"\n  \"--silent\"\n  \"--location\"\n  \"--output\"\
+            \ \"${outputDir}/jam\"\n)\n\nos=$(util::tools::os)\narch=$(util::tools::arch)\n\
+            \necho \"Installing jam $(params.JAM_VERSION)\"\ncurl \"https://github.com/paketo-buildpacks/jam/releases/download/$(params.JAM_VERSION)/jam-${os}-${arch}\"\
+            \ \\\n  \"${curl_args[@]}\"\nchmod +x ${outputDir}/jam\njam version\n\n\
+            echo \"This is a test demo - 1\"\n\nstack_dirpath=\".\"\ncat <<EOF > ${stack_dirpath}/stack.toml\n\
+            id = \"io.buildpacks.stacks.ubi8\"\nhomepage = \"https://github.com/paketo-community/ubi-base-stack\"\
+            \nmaintainer = \"Paketo Community\"\n\nplatforms = [\"linux/amd64\"]\n\
+            \n[build]\n  description = \"base build ubi8 image to support buildpacks\"\
+            \n  dockerfile = \"./build.Dockerfile\"\n  gid = 1000\n  shell = \"/bin/bash\"\
+            \n  uid = 1002\n\n  [build.args]\n\n[run]\n  description = \"base run\
+            \ ubi8 image to support buildpacks\"\n  dockerfile = \"./run.Dockerfile\"\
+            \n  gid = 1000\n  shell = \"/bin/bash\"\n  uid = 1001\n\n  [run.args]\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/build.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\ncat <<EOF > ${stack_dirpath}/run.Dockerfile\nFROM registry.access.redhat.com/ubi8/ubi-minimal:latest\n\
+            EOF\n\nargs=(\n  --config \"${stack_dirpath}/stack.toml\"\n  --build-output\
+            \ \"${build_dirpath}/build.oci\"\n  --run-output \"${build_dirpath}/run.oci\"\
+            \n)\njam create-stack \"${args[@]}\"\n        \necho -n \"URL of the image\
+            \ build is : quarkus-hello:1.0\" | tee \"$(results.IMAGE_URL.path)\"\n\
+            echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
+            \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
+            \n"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"
