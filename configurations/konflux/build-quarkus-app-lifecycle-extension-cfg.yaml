@@ -43,19 +43,29 @@ job:
     - output-image: "quay.io/ch007m/my-quarkus:{{revision}}"
     - image-expires-after: "5d"
     - build-image-index: ""
-    - skip-checks: "false"
+    - skip-checks: "true"
     # We need the following parameters when used within the Pipeline: when condition, etc
     - build-source-image: false
     - prefetch-input: ""
+    # SBOM Grype
+    - grype-version: v0.79.6
+    - grype-sbom-format: table
+
     # Buildpack params
 
   actions:
     # Finally
     - name: show-sbom
       finally: true
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
+      # ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
+      # params:
+      #   - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: url://https://raw.githubusercontent.com/tektoncd/catalog/main/task/grype/0.1/grype.yaml
       params:
-        - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+        - GRYPE_IMAGE: anchore/grype:$(params.grype-version)
+        - ARGS:
+            - $(tasks.build-container.results.IMAGE_URL)
+            - -o $(params.grype-sbom-format)
 
     - name: summary # Konflux uses as name show-summary !!
       finally: true
