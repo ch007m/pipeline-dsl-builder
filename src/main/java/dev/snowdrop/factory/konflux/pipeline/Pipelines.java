@@ -169,7 +169,11 @@ public class Pipelines implements JobProvider {
         /* TODO: Code to be reviewed to avoid hard code values
         */
         tasks.stream()
-            .filter(t -> t.getName().equals("buildpacks-extension-phases") || t.getName().equals("buildpacks-phases") || t.getName().equals(("pack")))
+            .filter(t ->
+                t.getName().equals("buildpacks-extension-phases") ||
+                t.getName().equals("buildpacks-phases") ||
+                t.getName().equals("jam") ||
+                t.getName().equals("pack"))
             .map(t-> { t.setName("build-container"); return t;}).collect(Collectors.toList());
 
         // @formatter:off

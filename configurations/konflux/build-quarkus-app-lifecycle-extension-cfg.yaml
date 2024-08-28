@@ -17,7 +17,7 @@ component:
 
 job:
   resourceType: PipelineRun
-  name: quarkus-app-on-push
+  name: quarkus-1-on-push
   description: PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
   workspaces:
