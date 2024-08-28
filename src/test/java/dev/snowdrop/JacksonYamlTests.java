@@ -55,6 +55,7 @@ public class JacksonYamlTests {
             component:
               enable: false
               name: null
+            bundles: null  
             """;
 
         Application app = new Application();
