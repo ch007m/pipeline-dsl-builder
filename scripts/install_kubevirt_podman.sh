@@ -14,6 +14,9 @@ function is_nested_virt_enabled() {
   [ "$kvm_nested" == "1" ] || [ "$kvm_nested" == "Y" ] || [ "$kvm_nested" == "y" ]
 }
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT_PATH="$SCRIPT_DIR/.."
+
 echo "Deploying KubeVirt"
 kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml"
 kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml"
@@ -42,12 +45,12 @@ kubectl create clusterrolebinding vm-podman --clusterrole=admin --serviceaccount
 kubectl create clusterrolebinding argocd-server-applications --clusterrole=argocd-applicationset-controller --serviceaccount=argocd:argocd-server
 
 kubectl create ns vm-images
-kubectl apply -n vm-images -f manifest/installation/virt/quay-to-pvc-datavolume.yml
+kubectl apply -n vm-images -f $ROOT_PATH/manifests/installation/virt/quay-to-pvc-datavolume.yml
 kubectl wait datavolume -n vm-images podman-remote --for condition=Ready=True --timeout=360s
 
 ssh-keygen -N "" -f id_rsa
 kubectl create secret generic podman-ssh-key -n ${KUBE_NAMESPACE} --from-file=key=id_rsa.pub
 
-MANIFEST_PATH=./manifest/installation/virt
+MANIFEST_PATH=$ROOT_PATH/manifests/installation/virt
 kustomize build ${MANIFEST_PATH} | kubectl apply -n ${KUBE_NAMESPACE} -f -
 kubectl wait --for=condition=Ready vm/vm-podman -n ${KUBE_NAMESPACE} --timeout=360s

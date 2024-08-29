@@ -81,7 +81,7 @@ job:
         - build-task-status: "$(tasks.build-container.status)"
 
     # Tasks
-    - name: virt
+    - name: virtualmachine
       params:
         - name: $(params.virtualMachineName)
         - namespace: $(params.virtualMachineNamespace)
