@@ -51,9 +51,9 @@ kubectl create secret generic podman-ssh-key -n ${KUBE_NAMESPACE} --from-file=ke
 
 echo "Deploy the Datavolume ..."
 kubectl apply -n vm-images -f $ROOT_PATH/manifests/installation/virt/podman-remote-datavolume.yaml
-kubectl wait datavolume -n vm-images podman-remote --for condition=Ready=True --timeout=360s
+#kubectl wait datavolume -n vm-images podman-remote --for condition=Ready=True --timeout=360s
 
 echo "Kustomize the VM resource and deploy it ..."
 MANIFEST_PATH=$ROOT_PATH/manifests/installation/virt
 kustomize build ${MANIFEST_PATH} | kubectl apply -n ${KUBE_NAMESPACE} -f -
-kubectl wait --for=condition=Ready vm/vm-podman -n ${KUBE_NAMESPACE} --timeout=360s
+#kubectl wait --for=condition=Ready vm/vm-podman -n ${KUBE_NAMESPACE} --timeout=360s
