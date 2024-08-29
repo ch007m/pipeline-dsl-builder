@@ -1,8 +1,12 @@
 package dev.snowdrop.factory;
 
 import dev.snowdrop.model.Bundle;
+import dev.snowdrop.model.Configurator;
+import dev.snowdrop.service.ConfiguratorSvc;
+import jakarta.inject.Inject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static dev.snowdrop.factory.konflux.Variables.KONFLUX_TEKTON_QUAY_CATALOG;
@@ -11,11 +15,14 @@ public class Bundles {
 
     private static Map<String, Bundle> bundles = new HashMap<>();
 
-    static {
-        initBundles();
+    @Inject
+    private void initBundlesFromDefaultCfg(ConfiguratorSvc configuratorSvc) {
+        List<Bundle> bundles = configuratorSvc.defaultConfigurator.getBundles();
+        bundles.forEach(b -> {
+            addBundle(new Bundle(b.getRegistry(), b.getName(), b.getVersion(), b.getSha256()));
+        });
     }
-
-    // TODO: Find a way to generate such a Map using the content published within this oci
+    // TODO: Find a way to generate such a Map using the content published within this oci or part of a default confg file
     // conftest pull --policy './temp' oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
     private static void initBundles() {
         addBundle(new Bundle(KONFLUX_TEKTON_QUAY_CATALOG,"task-buildah", "0.1","ref: url:https" ));

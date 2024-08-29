@@ -5,6 +5,7 @@ import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -29,16 +30,13 @@ public class BuilderCommand implements Runnable {
     @Option(names = {"-o", "--output-path"}, description = "The output path", required = true)
     String outputPath;
 
+    @Inject
+    ConfiguratorSvc configuratorSvc;
+
     @Override
     public void run() {
         logger.info("#### Configuration path: {}", configuration);
         logger.debug("#### Output path: {}", outputPath);
-
-        // Load the default configuration
-        String resourcesConfigurationPath = "dev/snowdrop/configuration/konflux-default-pipeline.yaml";
-        String configYaml = readFileFromResources(resourcesConfigurationPath);
-        Configurator defaultCfg = ConfiguratorSvc.LoadConfiguration(configYaml);
-        logger.info("#### Default configuration loaded: {}", resourcesConfigurationPath);
 
         // Parse and validate the user's configuration file
         Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);

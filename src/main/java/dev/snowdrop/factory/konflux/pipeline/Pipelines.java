@@ -6,7 +6,6 @@ import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.JobProvider;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
-import dev.snowdrop.factory.tekton.pipeline.TaskRefResolver;
 import dev.snowdrop.model.*;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -23,8 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.TektonResource.*;
-import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
-import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
+//import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
+//import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;

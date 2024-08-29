@@ -7,6 +7,8 @@ import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.Serialization;
+import jakarta.enterprise.context.ApplicationScoped;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +16,26 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 
+import static dev.snowdrop.service.FileUtilSvc.readFileFromResources;
+
+@ApplicationScoped
 public class ConfiguratorSvc {
 
     private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
+    public Configurator defaultConfigurator;
+
+    public ConfiguratorSvc() {
+        loadDefaultConfiguration();
+    }
+
+    public void loadDefaultConfiguration() {
+        if (defaultConfigurator == null) {
+            String resourcesConfigurationPath = "dev/snowdrop/configuration/konflux-default-pipeline.yaml";
+            String configYaml = readFileFromResources(resourcesConfigurationPath);
+            logger.info("#### Default configuration loaded: {}", resourcesConfigurationPath);
+            defaultConfigurator = ConfiguratorSvc.LoadConfiguration(configYaml);
+        }
+    }
 
     public static Configurator LoadConfiguration(String input) {
         Configurator configurator = new Configurator();
@@ -81,36 +100,4 @@ public class ConfiguratorSvc {
         }
     }
 
-    @Deprecated
-    public static void writeYamlUsingSnake(HasMetadata resource, String outputPath) {
-        try {
-            // Convert the resource(run) to YAML
-            String yamlResource = Serialization.asYaml(resource);
-            // TODO : find a better way to escape double quotes
-            // yamlResource = yamlResource.replaceAll("\\\\\"", "\"");
-            logger.debug("Created YAML: \n{}", yamlResource);
-
-            // Use the kubernetes kind as filename
-            String fileName = resource.getKind().toLowerCase() + "-" + resource.getMetadata().getName();
-            writeYamlToFile(outputPath, fileName, yamlResource);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    @Deprecated
-    public static void writeYamlToFile(String outputPath, String fileName, String yamlContent) {
-        Path filePath = Paths.get(outputPath, fileName + ".yaml");
-        try {
-            File dir = new File(outputPath);
-            dir.mkdirs();
-
-            File f = new File(String.valueOf(filePath));
-            Files.write(f.toPath(), yamlContent.getBytes());
-            logger.info("### YAML file generated: " + filePath);
-
-        } catch (Exception e) {
-            logger.error("Failed to write YAML to file: " + e.getMessage());
-        }
-    }
 }

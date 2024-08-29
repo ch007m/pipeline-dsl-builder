@@ -23,7 +23,6 @@ public class TektonResource {
     private static final Logger logger = LoggerFactory.getLogger(TektonResource.class);
 
     public static HasMetadata create(Configurator cfg) {
-        List<Action> actions = cfg.getJob().getActions();
         String domain = cfg.getDomain().toUpperCase();
         Type TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
