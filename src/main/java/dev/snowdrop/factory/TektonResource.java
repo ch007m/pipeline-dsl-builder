@@ -42,6 +42,17 @@ public class TektonResource {
     public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<String> args, List<When> when, Map<String, Workspace> jobWorkspacesMap, List<TaskResult> results) {
         String embeddedScript;
 
+        // List of workspaces's user defined part of the job / action definition
+        List<WorkspaceDeclaration> taskWorkspaces = new ArrayList<>();
+        if (action.getWorkspaces() != null && !action.getWorkspaces().isEmpty()) {
+            action.getWorkspaces().forEach(wks -> {
+                taskWorkspaces.add(new WorkspaceDeclarationBuilder()
+                    .withName(wks.getName())
+                    // TODO: Should we also uspport to define a volume to mount
+                    .build());
+            });
+        }
+
         if (action.getScript() != null) {
             embeddedScript = action.getScript();
         } else if (action.getScriptFileUrl() != null) {
@@ -73,7 +84,7 @@ public class TektonResource {
                         .build())
                     .toArray(WhenExpression[]::new))
             .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
-            .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, null))
+            .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
             .withTaskSpec(
                 new EmbeddedTaskBuilder()
                     .addNewStep()
