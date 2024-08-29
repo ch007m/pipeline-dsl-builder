@@ -2,7 +2,7 @@
 
 export KUBEVIRT_VERSION=v1.2.1
 export KUBEVIRT_CDI_VERSION=v1.59.0
-export KUBE_NAMESPACE=podman-remote
+export KUBE_NAMESPACE=vm-services
 
 function is_nested_virt_enabled() {
   kvm_nested="unknown"
@@ -36,7 +36,7 @@ kubectl patch --type merge -p '{"spec": {"claimPropertySets": [{"accessModes": [
 
 kubectl create clusterrolebinding pod-kubevirt-viewer --clusterrole=kubevirt.io:view --serviceaccount=${KUBE_NAMESPACE}:default
 kubectl create clusterrolebinding cdi-kubevirt-viewer --clusterrole=cdi.kubevirt.io:view --serviceaccount=${KUBE_NAMESPACE}:default
-kubectl create clusterrolebinding quarkus-dev --clusterrole=admin --serviceaccount=${KUBE_NAMESPACE}:default
+kubectl create clusterrolebinding vm-podman --clusterrole=admin --serviceaccount=${KUBE_NAMESPACE}:default
 
 # Give RBAC to the SA argocd-server of the namespace argocd to access Applications running in another namespaces
 kubectl create clusterrolebinding argocd-server-applications --clusterrole=argocd-applicationset-controller --serviceaccount=argocd:argocd-server
@@ -46,8 +46,8 @@ kubectl apply -n vm-images -f manifest/installation/virt/quay-to-pvc-datavolume.
 kubectl wait datavolume -n vm-images podman-remote --for condition=Ready=True --timeout=360s
 
 ssh-keygen -N "" -f id_rsa
-kubectl create secret generic quarkus-dev-ssh-key -n ${KUBE_NAMESPACE} --from-file=key=id_rsa.pub
+kubectl create secret generic podman-ssh-key -n ${KUBE_NAMESPACE} --from-file=key=id_rsa.pub
 
 MANIFEST_PATH=./manifest/installation/virt
 kustomize build ${MANIFEST_PATH} | kubectl apply -n ${KUBE_NAMESPACE} -f -
-kubectl wait --for=condition=Ready vm/quarkus-dev -n ${KUBE_NAMESPACE} --timeout=360s
+kubectl wait --for=condition=Ready vm/vm-podman -n ${KUBE_NAMESPACE} --timeout=360s

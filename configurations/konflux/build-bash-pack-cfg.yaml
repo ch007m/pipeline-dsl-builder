@@ -47,6 +47,10 @@ job:
     - build-source-image: false
     - prefetch-input: ""
 
+    # virt
+    - virtualMachineName: vm-podman
+    - virtualMachineNamespace: vm-services
+
     # Buildpack params
     - source-dir: "source"
     - imageUrl: "buildpacksio/pack"
@@ -77,11 +81,17 @@ job:
         - build-task-status: "$(tasks.build-container.status)"
 
     # Tasks
+    - name: virt
+      params:
+        - name: $(params.virtualMachineName)
+        - namespace: $(params.virtualMachineNamespace)
+      ref: url://https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/faba87980ecb7cbc35aa925d9c9d3562bba4f783/bundles/virtualmachine.yaml
+
     - name: pack
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_VERSION: "v0.35.1"
-        - VM_IP: 0.0.0.0
+        - DOCKER_HOST: $(tasks.virtualmachine.results.ip)
         #- PACK_CMD_FLAGS:
         #    - "$(params.packCmdBuilderFlags)"
       results:
@@ -102,7 +112,7 @@ job:
         echo "Checking pack ..."
         pack --version
 
-        export DOCKER_HOST=tcp://$(params.VM_IP):2376
+        export DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376
 
         # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
         echo "Getting the arguments ..."

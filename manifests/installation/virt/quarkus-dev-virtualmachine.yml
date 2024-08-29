@@ -1,15 +1,15 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: quarkus-dev
+  name: vm-podman
   labels:
-    app: quarkus-dev
+    app: vm-podman
 spec:
   dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
       metadata:
-        name: quarkus-dev-disk
+        name: podman-disk
       spec:
         pvc:
           accessModes:
@@ -25,7 +25,7 @@ spec:
   template:
     metadata:
       labels:
-        kubevirt.io/domain: quarkus-dev
+        kubevirt.io/domain: vm-podman
         kubevirt.io/size: small
     spec:
       accessCredentials:
@@ -34,7 +34,7 @@ spec:
               configDrive: {}
             source:
               secret:
-                secretName: quarkus-dev-ssh-key
+                secretName: podman-ssh-key
       domain:
         cpu:
           cores: 1
@@ -65,8 +65,8 @@ spec:
         - cloudInitConfigDrive:
             userData: |-
               #cloud-config
-              hostname: quarkus-dev
+              hostname: vm-podman
           name: cloudinitdisk
         - dataVolume:
-            name: quarkus-dev-disk
+            name: podman-disk
           name: rootdisk
