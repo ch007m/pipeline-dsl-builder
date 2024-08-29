@@ -81,6 +81,7 @@ job:
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_VERSION: "v0.35.1"
+        - VM_IP: 0.0.0.0
         #- PACK_CMD_FLAGS:
         #    - "$(params.packCmdBuilderFlags)"
       results:
@@ -101,8 +102,9 @@ job:
         echo "Checking pack ..."
         pack --version
 
+        export DOCKER_HOST=tcp://$(params.VM_IP):2376
+
         # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
-        
         echo "Getting the arguments ..."
         for cmd_arg in "$@"; do
           CLI_ARGS+=("$cmd_arg")
