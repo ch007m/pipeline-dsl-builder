@@ -45,13 +45,13 @@ kubectl create clusterrolebinding pod-kubevirt-viewer --clusterrole=kubevirt.io:
 kubectl create clusterrolebinding cdi-kubevirt-viewer --clusterrole=cdi.kubevirt.io:view --serviceaccount=${KUBE_NAMESPACE}:default
 kubectl create clusterrolebinding vm-podman --clusterrole=admin --serviceaccount=${KUBE_NAMESPACE}:default
 
-echo "Deploy the Datavolume ..."
-kubectl apply -n vm-images -f $ROOT_PATH/manifests/installation/virt/podman-remote-datavolume.yaml
-kubectl wait datavolume -n vm-images podman-remote --for condition=Ready=True --timeout=360s
-
 echo "Generate a ssh key ..."
 ssh-keygen -N "" -f id_rsa
 kubectl create secret generic podman-ssh-key -n ${KUBE_NAMESPACE} --from-file=key=id_rsa.pub
+
+echo "Deploy the Datavolume ..."
+kubectl apply -n vm-images -f $ROOT_PATH/manifests/installation/virt/podman-remote-datavolume.yaml
+kubectl wait datavolume -n vm-images podman-remote --for condition=Ready=True --timeout=360s
 
 echo "Kustomize the VM resource and deploy it ..."
 MANIFEST_PATH=$ROOT_PATH/manifests/installation/virt
