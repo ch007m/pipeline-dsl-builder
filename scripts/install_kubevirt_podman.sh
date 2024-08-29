@@ -17,6 +17,10 @@ function is_nested_virt_enabled() {
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ROOT_PATH="$SCRIPT_DIR/.."
 
+echo "Creating the needed namespaces ..."
+kubectl create ns ${KUBE_NAMESPACE}-images --dry-run=client -o yaml | kubectl apply -f -
+kubectl create ns vm-images --dry-run=client -o yaml | kubectl apply -f -
+
 echo "Deploying KubeVirt"
 kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml"
 kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml"
@@ -44,7 +48,6 @@ kubectl create clusterrolebinding vm-podman --clusterrole=admin --serviceaccount
 # Give RBAC to the SA argocd-server of the namespace argocd to access Applications running in another namespaces
 kubectl create clusterrolebinding argocd-server-applications --clusterrole=argocd-applicationset-controller --serviceaccount=argocd:argocd-server
 
-kubectl create ns vm-images
 kubectl apply -n vm-images -f $ROOT_PATH/manifests/installation/virt/quay-to-pvc-datavolume.yml
 kubectl wait datavolume -n vm-images podman-remote --for condition=Ready=True --timeout=360s
 
