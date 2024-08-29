@@ -16,7 +16,7 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 11Gi
+              storage: 10Gi
         source:
           pvc:
             namespace: openshift-virtualization-os-images
