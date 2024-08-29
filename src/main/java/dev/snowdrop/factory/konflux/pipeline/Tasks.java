@@ -1,15 +1,21 @@
 package dev.snowdrop.factory.konflux.pipeline;
 
+import dev.snowdrop.service.BundlesSvc;
 import io.fabric8.tekton.pipeline.v1.ParamValue;
 import io.fabric8.tekton.pipeline.v1.PipelineTask;
 import io.fabric8.tekton.pipeline.v1.PipelineTaskBuilder;
 
 import java.util.List;
 
-import static dev.snowdrop.factory.Bundles.getBundleURL;
 import static dev.snowdrop.factory.konflux.Variables.KONFLUX_TEKTON_QUAY_CATALOG;
 
 public class Tasks {
+
+   static BundlesSvc bundlesSvc;
+
+   static {
+      bundlesSvc = BundlesSvc.getInstance();
+   }
 
    public static PipelineTask INIT() {
       PipelineTask task = new PipelineTaskBuilder()
@@ -21,7 +27,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-init","0.2"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-init","0.2"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("init")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -43,7 +49,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-git-clone","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-git-clone","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("git-clone")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -68,7 +74,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-prefetch-dependencies","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-prefetch-dependencies","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("prefetch-dependencies")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -98,7 +104,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-build-image-index","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-build-image-index","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("build-image-index")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -125,7 +131,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-source-build","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-source-build","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("source-build")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -151,7 +157,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-deprecated-image-check","0.4"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-deprecated-image-check","0.4"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("deprecated-image-check")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -174,7 +180,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-clair-scan","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-clair-scan","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("clair-scan")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -196,7 +202,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-ecosystem-cert-preflight-checks","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-ecosystem-cert-preflight-checks","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("ecosystem-cert-preflight-checks")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -219,7 +225,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-sast-snyk-check","0.2"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-sast-snyk-check","0.2"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("sast-snyk-check")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -244,7 +250,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-clamav-scan","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-clamav-scan","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("clamav-scan")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -268,7 +274,7 @@ public class Tasks {
          .withNewTaskRef()
            .withResolver("bundles")
            .withParams()
-             .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-sbom-json-check","0.1"))).endParam()
+             .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-sbom-json-check","0.1"))).endParam()
              .addNewParam().withName("name").withValue(new ParamValue("sbom-json-check")).endParam()
              .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
          .endTaskRef()
@@ -300,7 +306,7 @@ public class Tasks {
           .withNewTaskRef()
              .withResolver("bundles")
              .withParams()
-                .addNewParam().withName("bundle").withValue(new ParamValue(getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-buildah","0.1"))).endParam()
+                .addNewParam().withName("bundle").withValue(new ParamValue(BundlesSvc.getBundleURL(KONFLUX_TEKTON_QUAY_CATALOG,"task-buildah","0.1"))).endParam()
                 .addNewParam().withName("name").withValue(new ParamValue("buildah")).endParam()
                 .addNewParam().withName("kind").withValue(new ParamValue("task")).endParam()
           .endTaskRef()
