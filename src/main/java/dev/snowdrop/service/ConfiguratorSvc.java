@@ -6,9 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.client.utils.Serialization;
 import jakarta.enterprise.context.ApplicationScoped;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
