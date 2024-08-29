@@ -11,5 +11,5 @@ spec:
   storage:
     resources:
       requests:
-        storage: 11Gi
+        storage: 10Gi
     volumeMode: Filesystem
