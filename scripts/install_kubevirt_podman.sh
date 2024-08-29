@@ -18,7 +18,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ROOT_PATH="$SCRIPT_DIR/.."
 
 echo "Creating the needed namespaces ..."
-kubectl create ns ${KUBE_NAMESPACE}-images --dry-run=client -o yaml | kubectl apply -f -
+kubectl create ns ${KUBE_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
 kubectl create ns vm-images --dry-run=client -o yaml | kubectl apply -f -
 
 echo "Deploying KubeVirt"
