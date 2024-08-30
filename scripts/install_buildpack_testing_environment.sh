@@ -224,7 +224,7 @@ export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 VERSION="v0.1.0"
 OS="linux"
 
-COMPILED_BUILDPACK="${HOME}/buildpack"
+COMPILED_BUILDPACK="${HOME}/buildpack/java"
 
 create-package \
    --source "${SOURCE_PATH}" \
@@ -233,12 +233,12 @@ create-package \
 
 PACKAGE_FILE="${SOURCE_PATH}/package.toml"
 if [ -f "${PACKAGE_FILE}" ]; then
-  cp "${PACKAGE_FILE}" "${COMPILED_BUILDPACK}/package.toml"
-  printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${COMPILED_BUILDPACK}" "${OS}" >> "${COMPILED_BUILDPACK}/package.toml"
+  cp "${PACKAGE_FILE}" "${COMPILED_BUILDPACK}/java/package.toml"
+  printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${COMPILED_BUILDPACK}/java" "${OS}" >> "${COMPILED_BUILDPACK}/java/package.toml"
 fi
 
 # create-package puts the buildpack here, we need to run from that directory
-cd "${COMPILED_BUILDPACK}"
+cd "${COMPILED_BUILDPACK}/java"
 
 print::colored_msg "${CYAN}" "Show buildpack.toml content for java buildpack"
 cat buildpack.toml
@@ -259,14 +259,14 @@ cd ${BUILDPACK_TEST_DIR}/quarkus
 VERSION="v0.1.0"
 OS="linux"
 
-COMPILED_BUILDPACK="${HOME}/buildpack"
+COMPILED_BUILDPACK="${HOME}/buildpack/quarkus"
 
 create-package \
    --source "${SOURCE_PATH}" \
-   --destination "${COMPILED_BUILDPACK}" \
+   --destination "${COMPILED_BUILDPACK}/quarkus" \
    --version "${VERSION}"
 
-cd "${COMPILED_BUILDPACK}"
+cd "${COMPILED_BUILDPACK}/quarkus"
 
 print::colored_msg "${CYAN}" "Show buildpack.toml content for Quarkus buildpack"
 cat buildpack.toml
