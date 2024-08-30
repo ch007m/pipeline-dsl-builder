@@ -210,10 +210,6 @@ export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 VERSION="v0.1.0"
 OS="linux"
 
-echo $PATH
-go env
-ls -la $HOME/workspace
-
 mkdir "${SOURCE_PATH}"/buildpack
 create-package \
    --source "${SOURCE_PATH:-.}" \
@@ -221,8 +217,8 @@ create-package \
    --version "${VERSION}"
 
 PACKAGE_FILE="${SOURCE_PATH:-.}/package.toml"
-if [ -f "${PACKAGE_FILE}" ]; then
-  cp "${PACKAGE_FILE}" "${SOURCE_PATH}/buildpack/package.toml"
+if [ -f "${SOURCE_PATH}/${PACKAGE_FILE}" ]; then
+  cp "${SOURCE_PATH}/${PACKAGE_FILE}" "${SOURCE_PATH}/buildpack/package.toml"
   printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${SOURCE_PATH}/buildpack" "${OS}" >> "${SOURCE_PATH}/buildpack/package.toml"
 fi
 
