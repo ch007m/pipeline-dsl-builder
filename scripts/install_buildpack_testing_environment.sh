@@ -82,8 +82,16 @@ BINARY_DIR="./tmp"
 SOURCE_PATH="."
 BP_DIR=test-buildpack
 
+print::colored_msg "${GREEN}" "Clean up folders"
 rm -rf $BP_DIR
-mkdir -p $BP_DIR/${BINARY_DIR}; cd $BP_DIR
+rm -rf ./bin
+rm -rf $BINARY_DIR
+
+mkdir -p $BP_DIR/${BINARY_DIR}
+mkdir -p $BINARY_DIR
+mkdir -p ./bin
+
+cd $BP_DIR
 
 os=$(util::tools::os)
 arch=$(util::tools::arch)
