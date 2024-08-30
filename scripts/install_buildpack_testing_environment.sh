@@ -81,6 +81,8 @@ RESET='\033[0m' # Reset color to default
 BINARY_DIR="./tmp"
 SOURCE_PATH="."
 BP_DIR=test-buildpack
+## TODO: To be defined as parameter
+PACKAGE="quay.io/ch007m"
 
 print::colored_msg "${GREEN}" "Clean up folders"
 rm -rf $BP_DIR
@@ -230,7 +232,11 @@ if [ -f "${PACKAGE_FILE}" ]; then
   printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${SOURCE_PATH}/buildpack" "${OS}" >> "${SOURCE_PATH}/buildpack/package.toml"
 fi
 
+cd ${SOURCE_PATH}/buildpack
 #ls -la ${SOURCE_PATH}/buildpack
-cat ${SOURCE_PATH}/buildpack/buildpack.toml
-cat ${SOURCE_PATH}/buildpack/package.toml
+cat buildpack.toml
+cat package.toml
 
+pack -v buildpack package \
+  "${PACKAGE}:${VERSION}" \
+  --config package.toml # --publish
