@@ -100,6 +100,8 @@ pack config experimental true
 echo "Test case: Build the ubi base stack image"
 cd ubi-base-stack
 
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+
 cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   NAME=$(echo "$image" | jq -r '.name')
   CONFIG_DIR=$(echo "$image" | jq -r '.config_dir')
