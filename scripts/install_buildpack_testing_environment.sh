@@ -231,13 +231,11 @@ create-package \
    --destination "${COMPILED_BUILDPACK}" \
    --version "${VERSION}"
 
-set -x
 PACKAGE_FILE="${SOURCE_PATH}/package.toml"
 if [ -f "${PACKAGE_FILE}" ]; then
   cp "${PACKAGE_FILE}" "${COMPILED_BUILDPACK}/package.toml"
   printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${COMPILED_BUILDPACK}" "${OS}" >> "${COMPILED_BUILDPACK}/package.toml"
 fi
-set +x
 
 # create-package puts the buildpack here, we need to run from that directory
 cd "${COMPILED_BUILDPACK}"
