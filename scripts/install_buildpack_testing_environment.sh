@@ -124,8 +124,7 @@ pack config experimental true
 print::message_with_color "${GREEN}" "Installing go framework."
 curl -sSL "https://go.dev/dl/go1.23.0.linux-amd64.tar.gz" | tar -C ${BINARY_DIR} -xzv go
 sudo mkdir -p $HOME/bin/go
-sudo mv ${BINARY_DIR}/go $HOME/bin/go
-export PATH=$PATH:$HOME/bin/go/bin
+mv ${BINARY_DIR}/go $HOME/bin/go
 export GOPATH=$HOME/bin/go
 export PATH=$PATH:$GOPATH/bin
 go version
