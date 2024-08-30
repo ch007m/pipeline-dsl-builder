@@ -60,6 +60,7 @@ arch=$(util::tools::arch)
 echo "Git clone the paketo repositories ..."
 repos=(
   https://github.com/paketo-community/builder-ubi-base.git
+  https://github.com/paketo-community/builder-ubi-buildpackless-base.git
   https://github.com/paketo-community/ubi-base-stack.git
 )
 
@@ -88,7 +89,7 @@ echo "Checking pack ..."
 pack --version
 pack config experimental true
 
-echo "Test case: Build the ubi builder image using pack"
+echo "## Test case:: Build the ubi builder image using pack"
 cd builder-ubi-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
@@ -97,7 +98,16 @@ pack builder create builder \
   ${SOURCE_PATH}/builder.toml
 cd ..
 
-echo "Test case: Build the ubi base stack image"
+echo "## Test case:: Build the ubi buildpackless builder image using pack"
+cd builder-ubi-buildpackless-base
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+
+pack builder create builder \
+  --config \
+  ${SOURCE_PATH}/builder.toml
+cd ..
+
+echo "## Test case:: Build the ubi base stack image"
 cd ubi-base-stack
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
