@@ -254,7 +254,7 @@ pack -v buildpack package \
 cd ..
 
 print::colored_msg "${CYAN}" "Test case:: Build the Quarkus Buildpack image."
-cd cd ${BUILDPACK_TEST_DIR}/quarkus
+cd ${BUILDPACK_TEST_DIR}/quarkus
 
 # TODO: Grab the version from git tag/ref/etc and pass OS as env var
 VERSION="v0.1.0"
