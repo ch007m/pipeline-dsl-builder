@@ -190,7 +190,7 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
     --run-output "${STACK_DIR}/${OUTPUT_DIR}/run.oci"
   )
   echo "jam create-stack \"${args[@]}\""
-  jam create-stack "${args[@]}"
+  #jam create-stack "${args[@]}"
 done
 cd ..
 
