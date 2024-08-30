@@ -128,8 +128,10 @@ mkdir -p $HOME/bin/go
 mv ${BINARY_DIR}/go $HOME/bin
 chmod +x $HOME/bin/go
 
-export GOPATH=$HOME/bin/go
-export PATH=$PATH:$GOPATH/bin
+mkdir -p $HOME/workspace
+export GOPATH=$HOME/workspace
+export GOROOT=$HOME/bin/go
+export PATH=$PATH:$GOROOT/bin
 go version
 
 print::message_with_color "${GREEN}" "Installing libpak/create-package."
