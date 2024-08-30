@@ -30,6 +30,9 @@ pack config experimental true
 
 # Build the ubi builder image
 cd builder-ubi-base
+
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+
 pack builder create builder \
   --config \
   builder.toml
