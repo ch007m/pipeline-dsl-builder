@@ -2,7 +2,7 @@
 set -e
 #set -o verbose
 
-OUTPUT_DIR="./tmp"
+BINARY_DIR="./tmp"
 SOURCE_PATH="."
 BP_DIR=test-buildpack
 
@@ -51,7 +51,7 @@ curl_args=(
   "--fail"
   "--silent"
   "--location"
-  "--output" "${OUTPUT_DIR}/jam"
+  "--output" "${BINARY_DIR}/jam"
 )
 
 os=$(util::tools::os)
@@ -74,7 +74,7 @@ echo "Installing jam: ${JAM_VERSION}"
 
 curl "https://github.com/paketo-buildpacks/jam/releases/download/${JAM_VERSION}/jam-${os}-${arch}" \
   "${curl_args[@]}"
-chmod +x ${OUTPUT_DIR}/jam; sudo mv ${OUTPUT_DIR}/jam /usr/local/bin
+chmod +x ${BINARY_DIR}/jam; sudo mv ${BINARY_DIR}/jam /usr/local/bin
 jam version
 
 # Install Pack CLI
