@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 ######################
 ## Functions ##
@@ -77,14 +77,7 @@ SOURCE_PATH="."
 BP_DIR=test-buildpack
 
 rm -rf $BP_DIR
-mkdir -p $BP_DIR/tmp; cd $BP_DIR
-
-curl_args=(
-  "--fail"
-  "--silent"
-  "--location"
-  "--output" "${BINARY_DIR}/jam"
-)
+mkdir -p $BP_DIR/${BINARY_DIR}; cd $BP_DIR
 
 os=$(util::tools::os)
 arch=$(util::tools::arch)
@@ -94,6 +87,7 @@ repos=(
   https://github.com/paketo-community/builder-ubi-base.git
   https://github.com/paketo-community/builder-ubi-buildpackless-base.git
   https://github.com/paketo-community/ubi-base-stack.git
+  https://github.com/paketo-buildpacks/java.git
 )
 
 for repo in "${repos[@]}"
@@ -105,6 +99,12 @@ done
 JAM_VERSION="v2.7.3"
 print::message_with_color "${GREEN}" "Installing jam: ${JAM_VERSION}"
 
+curl_args=(
+  "--fail"
+  "--silent"
+  "--location"
+  "--output" "${BINARY_DIR}/jam"
+)
 curl "https://github.com/paketo-buildpacks/jam/releases/download/${JAM_VERSION}/jam-${os}-${arch}" \
   "${curl_args[@]}"
 chmod +x ${BINARY_DIR}/jam; sudo mv ${BINARY_DIR}/jam /usr/local/bin
@@ -114,12 +114,23 @@ jam version
 PACK_CLI_VERSION="v0.35.1"
 
 print::message_with_color "${GREEN}" "Installing pack: ${PACK_CLI_VERSION}"
-curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ./tmp --no-same-owner -xzv pack
-sudo mv tmp/pack /usr/local/bin
+curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ${BINARY_DIR} --no-same-owner -xzv pack
+sudo mv ${BINARY_DIR}/pack /usr/local/bin
 
 echo "Checking pack ..."
 pack --version
 pack config experimental true
+
+print::message_with_color "${GREEN}" "Installing go framework."
+curl -sSL "https://go.dev/dl/go1.23.0.linux-amd64.tar.gz" | tar -C ${BINARY_DIR} -xzv go
+sudo mkdir -p /usr/local/go
+sudo mv ${BINARY_DIR}/pack /usr/local/go
+export PATH=$PATH:/usr/local/bin/go/bin
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+
+print::message_with_color "${GREEN}" "Installing libpak/create-package."
+go install -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/create-package@latest
 
 print::message_with_color "${CYAN}" "Test case:: Build the ubi builder image using pack. "
 cd builder-ubi-base
@@ -177,4 +188,14 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   jam create-stack "${args[@]}"
 done
 cd ..
+
+print::message_with_color "${CYAN}" "Test case:: Build the java meta/composite buildpack image. "
+cd java
+
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+
+create-package \
+   --source "${SOURCE_PATH:-.}" \
+   --destination "${HOME}"/buildpack \
+   --version "${VERSION}"
 
