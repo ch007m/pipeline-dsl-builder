@@ -88,14 +88,14 @@ echo "Checking pack ..."
 pack --version
 pack config experimental true
 
-#echo "Test case: Build the ubi builder image using pack"
-#cd builder-ubi-base
-#export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
-#
-#pack builder create builder \
-#  --config \
-#  ${SOURCE_PATH}/builder.toml
-#cd ..
+echo "Test case: Build the ubi builder image using pack"
+cd builder-ubi-base
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+
+pack builder create builder \
+  --config \
+  ${SOURCE_PATH}/builder.toml
+cd ..
 
 echo "Test case: Build the ubi base stack image"
 cd ubi-base-stack
