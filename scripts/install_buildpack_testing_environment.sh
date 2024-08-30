@@ -245,6 +245,7 @@ cd "${COMPILED_BUILDPACK}"
 cat buildpack.toml
 cat package.toml
 
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 pack -v buildpack package \
   "${PACKAGE}:${VERSION}" \
   --config "${COMPILED_BUILDPACK}/package.toml" # --publish
