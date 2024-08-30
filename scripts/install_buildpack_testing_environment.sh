@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+set -o verbose
 
 OUTPUT_DIR="./tmp"
 TOML_DIR="."
@@ -81,7 +82,6 @@ jam version
 PACK_CLI_VERSION="v0.35.1"
 
 echo "Installing pack ..."
-set -x
 curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ./tmp --no-same-owner -xzv pack
 sudo mv tmp/pack /usr/local/bin
 
@@ -92,9 +92,7 @@ pack config experimental true
 echo "Test case: Build the ubi builder image using pack"
 cd builder-ubi-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
-echo "pack builder create builder \
-        --config \
-        builder.toml"
+
 pack builder create builder \
   --config \
   ${TOML_DIR}/builder.toml
@@ -107,7 +105,7 @@ args=(
   --build-output "${OCI_BUILD_DIR}/build.oci"
   --run-output "${OCI_BUILD_DIR}/run.oci"
 )
-echo "jam create-stack \"${args[@]}\""
+
 jam create-stack "${args[@]}"
 cd ..
 
