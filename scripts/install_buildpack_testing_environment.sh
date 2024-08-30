@@ -89,7 +89,7 @@ curl_args=(
 os=$(util::tools::os)
 arch=$(util::tools::arch)
 
-echo "Git clone the paketo repositories ..."
+print::message_with_color "${GREEN}" "Git clone the paketo repositories ..."
 repos=(
   https://github.com/paketo-community/builder-ubi-base.git
   https://github.com/paketo-community/builder-ubi-buildpackless-base.git
@@ -103,7 +103,7 @@ done
 
 # Install Jam CLI
 JAM_VERSION="v2.7.3"
-echo "Installing jam: ${JAM_VERSION}"
+print::message_with_color "${GREEN}" "Installing jam: ${JAM_VERSION}"
 
 curl "https://github.com/paketo-buildpacks/jam/releases/download/${JAM_VERSION}/jam-${os}-${arch}" \
   "${curl_args[@]}"
@@ -113,7 +113,7 @@ jam version
 # Install Pack CLI
 PACK_CLI_VERSION="v0.35.1"
 
-echo "Installing pack ..."
+print::message_with_color "${GREEN}" "Installing pack: ${PACK_CLI_VERSION}"
 curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ./tmp --no-same-owner -xzv pack
 sudo mv tmp/pack /usr/local/bin
 
@@ -121,7 +121,7 @@ echo "Checking pack ..."
 pack --version
 pack config experimental true
 
-print::message_with_color "${CYAN}" "## Test case:: Build the ubi builder image using pack. ##"
+print::message_with_color "${CYAN}" "Test case:: Build the ubi builder image using pack. "
 cd builder-ubi-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
@@ -130,7 +130,7 @@ pack builder create builder \
   ${SOURCE_PATH}/builder.toml
 cd ..
 
-print::message_with_color "${CYAN}" "## Test case:: Build the ubi buildpackless builder image using pack. ##"
+print::message_with_color "${CYAN}" "Test case:: Build the ubi buildpackless builder image using pack. "
 cd builder-ubi-buildpackless-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
@@ -139,7 +139,7 @@ pack builder create builder \
   ${SOURCE_PATH}/builder.toml
 cd ..
 
-print::message_with_color "${CYAN}" "## Test case:: Build the ubi base stack image. ##"
+print::message_with_color "${CYAN}" "Test case:: Build the ubi base stack image. "
 cd ubi-base-stack
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
