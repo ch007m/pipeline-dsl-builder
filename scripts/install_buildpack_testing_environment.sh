@@ -81,22 +81,22 @@ RESET='\033[0m' # Reset color to default
 BINARY_DIR="./tmp"
 BUILDPACK_DIR="buildpack"
 SOURCE_PATH="."
-BP_DIR=test-buildpack
+BUILDPACK_TEST_DIR="test-buildpack"
 ## TODO: To be defined as parameter
 PACKAGE="quay.io/ch007m"
 
 print::colored_msg "${GREEN}" "Clean up folders"
-rm -rf $BP_DIR
-rm -rf ./bin
-rm -rf $BINARY_DIR
-rm -rf $BUILDPACK_DIR
+rm -rf ${BUILDPACK_TEST_DIR}
+rm -rf $HOME/bin
+rm -rf ${BINARY_DIR}
+rm -rf ${BUILDPACK_DIR}
 
-mkdir -p $BP_DIR/${BINARY_DIR}
-mkdir -p $BINARY_DIR
-mkdir -p ./bin
-mkdir -p $BUILDPACK_DIR
+mkdir -p ${BUILDPACK_TEST_DIR}/${BINARY_DIR}
+mkdir -p ${BINARY_DIR}
+mkdir -p $HOME/bin
+mkdir -p ${BUILDPACK_DIR}
 
-cd $BP_DIR
+cd ${BUILDPACK_TEST_DIR}
 
 os=$(util::tools::os)
 arch=$(util::tools::arch)
@@ -254,7 +254,7 @@ pack -v buildpack package \
 cd ..
 
 print::colored_msg "${CYAN}" "Test case:: Build the Quarkus Buildpack image."
-cd quarkus
+cd cd ${BUILDPACK_TEST_DIR}/quarkus
 
 # TODO: Grab the version from git tag/ref/etc and pass OS as env var
 VERSION="v0.1.0"
@@ -273,11 +273,10 @@ print::colored_msg "${CYAN}" "Show buildpack.toml content for Quarkus buildpack"
 cat buildpack.toml
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
-
 pack -v buildpack package \
   "${PACKAGE}:${VERSION}" \
   --config "${COMPILED_BUILDPACK}/package.toml" # --publish
-cd ..
+
 
 
 
