@@ -107,6 +107,7 @@ repos=(
   https://github.com/paketo-community/builder-ubi-buildpackless-base.git
   https://github.com/paketo-community/ubi-base-stack.git
   https://github.com/paketo-buildpacks/java.git
+  https://github.com/paketo-buildpacks/quarkus.git
 )
 
 for repo in "${repos[@]}"
@@ -225,7 +226,6 @@ OS="linux"
 
 COMPILED_BUILDPACK="${HOME}/buildpack"
 
-mkdir "${SOURCE_PATH}"/buildpack
 create-package \
    --source "${SOURCE_PATH}" \
    --destination "${COMPILED_BUILDPACK}" \
@@ -247,6 +247,37 @@ print::colored_msg "${CYAN}" "Show buildpack.toml content for java buildpack"
 cat package.toml
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+
 pack -v buildpack package \
   "${PACKAGE}:${VERSION}" \
   --config "${COMPILED_BUILDPACK}/package.toml" # --publish
+cd ..
+
+print::colored_msg "${CYAN}" "Test case:: Build the Quarkus Buildpack image."
+cd quarkus
+
+# TODO: Grab the version from git tag/ref/etc and pass OS as env var
+VERSION="v0.1.0"
+OS="linux"
+
+COMPILED_BUILDPACK="${HOME}/buildpack"
+
+create-package \
+   --source "${SOURCE_PATH}" \
+   --destination "${COMPILED_BUILDPACK}" \
+   --version "${VERSION}"
+
+cd "${COMPILED_BUILDPACK}"
+
+print::colored_msg "${CYAN}" "Show buildpack.toml content for Quarkus buildpack"
+cat buildpack.toml
+
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+
+pack -v buildpack package \
+  "${PACKAGE}:${VERSION}" \
+  --config "${COMPILED_BUILDPACK}/package.toml" # --publish
+cd ..
+
+
+
