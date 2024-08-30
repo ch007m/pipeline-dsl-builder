@@ -63,6 +63,7 @@ function print::colored_msg() {
 
 function print::error() {
     local msg="$1"
+    local RED='\033[0;31m'
     echo -e "${RED}Error: ${msg}${RESET}" >&2
 }
 ######################
