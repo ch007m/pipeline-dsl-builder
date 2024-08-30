@@ -220,16 +220,17 @@ OS="linux"
 
 mkdir "${SOURCE_PATH}"/buildpack
 create-package \
-   --source "${SOURCE_PATH:-.}" \
+   --source "${SOURCE_PATH}" \
    --destination "${SOURCE_PATH}"/buildpack \
    --version "${VERSION}"
 
-PACKAGE_FILE="${SOURCE_PATH:-.}/package.toml"
-if [ -f "${SOURCE_PATH}/${PACKAGE_FILE}" ]; then
-  cp "${SOURCE_PATH}/${PACKAGE_FILE}" "${SOURCE_PATH}/buildpack/package.toml"
+PACKAGE_FILE="${SOURCE_PATH}/package.toml"
+if [ -f "${PACKAGE_FILE}" ]; then
+  cp "${PACKAGE_FILE}" "${SOURCE_PATH}/buildpack/package.toml"
   printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${SOURCE_PATH}/buildpack" "${OS}" >> "${SOURCE_PATH}/buildpack/package.toml"
 fi
 
-ls -la ${SOURCE_PATH}/buildpack
+#ls -la ${SOURCE_PATH}/buildpack
 cat ${SOURCE_PATH}/buildpack/buildpack.toml
+cat ${SOURCE_PATH}/buildpack/package.toml
 
