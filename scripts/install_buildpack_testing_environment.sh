@@ -210,7 +210,7 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   )
   echo "jam create-stack \"${args[@]}\""
   jam create-stack "${args[@]}" || echo "The command failed !!!!"
-  trap 'print::error "Command failed with exit code $? at line ${LINENO}"' ERR
+  trap 'print::error "Jam command failed with exit code $? at line ${LINENO}"' ERR
 done
 cd ..
 
