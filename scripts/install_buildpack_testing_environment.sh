@@ -209,6 +209,10 @@ export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 VERSION="v0.1.0"
 OS="linux"
 
+echo $PATH
+go env
+ls -la $HOME/workspace
+
 mkdir "${SOURCE_PATH}"/buildpack
 create-package \
    --source "${SOURCE_PATH:-.}" \
@@ -222,4 +226,5 @@ if [ -f "${PACKAGE_FILE}" ]; then
 fi
 
 ls -la ${SOURCE_PATH}/buildpack
+cat ${SOURCE_PATH}/buildpack/buildpack.toml
 
