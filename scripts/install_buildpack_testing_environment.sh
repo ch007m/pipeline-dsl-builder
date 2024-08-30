@@ -251,7 +251,6 @@ export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 pack -v buildpack package \
   "${PACKAGE}:${VERSION}" \
   --config "${COMPILED_BUILDPACK}/package.toml" # --publish
-cd ..
 
 print::colored_msg "${CYAN}" "Test case:: Build the Quarkus Buildpack image."
 cd ${BUILDPACK_TEST_DIR}/quarkus
@@ -274,8 +273,7 @@ cat buildpack.toml
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 pack -v buildpack package \
-  "${PACKAGE}:${VERSION}" \
-  --config "${COMPILED_BUILDPACK}/package.toml" # --publish
+  "${PACKAGE}:${VERSION}" # --publish
 
 
 
