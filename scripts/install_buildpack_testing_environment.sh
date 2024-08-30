@@ -100,7 +100,7 @@ cd ..
 echo "Test case: Build the ubi base stack image"
 cd ubi-base-stack
 
-echo ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
+cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   name=$(echo "$image" | jq -r '.name')
   config_dir=$(echo "$image" | jq -r '.config_dir')
   output_dir=$(echo "$image" | jq -r '.output_dir')
