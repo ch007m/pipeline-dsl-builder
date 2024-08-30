@@ -79,6 +79,7 @@ CYAN='\033[0;36m'
 RESET='\033[0m' # Reset color to default
 
 BINARY_DIR="./tmp"
+BUILDPACK_DIR="buildpack"
 SOURCE_PATH="."
 BP_DIR=test-buildpack
 ## TODO: To be defined as parameter
@@ -88,10 +89,12 @@ print::colored_msg "${GREEN}" "Clean up folders"
 rm -rf $BP_DIR
 rm -rf ./bin
 rm -rf $BINARY_DIR
+rm -rf $BUILDPACK_DIR
 
 mkdir -p $BP_DIR/${BINARY_DIR}
 mkdir -p $BINARY_DIR
 mkdir -p ./bin
+mkdir -p $BUILDPACK_DIR
 
 cd $BP_DIR
 
@@ -220,25 +223,28 @@ export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 VERSION="v0.1.0"
 OS="linux"
 
+COMPILED_BUILDPACK="${HOME}/buildpack"
+
 mkdir "${SOURCE_PATH}"/buildpack
 create-package \
    --source "${SOURCE_PATH}" \
-   --destination "${SOURCE_PATH}"/buildpack \
+   --destination "${COMPILED_BUILDPACK}" \
    --version "${VERSION}"
 
 set -x
 PACKAGE_FILE="${SOURCE_PATH}/package.toml"
 if [ -f "${PACKAGE_FILE}" ]; then
-  cp "${PACKAGE_FILE}" "${SOURCE_PATH}/buildpack/package.toml"
-  printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${SOURCE_PATH}/buildpack" "${OS}" >> "${SOURCE_PATH}/buildpack/package.toml"
+  cp "${PACKAGE_FILE}" "${COMPILED_BUILDPACK}/package.toml"
+  printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${COMPILED_BUILDPACK}" "${OS}" >> "${COMPILED_BUILDPACK}/package.toml"
 fi
 set +x
 
-cd ${SOURCE_PATH}/buildpack
+# create-package puts the buildpack here, we need to run from that directory
+cd "${COMPILED_BUILDPACK}"
 #ls -la ${SOURCE_PATH}/buildpack
 cat buildpack.toml
 cat package.toml
 
 pack -v buildpack package \
   "${PACKAGE}:${VERSION}" \
-  --config package.toml # --publish
+  --config "${COMPILED_BUILDPACK}/package.toml" # --publish
