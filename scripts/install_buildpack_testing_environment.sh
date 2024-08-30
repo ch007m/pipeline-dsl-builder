@@ -131,7 +131,7 @@ chmod +x $HOME/bin/go
 mkdir -p $HOME/workspace
 export GOPATH=$HOME/workspace
 export GOROOT=$HOME/bin/go
-export PATH=$PATH:$GOROOT/bin
+export PATH=$PATH:$GOROOT/bin:$GOPATH
 go version
 
 print::message_with_color "${GREEN}" "Installing libpak/create-package."
