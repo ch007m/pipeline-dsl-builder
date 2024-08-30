@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 set -e
-#set -o verbose
 
-BINARY_DIR="./tmp"
-SOURCE_PATH="."
-BP_DIR=test-buildpack
-
-rm -rf $BP_DIR
-mkdir -p $BP_DIR/tmp; cd $BP_DIR
+######################
+## Functions ##
+######################
 
 function util::tools::os() {
   case "$(uname)" in
@@ -46,6 +42,42 @@ function util::tools::arch() {
       exit 1
   esac
 }
+
+function print::message_with_color() {
+    local color="$1"
+    local message="$2"
+    local reset='\033[0m'
+
+    # Calculate the length of the message plus the extra decorations
+    local message_length=${#message}
+    local border_length=$((message_length + 6))
+
+    # Create the top and bottom border
+    local border=$(printf "%${border_length}s" | tr ' ' '#')
+
+    # Display the message with the color and borders
+    echo -e "${color}${border}"
+    echo -e "${color}## ${message} ##"
+    echo -e "${border}${reset}"
+}
+######################
+## Variables ##
+######################
+# Define colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+RESET='\033[0m' # Reset color to default
+
+BINARY_DIR="./tmp"
+SOURCE_PATH="."
+BP_DIR=test-buildpack
+
+rm -rf $BP_DIR
+mkdir -p $BP_DIR/tmp; cd $BP_DIR
 
 curl_args=(
   "--fail"
@@ -89,7 +121,7 @@ echo "Checking pack ..."
 pack --version
 pack config experimental true
 
-echo "## Test case:: Build the ubi builder image using pack"
+print::message_with_color "${CYAN}" "## Test case:: Build the ubi builder image using pack. ##"
 cd builder-ubi-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
@@ -98,7 +130,7 @@ pack builder create builder \
   ${SOURCE_PATH}/builder.toml
 cd ..
 
-echo "## Test case:: Build the ubi buildpackless builder image using pack"
+print::message_with_color "${CYAN}" "## Test case:: Build the ubi buildpackless builder image using pack. ##"
 cd builder-ubi-buildpackless-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
@@ -107,7 +139,7 @@ pack builder create builder \
   ${SOURCE_PATH}/builder.toml
 cd ..
 
-echo "## Test case:: Build the ubi base stack image"
+print::message_with_color "${CYAN}" "## Test case:: Build the ubi base stack image. ##"
 cd ubi-base-stack
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
