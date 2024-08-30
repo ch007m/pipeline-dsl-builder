@@ -125,7 +125,7 @@ print::message_with_color "${GREEN}" "Installing go framework."
 curl -sSL "https://go.dev/dl/go1.23.0.linux-amd64.tar.gz" | tar -C ${BINARY_DIR} -xzv go
 sudo chown -R $USER:$(id -g -n) ${BINARY_DIR}/go
 mkdir -p $HOME/bin/go
-mv ${BINARY_DIR}/go $HOME/bin/go
+mv ${BINARY_DIR}/go $HOME/bin
 chmod +x $HOME/bin/go
 
 export GOPATH=$HOME/bin/go
