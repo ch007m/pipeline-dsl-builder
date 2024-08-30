@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-set -o verbose
+#set -o verbose
 
 OUTPUT_DIR="./tmp"
 SOURCE_PATH="."
@@ -88,17 +88,19 @@ echo "Checking pack ..."
 pack --version
 pack config experimental true
 
-echo "Test case: Build the ubi builder image using pack"
-cd builder-ubi-base
-export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
-
-pack builder create builder \
-  --config \
-  ${SOURCE_PATH}/builder.toml
-cd ..
+#echo "Test case: Build the ubi builder image using pack"
+#cd builder-ubi-base
+#export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+#
+#pack builder create builder \
+#  --config \
+#  ${SOURCE_PATH}/builder.toml
+#cd ..
 
 echo "Test case: Build the ubi base stack image"
 cd ubi-base-stack
+
+set -x
 
 cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   name=$(echo "$image" | jq -r '.name')
