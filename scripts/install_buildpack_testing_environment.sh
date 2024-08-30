@@ -43,7 +43,7 @@ function util::tools::arch() {
   esac
 }
 
-function print::message_with_color() {
+function print::colored_msg() {
     local color="$1"
     local message="$2"
     local reset='\033[0m'
@@ -59,6 +59,11 @@ function print::message_with_color() {
     echo -e "${color}${border}"
     echo -e "${color}## ${message} ##"
     echo -e "${border}${reset}"
+}
+
+function print::error() {
+    local msg="$1"
+    echo -e "${RED}Error: ${msg}${RESET}" >&2
 }
 ######################
 ## Variables ##
@@ -82,7 +87,7 @@ mkdir -p $BP_DIR/${BINARY_DIR}; cd $BP_DIR
 os=$(util::tools::os)
 arch=$(util::tools::arch)
 
-print::message_with_color "${GREEN}" "Git clone the paketo repositories ..."
+print::colored_msg "${GREEN}" "Git clone the paketo repositories ..."
 repos=(
   https://github.com/paketo-community/builder-ubi-base.git
   https://github.com/paketo-community/builder-ubi-buildpackless-base.git
@@ -97,7 +102,7 @@ done
 
 # Install Jam CLI
 JAM_VERSION="v2.7.3"
-print::message_with_color "${GREEN}" "Installing jam: ${JAM_VERSION}"
+print::colored_msg "${GREEN}" "Installing jam: ${JAM_VERSION}"
 
 curl_args=(
   "--fail"
@@ -113,7 +118,7 @@ jam version
 # Install Pack CLI
 PACK_CLI_VERSION="v0.35.1"
 
-print::message_with_color "${GREEN}" "Installing pack: ${PACK_CLI_VERSION}"
+print::colored_msg "${GREEN}" "Installing pack: ${PACK_CLI_VERSION}"
 curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ${BINARY_DIR} --no-same-owner -xzv pack
 sudo mv ${BINARY_DIR}/pack /usr/local/bin
 
@@ -121,7 +126,7 @@ echo "Checking pack ..."
 pack --version
 pack config experimental true
 
-print::message_with_color "${GREEN}" "Installing go framework."
+print::colored_msg "${GREEN}" "Installing go framework."
 curl -sSL "https://go.dev/dl/go1.23.0.linux-amd64.tar.gz" | tar -C ${BINARY_DIR} -xzv go
 sudo chown -R $USER:$(id -g -n) ${BINARY_DIR}/go
 mkdir -p $HOME/bin/go
@@ -134,10 +139,10 @@ export GOROOT=$HOME/bin/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH
 go version
 
-print::message_with_color "${GREEN}" "Installing libpak/create-package."
+print::colored_msg "${GREEN}" "Installing libpak/create-package."
 go install -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/create-package@latest
 
-print::message_with_color "${CYAN}" "Test case:: Build the ubi builder image using pack. "
+print::colored_msg "${CYAN}" "Test case:: Build the ubi builder image using pack. "
 cd builder-ubi-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
@@ -146,7 +151,7 @@ pack builder create builder \
   ${SOURCE_PATH}/builder.toml
 cd ..
 
-print::message_with_color "${CYAN}" "Test case:: Build the ubi buildpackless builder image using pack. "
+print::colored_msg "${CYAN}" "Test case:: Build the ubi buildpackless builder image using pack. "
 cd builder-ubi-buildpackless-base
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
@@ -155,7 +160,7 @@ pack builder create builder \
   ${SOURCE_PATH}/builder.toml
 cd ..
 
-print::message_with_color "${CYAN}" "Test case:: Build the ubi base stack image. "
+print::colored_msg "${CYAN}" "Test case:: Build the ubi base stack image. "
 cd ubi-base-stack
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
@@ -191,10 +196,11 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   )
   echo "jam create-stack \"${args[@]}\""
   jam create-stack "${args[@]}" || echo "The command failed !!!!"
+  trap 'print::error "Command failed with exit code $? at line ${LINENO}"' ERR
 done
 cd ..
 
-print::message_with_color "${CYAN}" "Test case:: Build the java meta/composite buildpack image. "
+print::colored_msg "${CYAN}" "Test case:: Build the java meta/composite buildpack image. "
 cd java
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
