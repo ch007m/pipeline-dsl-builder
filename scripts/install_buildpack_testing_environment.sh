@@ -100,14 +100,13 @@ pack config experimental true
 echo "Test case: Build the ubi base stack image"
 cd ubi-base-stack
 
-set -x
-
 cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
-  name=$(echo "$image" | jq -r '.name')
-  config_dir=$(echo "$image" | jq -r '.config_dir')
-  output_dir=$(echo "$image" | jq -r '.output_dir')
-  build_image=$(echo "$image" | jq -r '.build_image')
-  run_image=$(echo "$image" | jq -r '.run_image')
+  NAME=$(echo "$image" | jq -r '.name')
+  CONFIG_DIR=$(echo "$image" | jq -r '.config_dir')
+  OUTPUT_DIR=$(echo "$image" | jq -r '.output_dir')
+  BUILD_IMAGE=$(echo "$image" | jq -r '.build_image')
+  RUN_IMAGE=$(echo "$image" | jq -r '.run_image')
+
   build_receipt_filename=$(echo "$image" | jq -r '.build_receipt_filename')
   run_receipt_filename=$(echo "$image" | jq -r '.run_receipt_filename')
 
@@ -115,8 +114,8 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   echo "Config Dir: ${CONFIG_DIR}"
   echo "Output Dir: ${OUTPUT_DIR}"
 
-  echo "Build Image: $build_image"
-  echo "Run Image: $run_image"
+  echo "Build Image: ${BUILD_IMAGE}"
+  echo "Run Image: ${RUN_IMAGE}"
 
   echo "Build Receipt Filename: $build_receipt_filename"
   echo "Run Receipt Filename: $run_receipt_filename"
