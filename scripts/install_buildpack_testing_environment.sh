@@ -239,8 +239,11 @@ fi
 
 # create-package puts the buildpack here, we need to run from that directory
 cd "${COMPILED_BUILDPACK}"
-#ls -la ${SOURCE_PATH}/buildpack
+
+print::colored_msg "${CYAN}" "Show buildpack.toml content for java buildpack"
 cat buildpack.toml
+
+print::colored_msg "${CYAN}" "Show buildpack.toml content for java buildpack"
 cat package.toml
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
