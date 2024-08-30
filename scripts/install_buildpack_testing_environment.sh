@@ -197,8 +197,21 @@ cd java
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
+# TODO: Grab the version from git tag/ref/etc and pass OS as env var
+VERSION="v0.1.0"
+OS="linux"
+
+mkdir "${SOURCE_PATH}"/buildpack
 create-package \
    --source "${SOURCE_PATH:-.}" \
-   --destination "${HOME}"/buildpack \
+   --destination "${SOURCE_PATH}"/buildpack \
    --version "${VERSION}"
+
+PACKAGE_FILE="${SOURCE_PATH:-.}/package.toml"
+if [ -f "${PACKAGE_FILE}" ]; then
+  cp "${PACKAGE_FILE}" "${SOURCE_PATH}/buildpack/package.toml"
+  printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${SOURCE_PATH}/buildpack" "${OS}" >> "${SOURCE_PATH}/buildpack/package.toml"
+fi
+
+ls -la ${SOURCE_PATH}/buildpack
 
