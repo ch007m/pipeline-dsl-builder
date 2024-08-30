@@ -226,11 +226,13 @@ create-package \
    --destination "${SOURCE_PATH}"/buildpack \
    --version "${VERSION}"
 
+set -x
 PACKAGE_FILE="${SOURCE_PATH}/package.toml"
 if [ -f "${PACKAGE_FILE}" ]; then
   cp "${PACKAGE_FILE}" "${SOURCE_PATH}/buildpack/package.toml"
   printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${SOURCE_PATH}/buildpack" "${OS}" >> "${SOURCE_PATH}/buildpack/package.toml"
 fi
+set +x
 
 cd ${SOURCE_PATH}/buildpack
 #ls -la ${SOURCE_PATH}/buildpack
