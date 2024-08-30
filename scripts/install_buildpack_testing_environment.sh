@@ -3,8 +3,7 @@ set -e
 set -o verbose
 
 OUTPUT_DIR="./tmp"
-TOML_DIR="."
-OCI_BUILD_DIR="./oci"
+SOURCE_PATH="."
 BP_DIR=test-buildpack
 
 rm -rf $BP_DIR
@@ -95,17 +94,42 @@ export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 
 pack builder create builder \
   --config \
-  ${TOML_DIR}/builder.toml
+  ${SOURCE_PATH}/builder.toml
 cd ..
 
 echo "Test case: Build the ubi base stack image"
 cd ubi-base-stack
-args=(
-  --config "${TOML_DIR}/stack.toml"
-  --build-output "${OCI_BUILD_DIR}/build.oci"
-  --run-output "${OCI_BUILD_DIR}/run.oci"
-)
 
-jam create-stack "${args[@]}"
+echo ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
+  name=$(echo "$image" | jq -r '.name')
+  config_dir=$(echo "$image" | jq -r '.config_dir')
+  output_dir=$(echo "$image" | jq -r '.output_dir')
+  build_image=$(echo "$image" | jq -r '.build_image')
+  run_image=$(echo "$image" | jq -r '.run_image')
+  build_receipt_filename=$(echo "$image" | jq -r '.build_receipt_filename')
+  run_receipt_filename=$(echo "$image" | jq -r '.run_receipt_filename')
+
+  echo "Name: ${NAME}"
+  echo "Config Dir: ${CONFIG_DIR}"
+  echo "Output Dir: ${OUTPUT_DIR}"
+
+  echo "Build Image: $build_image"
+  echo "Run Image: $run_image"
+
+  echo "Build Receipt Filename: $build_receipt_filename"
+  echo "Run Receipt Filename: $run_receipt_filename"
+  echo "----"
+
+  STACK_DIR=${SOURCE_PATH}/${CONFIG_DIR}
+  mkdir -p "${STACK_DIR}/${OUTPUT_DIR}"
+
+  args=(
+    --config "${STACK_DIR}/stack.toml"
+    --build-output "${STACK_DIR}/${OUTPUT_DIR}/build.oci"
+    --run-output "${STACK_DIR}/${OUTPUT_DIR}/run.oci"
+  )
+
+  jam create-stack "${args[@]}"
+done
 cd ..
 
