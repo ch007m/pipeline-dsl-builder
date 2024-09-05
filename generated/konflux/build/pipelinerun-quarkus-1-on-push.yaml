@@ -14,7 +14,7 @@ metadata:
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
     appstudio.openshift.io/application: "my-quarkus"
-    appstudio.openshift.io/component: "quarkus-1"
+    appstudio.openshift.io/component: "my-quarkus-app"
   name: "quarkus-1-on-push"
   namespace: "user-ns1"
 spec:
@@ -163,7 +163,7 @@ spec:
         workspace: "workspace"
       - name: "git-basic-auth"
         workspace: "git-auth"
-    - name: "jam"
+    - name: "build-container"
       params:
       - name: "JAM_VERSION"
         value: "v2.9.0"
@@ -213,38 +213,6 @@ spec:
             echo -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
             \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
             \n"
-    - name: "build-image-index"
-      params:
-      - name: "IMAGE"
-        value: "$(params.output-image)"
-      - name: "COMMIT_SHA"
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: "IMAGE_EXPIRES_AFTER"
-        value: "$(params.image-expires-after)"
-      - name: "ALWAYS_BUILD_INDEX"
-        value: "$(params.build-image-index)"
-      - name: "IMAGES"
-        value:
-        - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e"
-        - name: "name"
-          value: "build-image-index"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: "in"
-        values:
-        - "true"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "build-source-image"
       params:
       - name: "BINARY_IMAGE"

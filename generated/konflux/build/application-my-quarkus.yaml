@@ -1,0 +1,9 @@
+apiVersion: "appstudio.redhat.com/v1alpha1"
+kind: "Application"
+metadata:
+  annotations:
+    application.thumbnail: "10"
+  name: "my-quarkus"
+  namespace: "user-ns1"
+spec:
+  displayName: "my-quarkus"
