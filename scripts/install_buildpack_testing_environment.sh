@@ -300,6 +300,10 @@ create-package \
    --destination "${COMPILED_BUILDPACK}" \
    --version "${VERSION}"
 
+PACKAGE_FILE=${SOURCE_PATH:-.}/package.toml
+[[ -e ${PACKAGE_FILE} ]] && cp ${PACKAGE_FILE} "${COMPILED_BUILDPACK}/package.toml"
+printf '['extension']\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${COMPILED_BUILDPACK}" "${OS}" >> "${COMPILED_BUILDPACK}/package.toml"
+
 cd "${COMPILED_BUILDPACK}"
 
 print::colored_msg "${CYAN}" "Show extension.toml content for the ubi java extension"
