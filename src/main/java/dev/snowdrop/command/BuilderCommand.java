@@ -5,18 +5,15 @@ import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 
 import static dev.snowdrop.factory.konflux.builder.ComponentBuilder.createComponent;
 import static dev.snowdrop.factory.konflux.builder.ApplicationBuilder.createApplication;
-import static dev.snowdrop.service.FileUtilSvc.readFileFromResources;
 
 @TopCommand
 @Command(name = "builder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline(run)s")
@@ -30,8 +27,7 @@ public class BuilderCommand implements Runnable {
     @Option(names = {"-o", "--output-path"}, description = "The output path", required = true)
     String outputPath;
 
-    @Inject
-    ConfiguratorSvc configuratorSvc;
+    ConfiguratorSvc configuratorSvc = ConfiguratorSvc.getInstance();
 
     @Override
     public void run() {
@@ -39,7 +35,10 @@ public class BuilderCommand implements Runnable {
         logger.debug("#### Output path: {}", outputPath);
 
         // Parse and validate the user's configuration file
-        Configurator cfg = ConfiguratorSvc.LoadConfiguration(configuration);
+        Configurator cfg = configuratorSvc.loadConfiguration(configuration);
+
+        // Load the default Configuration according to the type
+        configuratorSvc.loadDefaultConfiguration(String.format("%s-default-pipeline.yaml",cfg.getType()));
 
         // Set the outputPath to the configurator object
         cfg.setOutputPath(outputPath);

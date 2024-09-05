@@ -22,7 +22,7 @@ public class BundlesSvc {
     }
 
     public void initBundlesFromDefaultCfg() {
-        ConfiguratorSvc configuratorSvc = new ConfiguratorSvc();
+        ConfiguratorSvc configuratorSvc = ConfiguratorSvc.getInstance();
         List<Bundle> defaultBundles = configuratorSvc.defaultConfigurator.getBundles();
         defaultBundles.forEach(b -> {
             addBundle(new Bundle(b.getRegistry(), b.getName(), b.getVersion(), b.getSha256()));

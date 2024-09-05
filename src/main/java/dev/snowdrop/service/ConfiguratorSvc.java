@@ -20,24 +20,29 @@ import static dev.snowdrop.service.FileUtilSvc.readFileFromResources;
 public class ConfiguratorSvc {
 
     private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
+    private static ConfiguratorSvc instance;
     public Configurator defaultConfigurator;
 
-    public ConfiguratorSvc() {
-        loadDefaultConfiguration();
+    public ConfiguratorSvc() {}
+
+    // Public method to provide the singleton instance
+    public static ConfiguratorSvc getInstance() {
+        if (instance == null) {
+            instance = new ConfiguratorSvc();
+        }
+        return instance;
     }
 
-    public void loadDefaultConfiguration() {
+    public void loadDefaultConfiguration(String cfgFileName) {
         if (defaultConfigurator == null) {
-            String resourcesConfigurationPath = "dev/snowdrop/configuration/konflux-default-pipeline.yaml";
-            String configYaml = readFileFromResources(resourcesConfigurationPath);
-            logger.info("#### Default configuration loaded: {}", resourcesConfigurationPath);
-            defaultConfigurator = ConfiguratorSvc.LoadConfiguration(configYaml);
+            String configYaml = readFileFromResources("dev/snowdrop/configuration/" + cfgFileName);
+            logger.info("#### Default configuration loaded: {}", "dev/snowdrop/configuration/" + cfgFileName);
+            defaultConfigurator = loadConfiguration(configYaml);
         }
     }
 
-    public static Configurator LoadConfiguration(String input) {
+    public Configurator loadConfiguration(String input) {
         Configurator configurator = new Configurator();
-
         try {
             configurator = loadYaml(input);
         } catch (Exception e) {
