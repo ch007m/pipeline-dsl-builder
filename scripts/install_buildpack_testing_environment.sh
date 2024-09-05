@@ -166,7 +166,8 @@ export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 go version
 
 print::colored_msg "${GREEN}" "Installing libpak/create-package."
-go install -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/create-package@latest
+#go install -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/create-package@latest
+go install -ldflags="-s -w" github.com/paketo-buildpacks/libpak/v2/cmd/create-package@latest
 
 print::colored_msg "${CYAN}" "Test case:: Build the ubi builder image using pack. "
 cd builder-ubi-base
