@@ -115,6 +115,7 @@ repos=(
   https://github.com/paketo-community/ubi-base-stack.git
   https://github.com/paketo-buildpacks/java.git
   https://github.com/paketo-buildpacks/quarkus.git
+  https://github.com/paketo-community/ubi-java-extension.git
 )
 
 for repo in "${repos[@]}"
@@ -274,12 +275,34 @@ create-package \
 
 cd "${COMPILED_BUILDPACK}"
 
-print::colored_msg "${CYAN}" "Show buildpack.toml content for Quarkus buildpack"
-cat buildpack.toml
-
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 pack -v buildpack package \
   "${PACKAGE}:${VERSION}" # --publish
+
+print::colored_msg "${CYAN}" "Test case:: Build the ubi java extension image."
+cd "${HOME}/${BUILDPACK_TEST_DIR}/ubi-java-extension"
+
+# TODO: Grab the version from git tag/ref/etc and pass OS as env var
+VERSION="v0.1.0"
+OS="linux"
+
+COMPILED_BUILDPACK="${HOME}/buildpack/ubi-java-extension"
+
+create-package \
+   --source "${SOURCE_PATH}" \
+   --destination "${COMPILED_BUILDPACK}" \
+   --version "${VERSION}"
+
+cd "${COMPILED_BUILDPACK}"
+
+print::colored_msg "${CYAN}" "Show extension.toml content for the ubi java extension"
+cat extension.toml
+
+export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+pack -v extension package \
+  "${PACKAGE}:${VERSION}" # --publish
+
+
 
 
 
