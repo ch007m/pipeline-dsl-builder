@@ -292,8 +292,8 @@ OS="linux"
 
 COMPILED_BUILDPACK="${HOME}/${EXTENSION_DIR}/ubi-java-extension"
 
-print::colored_msg "${YELLOW}" "Workaround: Rename the file extension.toml to buildpack.toml to create the package"
-cp ${SOURCE_PATH}/extension.toml ${SOURCE_PATH}/buildpack.toml
+#print::colored_msg "${YELLOW}" "Workaround: Rename the file extension.toml to buildpack.toml to create the package"
+#cp ${SOURCE_PATH}/extension.toml ${SOURCE_PATH}/buildpack.toml
 
 create-package \
    --source "${SOURCE_PATH}" \
