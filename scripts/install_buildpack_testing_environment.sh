@@ -62,10 +62,15 @@ function print::colored_msg() {
 }
 
 function print::error() {
-    local msg="$1"
     local RED='\033[0;31m'
-    echo -e "${RED}Error: ${msg}${RESET}" >&2
+    echo -e "${RED}Error occurred at line $2: Command ${BASH_COMMAND} failed with exit code: $1 !${RESET}" >&2
+    exit
 }
+
+function err() {
+  print::error $? $(caller) >&2
+}
+
 ######################
 ## Variables ##
 ######################
@@ -211,7 +216,7 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   )
   echo "jam create-stack \"${args[@]}\""
   jam create-stack "${args[@]}" || echo "The command failed !!!!"
-  trap 'print::error "Jam command failed with exit code $? at line ${LINENO}"' ERR
+  trap 'err $LINENO' ERR
 done
 cd ..
 
