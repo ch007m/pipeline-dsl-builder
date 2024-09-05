@@ -28,6 +28,10 @@ Log on to the registries:
 ```bash
 podman login -u ch007m@gmail.com -p xxxxxx docker.io
 ```
+Disable `setenforce` to avoid such an error reported during the build of the Dockerfile: https://github.com/containers/podman/issues/3234
+```bash
+sudo setenforce 0
+```
 Install or curl the installation bash script
 ```bash
 curl -sL -H 'Cache-Control: no-cache, no-store' \

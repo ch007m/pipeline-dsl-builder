@@ -103,7 +103,7 @@ mkdir -p ${BINARY_DIR}
 mkdir -p $HOME/bin
 mkdir -p ${BUILDPACK_DIR}
 
-cd ${BUILDPACK_TEST_DIR}
+cd $HOME/${BUILDPACK_TEST_DIR}
 
 os=$(util::tools::os)
 arch=$(util::tools::arch)
@@ -259,7 +259,7 @@ pack -v buildpack package \
   --config "${COMPILED_BUILDPACK}/package.toml" # --publish
 
 print::colored_msg "${CYAN}" "Test case:: Build the Quarkus Buildpack image."
-cd ${BUILDPACK_TEST_DIR}/quarkus
+cd "${HOME}/${BUILDPACK_TEST_DIR}/quarkus"
 
 # TODO: Grab the version from git tag/ref/etc and pass OS as env var
 VERSION="v0.1.0"
