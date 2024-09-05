@@ -308,7 +308,7 @@ cat extension.toml
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 pack -v extension package \
   "${PACKAGE}:${VERSION}" \
-  --config # --publish
+  --config "${COMPILED_BUILDPACK}/package.toml" # --publish
 
 
 
