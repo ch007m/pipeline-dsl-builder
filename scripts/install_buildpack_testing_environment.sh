@@ -87,6 +87,7 @@ RESET='\033[0m' # Reset color to default
 
 BINARY_DIR="./tmp"
 BUILDPACK_DIR="buildpack"
+EXTENSION_DIR="extension"
 SOURCE_PATH="."
 BUILDPACK_TEST_DIR="test-buildpack"
 ## TODO: To be defined as parameter
@@ -97,11 +98,13 @@ rm -rf ${BUILDPACK_TEST_DIR}
 rm -rf $HOME/bin
 rm -rf ${BINARY_DIR}
 rm -rf ${BUILDPACK_DIR}
+rm -rf ${EXTENSION_DIR}
 
 mkdir -p ${BUILDPACK_TEST_DIR}/${BINARY_DIR}
 mkdir -p ${BINARY_DIR}
 mkdir -p $HOME/bin
 mkdir -p ${BUILDPACK_DIR}
+mkdir -p ${EXTENSION_DIR}
 
 cd $HOME/${BUILDPACK_TEST_DIR}
 
@@ -286,7 +289,7 @@ cd "${HOME}/${BUILDPACK_TEST_DIR}/ubi-java-extension"
 VERSION="v0.1.0"
 OS="linux"
 
-COMPILED_BUILDPACK="${HOME}/buildpack/ubi-java-extension"
+COMPILED_BUILDPACK="${HOME}/${EXTENSION_DIR}/ubi-java-extension"
 
 create-package \
    --source "${SOURCE_PATH}" \
@@ -300,7 +303,8 @@ cat extension.toml
 
 export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 pack -v extension package \
-  "${PACKAGE}:${VERSION}" # --publish
+  "${PACKAGE}:${VERSION}" \
+  --config # --publish
 
 
 
