@@ -78,7 +78,7 @@ job:
     # Tasks
     - name: jam
       params:
-        - JAM_VERSION: "v2.7.3"
+        - JAM_VERSION: "v2.9.0"
 
       results:
         - IMAGE_URL: "Image repository where the built image was pushed"

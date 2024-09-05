@@ -166,7 +166,7 @@ spec:
     - name: "jam"
       params:
       - name: "JAM_VERSION"
-        value: "v2.7.3"
+        value: "v2.9.0"
       runAfter:
       - "prefetch-dependencies"
       taskSpec:

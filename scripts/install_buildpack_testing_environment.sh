@@ -116,7 +116,7 @@ do
 done
 
 # Install Jam CLI
-JAM_VERSION="v2.7.3"
+JAM_VERSION="v2.9.0"
 print::colored_msg "${GREEN}" "Installing jam: ${JAM_VERSION}"
 
 curl_args=(

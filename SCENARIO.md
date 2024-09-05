@@ -95,7 +95,7 @@ job:
     # Tasks
     - name: jam
       params:
-        - JAM_VERSION: "v2.7.3"
+        - JAM_VERSION: "v2.9.0"
 
       results:
         - IMAGE_URL: "Image repository where the built image was pushed"
@@ -392,7 +392,7 @@ spec:
     - name: "jam"
       params:
       - name: "JAM_VERSION"
-        value: "v2.7.3"
+        value: "v2.9.0"
       runAfter:
       - "prefetch-dependencies"
       taskSpec:
@@ -1885,7 +1885,7 @@ spec:
     - name: "jam"
       params:
       - name: "JAM_VERSION"
-        value: "v2.7.3"
+        value: "v2.9.0"
       runAfter:
       - "prefetch-dependencies"
       taskSpec:
