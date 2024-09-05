@@ -19,6 +19,8 @@ sudo subscription-manager list
 Provision the VM and start podman
 ```bash
 sudo yum install git curl wget jq podman
+sudo systemctl enable podman
+sudo systemctl start podman
 systemctl --user start podman.socket
 ls $XDG_RUNTIME_DIR/podman/podman.sock
 ```
