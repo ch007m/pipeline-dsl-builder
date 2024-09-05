@@ -238,12 +238,12 @@ create-package \
 
 PACKAGE_FILE="${SOURCE_PATH}/package.toml"
 if [ -f "${PACKAGE_FILE}" ]; then
-  cp "${PACKAGE_FILE}" "${COMPILED_BUILDPACK}/java/package.toml"
-  printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${COMPILED_BUILDPACK}/java" "${OS}" >> "${COMPILED_BUILDPACK}/java/package.toml"
+  cp "${PACKAGE_FILE}" "${COMPILED_BUILDPACK}/package.toml"
+  printf '[buildpack]\nuri = "%s"\n\n[platform]\nos = "%s"\n' "${COMPILED_BUILDPACK}" "${OS}" >> "${COMPILED_BUILDPACK}/package.toml"
 fi
 
 # create-package puts the buildpack here, we need to run from that directory
-cd "${COMPILED_BUILDPACK}/java"
+cd "${COMPILED_BUILDPACK}"
 
 print::colored_msg "${CYAN}" "Show buildpack.toml content for java buildpack"
 cat buildpack.toml
@@ -268,10 +268,10 @@ COMPILED_BUILDPACK="${HOME}/buildpack/quarkus"
 
 create-package \
    --source "${SOURCE_PATH}" \
-   --destination "${COMPILED_BUILDPACK}/quarkus" \
+   --destination "${COMPILED_BUILDPACK}" \
    --version "${VERSION}"
 
-cd "${COMPILED_BUILDPACK}/quarkus"
+cd "${COMPILED_BUILDPACK}"
 
 print::colored_msg "${CYAN}" "Show buildpack.toml content for Quarkus buildpack"
 cat buildpack.toml
