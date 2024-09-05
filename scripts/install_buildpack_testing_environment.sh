@@ -71,6 +71,8 @@ function err() {
   print::error $? $(caller) >&2
 }
 
+trap 'err $LINENO' ERR
+
 ######################
 ## Variables ##
 ######################
@@ -215,8 +217,7 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
     --run-output "${STACK_DIR}/${OUTPUT_DIR}/run.oci"
   )
   echo "jam create-stack \"${args[@]}\""
-  jam create-stack "${args[@]}" #|| echo "The command failed !!!!"
-  trap 'err $LINENO' ERR
+  jam create-stack "${args[@]}" || echo "The command failed but we continue ..."
 done
 cd ..
 
