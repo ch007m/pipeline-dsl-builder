@@ -7,11 +7,12 @@ import dev.snowdrop.factory.JobProvider;
 import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.*;
+import dev.snowdrop.service.ConfiguratorSvc;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1.*;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,8 +31,11 @@ import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
 public class Pipelines implements JobProvider {
 
-    //private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
+    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
     private static Type TYPE = null;
+
+    ConfiguratorSvc configuratorSvc = ConfiguratorSvc.getInstance();
+    List<PipelineTask> tasks = new ArrayList<>();
 
     @Override
     public HasMetadata generatePipeline(Configurator cfg) {
@@ -39,7 +43,6 @@ public class Pipelines implements JobProvider {
 
         PipelineTask aTask;
         List<Action> actions = cfg.getJob().getActions();
-        List<PipelineTask> tasks = new ArrayList<>();
         List<PipelineTask> finallyTasks = new ArrayList<>();
         List<Param> pipelineParams = new ArrayList<>();
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
@@ -166,20 +169,23 @@ public class Pipelines implements JobProvider {
         }
 
         /* TODO: Code to be reviewed to avoid hard code values
-        */
+         */
         tasks.stream()
             .filter(t ->
                 t.getName().equals("buildpacks-extension-phases") ||
-                t.getName().equals("buildpacks-phases") ||
-                t.getName().equals("jam") ||
-                t.getName().equals("pack"))
-            .map(t-> { t.setName("build-container"); return t;}).collect(Collectors.toList());
+                    t.getName().equals("buildpacks-phases") ||
+                    t.getName().equals("jam") ||
+                    t.getName().equals("pack"))
+            .map(t -> {
+                t.setName("build-container");
+                return t;
+            }).collect(Collectors.toList());
 
         // @formatter:off
         List<PipelineTask> pipelineTasks = new ArrayList<>();
-        pipelineTasks.add(INIT());
-        pipelineTasks.add(CLONE_REPOSITORY());
-        pipelineTasks.add(PREFETCH_DEPENDENCIES());
+        pipelineTasks.add(findTask("init"));
+        pipelineTasks.add(findTask("clone-repository"));  // CLONE_REPOSITORY());
+        pipelineTasks.add(findTask("prefetch-dependencies")); //PREFETCH_DEPENDENCIES());
         pipelineTasks.addAll(tasks);
         // To be reviewed to pass an array instead of just a task
         //pipelineTasks.add(tasks.get(0));
@@ -187,13 +193,13 @@ public class Pipelines implements JobProvider {
         // This task fails as it cannot be bind to the workspace: workspace
         // pipelineTasks.add(BUILD_IMAGE_INDEX());
 
-        pipelineTasks.add(BUILD_SOURCE_IMAGE());
-        pipelineTasks.add(DEPRECATED_BASE_IMAGE_CHECK());
-        pipelineTasks.add(CLAIR_SCAN());
-        pipelineTasks.add(ECOSYSTEM_CERT_PREFLIGHT_CHECKS());
-        pipelineTasks.add(SAST_SNYK_CHECK());
-        pipelineTasks.add(CLAMAV_SCAN());
-        pipelineTasks.add(SBOM_JSON_CHECK());
+        pipelineTasks.add(findTask("build-source-image")); // BUILD_SOURCE_IMAGE();
+        pipelineTasks.add(findTask("deprecated-image-check")); // DEPRECATED_BASE_IMAGE_CHECK());
+        pipelineTasks.add(findTask("clair-scan")); // CLAIR_SCAN());
+        pipelineTasks.add(findTask("ecosystem-cert-preflight-checks")); // ECOSYSTEM_CERT_PREFLIGHT_CHECKS());
+        pipelineTasks.add(findTask("sast-snyk-check")); // SAST_SNYK_CHECK());
+        pipelineTasks.add(findTask("clamav-scan")); // CLAMAV_SCAN());
+        pipelineTasks.add(findTask("sbom-json-check")); // SBOM_JSON_CHECK());
 
         PipelineRun pipeline = new PipelineRunBuilder()
                 .withNewMetadata()
@@ -217,5 +223,20 @@ public class Pipelines implements JobProvider {
 
         // TODO: Add like with Tekton a switch to handle: Pipeline vs PipelineRun
         return pipeline;
+    }
+
+    private PipelineTask findTask(String toSearch) {
+        Optional<PipelineTask> task = tasks.stream()
+            .filter(t -> toSearch.equals(t.getName()))  // Filter tasks with name to search
+            .findFirst();  // Get the first match (or empty if none found)
+
+        if (task.isPresent()) {
+            // Task with taskName to search found
+            return task.get();
+        } else {
+            logger.info("##### TODO: Add to the default config file the task: " + toSearch);
+            return null;
+            //throw new RuntimeException("Task not found: " + toSearch);
+        }
     }
 }

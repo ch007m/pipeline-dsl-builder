@@ -1,4 +1,8 @@
 type: konflux
+domain: configuration
+
+repository:
+  url: https://github.com/konflux-ci/build-definitions.git # dummy as we will be override using user's configuration
 
 # List of OCI bundles used part of a task within the Pipeline
 bundles:
@@ -18,8 +22,8 @@ bundles:
 
 job:
   resourceType: PipelineRun
-  name: default-buildpack
-  description: Default pipeline configuration to be used for buildpack's build tasks on konflux
+  name: default-konflux
+  description: Default konflux pipeline
 
   workspaces:
     - name: workspace
@@ -37,3 +41,133 @@ job:
 
     - CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
     - CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
+  
+  actions:
+    # Finally
+    - name: show-sbom
+      finally: true
+      params:
+        - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1
+
+    - name: show-summary
+      finally: true
+      params:
+        - pipelinerun-name: "$(context.pipelineRun.name)"
+        - git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+        - image-url: "$(params.output-image)"
+        - build-task-status: "$(tasks.build-container.status)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2
+      workspaces:
+        - name: workspace
+          workspace: workspace
+      
+    # Tasks
+    - name: init
+      params:
+        - image-url: "$(params.output-image)"
+        - rebuild: "$(params.rebuild)"
+        - skip-checks: "$(params.skip-checks)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-init:0.2
+
+    - name: git-clone # Konflux name is : clone-repository !!
+      runAfter: init
+      when:
+        - "$(tasks.init.results.build): true"
+      params:
+        - url: "$(params.git-url)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1
+      workspaces:
+        - name: output
+          workspace: workspace
+        - name: basic-auth
+          workspace: git-auth
+
+    - name: prefetch-dependencies
+      runAfter: clone-repository
+      when: # TODO: Do we support notin ?
+        - "$(params.prefetch-input): notin empty list"
+      params:
+        - input: "$(params.prefetch-input)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1
+      workspaces:
+        - name: source
+          workspace: workspace
+        - name: git-basic-auth
+          workspace: git-auth
+
+    - name: build-image-index
+      runAfter: build-container
+      when:
+        - "$(tasks.init.results.build): true"
+      params:
+        - IMAGE: "$(params.output-image)"
+        - COMMIT_SHA: "$(tasks.clone-repository.results.commit)"
+        - IMAGE_EXPIRES_AFTER: "$(params.image-expires-after)"
+        - ALWAYS_BUILD_INDEX: "$(params.build-image-index)"
+        - IMAGES:
+          - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1
+      workspaces:
+        - name: workspace
+          workspace: workspace
+
+    - name: source-build # Konflux name is : build-source-image !!
+      runAfter: build-container
+      when:
+        - "$(tasks.init.results.build): true"
+        - "$(params.build-source-image): true"
+      params:
+        - BINARY_IMAGE: "$(params.output-image)"
+        - BASE_IMAGES: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-source-build:0.1
+      workspaces:
+        - name: workspace
+          workspace: workspace
+
+    - name: clair-scan
+      runAfter: build-container
+      when:
+        - "$(params.skip-checks): false"
+      params:
+        - image-digest: "$(tasks.build-container.results.IMAGE_DIGEST)"
+        - image-url: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.1
+
+    - name: ecosystem-cert-preflight-checks
+      runAfter: build-container
+      when:
+        - "$(params.skip-checks): false"
+      params:
+        - image-url: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1
+
+    - name: sast-snyk-check
+      runAfter: build-container
+      when:
+        - "$(params.skip-checks): true"
+      params:
+        - image-digest: "$(tasks.build-container.results.IMAGE_DIGEST)"
+        - image-url: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check:0.2
+      workspaces:
+        - name: workspace
+          workspace: workspace
+
+    - name: clamav-scan
+      runAfter: build-container
+      when:
+        - "$(params.skip-checks): false"
+      params:
+        - image-digest: "$(tasks.build-container.results.IMAGE_DIGEST)"
+        - image-url: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1
+
+    - name: sbom-json-check
+      runAfter: build-container
+      when:
+        - "$(params.skip-checks): false"
+      params:
+        - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
+        - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1

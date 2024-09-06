@@ -36,12 +36,15 @@ public class BuilderCommand implements Runnable {
 
         // Parse and validate the user's configuration file
         Configurator cfg = configuratorSvc.loadConfiguration(configuration);
-
-        // Load the default Configuration according to the type
-        configuratorSvc.loadDefaultConfiguration(String.format("%s-default-pipeline.yaml",cfg.getType()));
-
         // Set the outputPath to the configurator object
         cfg.setOutputPath(outputPath);
+
+        // Create the default Pipeline using the configuration file loaded from the resources folder
+        // TODO: To be documented
+        configuratorSvc.loadDefaultConfiguration(cfg);
+        // Populate the default Pipeline
+        configuratorSvc.populateDefaultPipeline();
+
 
         if (cfg == null) {
             logger.error("Configuration file cannot be empty !");
