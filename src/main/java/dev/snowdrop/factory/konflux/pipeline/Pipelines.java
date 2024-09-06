@@ -183,17 +183,19 @@ public class Pipelines implements JobProvider {
                 return t;
             }).collect(Collectors.toList());
 
-        // If a default pipeline exists, then we will use it
-        // and insert the build tasks of the user
-        // The dummy task "build-container" is replaced with the user's tasks
+        /*
+           If a default pipeline exists, then we will merge it with the new pipeline to be created but where we will
+           remove from the default pipeline the dummy task "build-container" and insert the build tasks of the user
+        */
         List<PipelineTask> pipelineTasks = new ArrayList<>();
+
         if (configuratorSvc.defaultPipeline != null) {
             PipelineRun defaultPipelineRun = (PipelineRun) configuratorSvc.defaultPipeline;
             List<PipelineTask> defaultPipelineTasks = defaultPipelineRun.getSpec().getPipelineSpec().getTasks();
 
             int indexToSearch = findBuildContainerIndex(BUILD_TASK_NAME, defaultPipelineTasks);
 
-            if ( indexToSearch!= -1 ) {
+            if (indexToSearch != -1) {
                 // Split the original list into two parts: before and after the "build-container" task
                 List<PipelineTask> before = defaultPipelineTasks.subList(0, indexToSearch);
                 List<PipelineTask> after = defaultPipelineTasks.subList(indexToSearch + 1, defaultPipelineTasks.size());
@@ -205,18 +207,38 @@ public class Pipelines implements JobProvider {
                 throw new RuntimeException("No build-container task found in the default Pipeline !");
             }
 
+            // @formatter:off
+            return new PipelineRunBuilder()
+                .withNewMetadata()
+                   .withName(cfg.getJob().getName()) // User's job name
+                   .withLabels(defaultPipelineRun.getMetadata().getLabels()) // Default labels
+                   .withAnnotations(defaultPipelineRun.getMetadata().getAnnotations()) // Default annotations
+                   .withNamespace(cfg.getNamespace()) // User's namespace
+                .endMetadata()
+                .withNewSpec()
+                   .withWorkspaces(defaultPipelineRun.getSpec().getWorkspaces()) // Default workspaces
+                   .withParams(defaultPipelineRun.getSpec().getParams()) // Default params
+                   //.withTimeouts(populateTimeOut("1h0m0s"))
+                   .withNewPipelineSpec()
+                      .withResults(defaultPipelineRun.getSpec().getPipelineSpec().getResults())
+                      .withFinally(defaultPipelineRun.getSpec().getPipelineSpec().getFinally())
+                      .withTasks(pipelineTasks) // Default tasks where user's build tasks have been inserted
+                   .endPipelineSpec()
+                .endSpec()
+                .build();
+                // @formatter:on
         } else {
+            Configurator defaultCfg = configuratorSvc.defaultConfigurator;
+
             // Add all the tasks found from the default pipeline configuration
             pipelineTasks.addAll(tasks);
-        }
 
-        // @formatter:off
-        PipelineRun pipeline = new PipelineRunBuilder()
+            // @formatter:off
+            return new PipelineRunBuilder()
                 .withNewMetadata()
-                   .withName(cfg.getJob().getName())
-                   .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
-                   .withNamespace(cfg.getNamespace())
+                   .withName(defaultCfg.getJob().getName())
+                   .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(defaultCfg))
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(defaultCfg))
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(pipelineWorkspaces)
@@ -230,9 +252,7 @@ public class Pipelines implements JobProvider {
                 .endSpec()
                 .build();
                 // @formatter:on
-
-        // TODO: Add like with Tekton a switch to handle: Pipeline vs PipelineRun
-        return pipeline;
+        }
     }
 
     // Find the index of the "build-container" task in the list of the default pipeline
