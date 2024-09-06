@@ -32,13 +32,6 @@ job:
         - $(workspaces.source.path)/$(params.SOURCE_SUBPATH)/builder.toml
 
   actions:
-    # Tasks
-    #- name: virtualmachine
-    #  params:
-    #    - name: $(params.virtualMachineName)
-    #    - namespace: $(params.virtualMachineNamespace)
-    #  ref: url://https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/faba87980ecb7cbc35aa925d9c9d3562bba4f783/bundles/virtualmachine.yaml
-
     - name: pack
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
