@@ -61,8 +61,11 @@ job:
     - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
     - BASE_IMAGES_DIGESTS: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
 
-    - CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
-    - CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
+    - CHAINS-GIT_URL: "$(tasks.git-clone.results.url)"
+    - CHAINS-GIT_COMMIT: "$(tasks.git-clone.results.commit)"
+
+    #- CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
+    #- CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
   
   actions:
     # Finally
@@ -76,7 +79,8 @@ job:
       finally: true
       params:
         - pipelinerun-name: "$(context.pipelineRun.name)"
-        - git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+        - git-url: "$(tasks.git-clone.results.url)?rev=$(tasks.git-clone.results.commit)"
+        #- git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
         - image-url: "$(params.output-image)"
         - build-task-status: "$(tasks.build-container.status)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2
@@ -110,7 +114,7 @@ job:
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2
 
     - name: prefetch-dependencies
-      runAfter: clone-repository
+      runAfter: git-clone #clone-repository
       when: # TODO: Do we support notin ?
         - "$(params.prefetch-input): notin empty list"
       params:
@@ -128,7 +132,7 @@ job:
         - "$(tasks.init.results.build): true"
       params:
         - IMAGE: "$(params.output-image)"
-        - COMMIT_SHA: "$(tasks.clone-repository.results.commit)"
+        - COMMIT_SHA: "$(tasks.git-clone.results.commit)" # "$(tasks.clone-repository.results.commit)"
         - IMAGE_EXPIRES_AFTER: "$(params.image-expires-after)"
         - ALWAYS_BUILD_INDEX: "$(params.build-image-index)"
         - IMAGES:
