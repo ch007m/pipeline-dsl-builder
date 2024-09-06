@@ -36,15 +36,15 @@ public class BuilderCommand implements Runnable {
 
         // Parse and validate the user's configuration file
         Configurator cfg = configuratorSvc.loadConfiguration(configuration);
-        // Set the outputPath to the configurator object
+        // Set the outputPath (used to extract tasks from oci bundles, etc.) to the configurator object
         cfg.setOutputPath(outputPath);
 
-        // Create the default Pipeline using the configuration file loaded from the resources folder
-        // TODO: To be documented
+        // Load the default Pipeline configuration using the yaml file loaded from the resources folder
+        // TODO: To be documented & tested
         configuratorSvc.loadDefaultConfiguration(cfg);
-        // Populate the default Pipeline
+        // Populate the default Pipeline object that we will use
+        // as template tlo add the user's tasks, etc
         configuratorSvc.populateDefaultPipeline();
-
 
         if (cfg == null) {
             logger.error("Configuration file cannot be empty !");

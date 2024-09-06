@@ -20,12 +20,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.TektonResource.*;
 //import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
 //import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
-import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
+// import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
@@ -33,6 +34,7 @@ public class Pipelines implements JobProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
     private static Type TYPE = null;
+    private static final String BUILD_TASK_NAME = "build-container";
 
     ConfiguratorSvc configuratorSvc = ConfiguratorSvc.getInstance();
     List<PipelineTask> tasks = new ArrayList<>();
@@ -177,30 +179,38 @@ public class Pipelines implements JobProvider {
                     t.getName().equals("jam") ||
                     t.getName().equals("pack"))
             .map(t -> {
-                t.setName("build-container");
+                t.setName(BUILD_TASK_NAME);
                 return t;
             }).collect(Collectors.toList());
 
-        // @formatter:off
+        // If a default pipeline exists, then we will use it
+        // and insert the build tasks of the user
+        // The dummy task "build-container" is replaced with the user's tasks
         List<PipelineTask> pipelineTasks = new ArrayList<>();
-        pipelineTasks.add(findTask("init"));
-        pipelineTasks.add(findTask("clone-repository"));  // CLONE_REPOSITORY());
-        pipelineTasks.add(findTask("prefetch-dependencies")); //PREFETCH_DEPENDENCIES());
-        pipelineTasks.addAll(tasks);
-        // To be reviewed to pass an array instead of just a task
-        //pipelineTasks.add(tasks.get(0));
+        if (configuratorSvc.defaultPipeline != null) {
+            PipelineRun defaultPipelineRun = (PipelineRun) configuratorSvc.defaultPipeline;
+            List<PipelineTask> defaultPipelineTasks = defaultPipelineRun.getSpec().getPipelineSpec().getTasks();
 
-        // This task fails as it cannot be bind to the workspace: workspace
-        // pipelineTasks.add(BUILD_IMAGE_INDEX());
+            int indexToSearch = findBuildContainerIndex(BUILD_TASK_NAME, defaultPipelineTasks);
 
-        pipelineTasks.add(findTask("build-source-image")); // BUILD_SOURCE_IMAGE();
-        pipelineTasks.add(findTask("deprecated-image-check")); // DEPRECATED_BASE_IMAGE_CHECK());
-        pipelineTasks.add(findTask("clair-scan")); // CLAIR_SCAN());
-        pipelineTasks.add(findTask("ecosystem-cert-preflight-checks")); // ECOSYSTEM_CERT_PREFLIGHT_CHECKS());
-        pipelineTasks.add(findTask("sast-snyk-check")); // SAST_SNYK_CHECK());
-        pipelineTasks.add(findTask("clamav-scan")); // CLAMAV_SCAN());
-        pipelineTasks.add(findTask("sbom-json-check")); // SBOM_JSON_CHECK());
+            if ( indexToSearch!= -1 ) {
+                // Split the original list into two parts: before and after the "build-container" task
+                List<PipelineTask> before = defaultPipelineTasks.subList(0, indexToSearch);
+                List<PipelineTask> after = defaultPipelineTasks.subList(indexToSearch + 1, defaultPipelineTasks.size());
 
+                // Create a new list by merging before, new tasks, and after
+                pipelineTasks = Stream.concat(Stream.concat(before.stream(), tasks.stream()), after.stream())
+                    .collect(Collectors.toList());
+            } else {
+                throw new RuntimeException("No build-container task found in the default Pipeline !");
+            }
+
+        } else {
+            // Add all the tasks found from the default pipeline configuration
+            pipelineTasks.addAll(tasks);
+        }
+
+        // @formatter:off
         PipelineRun pipeline = new PipelineRunBuilder()
                 .withNewMetadata()
                    .withName(cfg.getJob().getName())
@@ -215,7 +225,7 @@ public class Pipelines implements JobProvider {
                    .withNewPipelineSpec()
                       .withResults(pipelineResults)
                       .withFinally(finallyTasks)
-                      .withTasks(pipelineTasks.toArray(new PipelineTask[0]))
+                      .withTasks(pipelineTasks)
                    .endPipelineSpec()
                 .endSpec()
                 .build();
@@ -225,18 +235,12 @@ public class Pipelines implements JobProvider {
         return pipeline;
     }
 
-    private PipelineTask findTask(String toSearch) {
-        Optional<PipelineTask> task = tasks.stream()
-            .filter(t -> toSearch.equals(t.getName()))  // Filter tasks with name to search
-            .findFirst();  // Get the first match (or empty if none found)
-
-        if (task.isPresent()) {
-            // Task with taskName to search found
-            return task.get();
-        } else {
-            logger.info("##### TODO: Add to the default config file the task: " + toSearch);
-            return null;
-            //throw new RuntimeException("Task not found: " + toSearch);
-        }
+    // Find the index of the "build-container" task in the list of the default pipeline
+    private int findBuildContainerIndex(String taskToSearch, List<PipelineTask> tasks) {
+        return IntStream.range(0, tasks.size())
+            .filter(i -> tasks.get(i).getName().equals(taskToSearch))
+            .findFirst()
+            .orElse(-1);  // If not found, returns -1
     }
+
 }

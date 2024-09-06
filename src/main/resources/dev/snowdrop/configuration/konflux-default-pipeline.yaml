@@ -19,6 +19,7 @@ bundles:
   - bundle://quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1@sha256:2c5de51ec858fc8d47e41c65b20c83fdac249425d67ed6d1058f9f3e0b574500
   - bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
   - bundle://quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1@sha256:5131cce0f93d0b728c7bcc0d6cee4c61d4c9f67c6d619c627e41e3c9775b497d
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2@sha256:5d0bd592a8924451b6472696e398fa719773f819df6e8e040cd2fb2b550e0e74
 
 job:
   resourceType: PipelineRun
@@ -82,6 +83,10 @@ job:
           workspace: workspace
         - name: basic-auth
           workspace: git-auth
+
+    - name: build-container # dummy task to be replaced with the user's tasks
+      runAfter: prefetch-dependencies
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2
 
     - name: prefetch-dependencies
       runAfter: clone-repository
