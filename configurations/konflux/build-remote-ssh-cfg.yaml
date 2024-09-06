@@ -1,17 +1,17 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: konflux
-domain: build
-namespace: cmoullia
+domain: remote-build
+namespace: cmoullia-tenant
 
 repository:
   url: https://github.com/paketo-community/builder-ubi-base
 
 # To generate the Application and/or Component CR
 application:
-  name: my-quarkus
+  name: buildpack-remote
   enable: false
 component:
-  name: my-quarkus-app
+  name: buildpack-remote
   enable: false
 
 job:
