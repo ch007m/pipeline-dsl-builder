@@ -27,6 +27,8 @@ import static dev.snowdrop.factory.TektonResource.*;
 //import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
 //import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 // import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
+import static dev.snowdrop.factory.konflux.pipeline.Annotations.generateAnnotations;
+import static dev.snowdrop.factory.konflux.pipeline.Labels.generateLabels;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
@@ -211,8 +213,8 @@ public class Pipelines implements JobProvider {
             return new PipelineRunBuilder()
                 .withNewMetadata()
                    .withName(cfg.getJob().getName()) // User's job name
-                   .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg)) // See TODO hereafter
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg)) // See TODO hereafter
+                   .withLabels(generateLabels(cfg)) // Calculate new labels using Application/Component name, domain, etc.
+                   .withAnnotations(generateAnnotations(cfg)) // Create the annotation build.appstudio.openshift.io/repo
                    .withNamespace(cfg.getNamespace()) // User's namespace
                 .endMetadata()
                 .withNewSpec()
@@ -237,9 +239,8 @@ public class Pipelines implements JobProvider {
             return new PipelineRunBuilder()
                 .withNewMetadata()
                    .withName(defaultCfg.getJob().getName())
-                    // TODO: To be reviewed as currently annotations/labels are not defined within the cfg file
-                   .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(defaultCfg))
-                   .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(defaultCfg))
+                   .withLabels(populateMap(defaultCfg.getJob().getLabels()))
+                   .withAnnotations(populateMap(defaultCfg.getJob().getAnnotations()))
                 .endMetadata()
                 .withNewSpec()
                    .withWorkspaces(pipelineWorkspaces)

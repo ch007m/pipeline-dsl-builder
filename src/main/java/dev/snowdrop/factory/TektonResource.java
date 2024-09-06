@@ -297,6 +297,14 @@ public class TektonResource {
         return paramList;
     }
 
+    public static Map<String, String> populateMap(List<Map<String, String>> list) {
+        Map<String, String> newMap = new HashMap<>();
+        for (Map<String, String> hash : list) {
+            hash.forEach((key, val) -> { newMap.put(key,val);});
+        }
+        return newMap;
+    }
+
     public static List<PipelineResult> populatePipelineResults(List<Map<String, String>> results) {
         List<PipelineResult> pipelineResultList = new ArrayList<>();
 

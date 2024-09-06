@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 public class Labels implements LabelsProvider {
 
+   @Deprecated
    public static Map<String, String> KONFLUX_PIPELINE_LABELS() {
       Map<String, String> labels = Map.of(
          "pipelines.openshift.io/used-by", "build-cloud",
@@ -18,6 +19,24 @@ public class Labels implements LabelsProvider {
           "appstudio.openshift.io/application", "my-quarkus",
           "appstudio.openshift.io/component", "quarkus-1",
           "pipelines.appstudio.openshift.io/type", "build"
+      );
+
+      return labels.entrySet()
+          .stream()
+          .sorted(Map.Entry.comparingByValue()) // Sort by value
+          .collect(Collectors.toMap(
+              Map.Entry::getKey,
+              Map.Entry::getValue,
+              (oldValue, newValue) -> oldValue,
+              LinkedHashMap::new  // Use LinkedHashMap to maintain insertion order
+          ));
+   }
+
+   public static Map<String, String> generateLabels(Configurator cfg) {
+      Map<String, String> labels = Map.of(
+          "pipelines.openshift.io/strategy", cfg.getDomain(),
+          "appstudio.openshift.io/application", cfg.getApplication() != null && cfg.getApplication().getName() != null ? cfg.getApplication().getName() : cfg.getJob().getName(),
+          "appstudio.openshift.io/component", cfg.getComponent() != null && cfg.getComponent().getName() != null ? cfg.getComponent().getName() : cfg.getJob().getName()
       );
 
       return labels.entrySet()

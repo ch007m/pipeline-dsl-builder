@@ -28,4 +28,10 @@ public class Annotations implements AnnotationsProvider {
               LinkedHashMap::new  // Use LinkedHashMap to maintain insertion order
           ));
    }
+
+   public static Map<String, String> generateAnnotations(Configurator cfg) {
+      return Map.of(
+          "build.appstudio.openshift.io/repo",cfg.getRepository().getUrl() + "?rev={{revision}}"
+      );
+   }
 }

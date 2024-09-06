@@ -15,6 +15,8 @@ public class Job {
    @JsonProperty(required = true)
    private String name;
    private String description;
+   private List<Map<String, String>> annotations;
+   private List<Map<String, String>> labels;
 
    @JsonSetter(nulls = Nulls.SKIP)
    private String resourceType = DEFAULT_RESOURCE_TYPE;
