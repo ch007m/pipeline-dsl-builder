@@ -213,8 +213,20 @@ public class Pipelines implements JobProvider {
             return new PipelineRunBuilder()
                 .withNewMetadata()
                    .withName(cfg.getJob().getName()) // User's job name
-                   .withLabels(generateLabels(cfg)) // Calculate new labels using Application/Component name, domain, etc.
-                   .withAnnotations(generateAnnotations(cfg)) // Create the annotation build.appstudio.openshift.io/repo
+                   .addToLabels(
+                       Stream.concat(defaultPipelineRun.getMetadata().getLabels().entrySet().stream(),generateLabels(cfg).entrySet().stream())
+                         .collect(Collectors.toMap(
+                             Map.Entry::getKey,               // Key mapper
+                             Map.Entry::getValue,             // Value mapper
+                             (v1, v2) -> v1 + v2))
+                   ) // Merge calculated new labels (based on Application/Component name, domain, etc.) with defaults
+                   .addToAnnotations(
+                       Stream.concat(defaultPipelineRun.getMetadata().getAnnotations().entrySet().stream(),generateAnnotations(cfg).entrySet().stream())
+                           .collect(Collectors.toMap(
+                               Map.Entry::getKey,               // Key mapper
+                               Map.Entry::getValue,             // Value mapper
+                               (v1, v2) -> v1 + v2))
+                   ) // Merge calculated new annotation generated: build.appstudio.openshift.io/repo with defaults
                    .withNamespace(cfg.getNamespace()) // User's namespace
                 .endMetadata()
                 .withNewSpec()
