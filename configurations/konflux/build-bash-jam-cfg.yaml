@@ -19,33 +19,8 @@ job:
   resourceType: PipelineRun
   name: quarkus-1-on-push
   description: PipelineRun performing a build of a Quarkus application using a bash script
-
-  workspaces:
-  - name: workspace
-    volumeClaimTemplate:
-      storage: 1Gi
-      accessMode: ReadWriteOnce
-  - name: git-auth
-    secret:
-      name: "{{ git_auth_secret }}"
-
-  results:
-    - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
-    - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
-    - BASE_IMAGES_DIGESTS: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
-    - CHAINS-GIT_URL: "$(tasks.clone-repository.results.url)"
-    - CHAINS-GIT_COMMIT: "$(tasks.clone-repository.results.commit)"
   
   params:
-    - git-url: "{{source_url}}"
-    - revision: "{{revision}}"
-    - output-image: "quay.io/ch007m/user-ns1/my-quarkus/quarkus-1:{{revision}}"
-    - image-expires-after: "5d"
-    - build-image-index: ""
-    # We need the following parameters when defined part of the PipelineSpec with default value and used by a task
-    - build-source-image: false
-    - prefetch-input: ""
-
     # Buildpack params
     - source-dir: "source"
     - imageUrl: "buildpacksio/pack"
@@ -59,22 +34,6 @@ job:
        - quarkus-hello:1.0
 
   actions:
-    # Finally
-    - name: show-sbom
-      finally: true
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
-      params:
-        - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
-          
-    - name: summary # Konflux uses as name show-summary !!
-      finally: true
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
-      params:
-        - pipelinerun-name: "$(context.pipelineRun.name)"
-        - git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
-        - image-url: "$(params.output-image)"
-        - build-task-status: "$(tasks.build-container.status)"
-
     # Tasks
     - name: jam
       params:
