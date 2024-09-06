@@ -211,8 +211,8 @@ public class Pipelines implements JobProvider {
             return new PipelineRunBuilder()
                 .withNewMetadata()
                    .withName(cfg.getJob().getName()) // User's job name
-                   .withLabels(defaultPipelineRun.getMetadata().getLabels()) // Default labels
-                   .withAnnotations(defaultPipelineRun.getMetadata().getAnnotations()) // Default annotations
+                   .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg)) // See TODO hereafter
+                   .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg)) // See TODO hereafter
                    .withNamespace(cfg.getNamespace()) // User's namespace
                 .endMetadata()
                 .withNewSpec()
@@ -237,6 +237,7 @@ public class Pipelines implements JobProvider {
             return new PipelineRunBuilder()
                 .withNewMetadata()
                    .withName(defaultCfg.getJob().getName())
+                    // TODO: To be reviewed as currently annotations/labels are not defined within the cfg file
                    .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(defaultCfg))
                    .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(defaultCfg))
                 .endMetadata()
