@@ -16,7 +16,7 @@ component:
 
 job:
   resourceType: PipelineRun
-  name: pack-build-builder-image-remote
+  name: buildpack-remote
   description: PipelineRun using the pack cli to build the builder image remotely
 
   params:
@@ -36,7 +36,7 @@ job:
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_VERSION: "v0.35.1"
-        - DOCKER_HOST: $(tasks.virtualmachine.results.ip)
+        #- DOCKER_HOST: $(tasks.virtualmachine.results.ip)
         #- PACK_CMD_FLAGS:
         #    - "$(params.packCmdBuilderFlags)"
       workspaces:
@@ -60,8 +60,8 @@ job:
         pack --version
         pack config experimental true
 
-        export DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376
-        echo "DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376"
+        #export DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376
+        #echo "DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376"
 
         # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
         echo "Getting the arguments ..."
