@@ -40,6 +40,7 @@ public class ConfiguratorSvc {
         return instance;
     }
 
+    // TODO: To be reviewed as code will fail when there is no default config file, which is certainly an option
     public void loadDefaultConfiguration(Configurator cfg) {
         if (defaultConfigurator == null) {
             String cfgFileName = String.format("%s-default-pipeline.yaml",cfg.getType());

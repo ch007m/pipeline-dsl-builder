@@ -40,7 +40,7 @@ public class BuilderCommand implements Runnable {
         cfg.setOutputPath(outputPath);
 
         // Load the default Pipeline configuration using the yaml file loaded from the resources folder
-        // TODO: To be documented & tested
+        // TODO: To be documented, reviewed & tested
         configuratorSvc.loadDefaultConfiguration(cfg);
         // Populate the default Pipeline object that we will use
         // as template tlo add the user's tasks, etc
