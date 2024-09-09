@@ -82,4 +82,45 @@ public class JacksonYamlTests {
         assertEquals(yamlStr, result);
     }
 
+    @Test
+    public void checkYAMLBlockLiteral() throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper(
+            new YAMLFactory()
+                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)  // Disable "---"
+                .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)      // Use block style for multi-line strings
+        );
+
+        String bashScript = """
+            #!/usr/bin/env bash
+            set -e
+            mkdir -p ~/.ssh
+            if [ -e "/ssh/error" ]; then
+              #no server could be provisioned
+              cat /ssh/error
+              exit 1
+            fi
+            export SSH_HOST=$(cat /ssh/host)
+            cp /ssh/id_rsa ~/.ssh
+            chmod 0400 ~/.ssh/id_rsa"
+            """;
+
+        MyScript script = new MyScript();
+        script.setScript(bashScript);
+
+        String yamlOutput = mapper.writeValueAsString(script);
+        System.out.println(yamlOutput);
+    }
+}
+
+class MyScript {
+    private String script;
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
+    }
 }
