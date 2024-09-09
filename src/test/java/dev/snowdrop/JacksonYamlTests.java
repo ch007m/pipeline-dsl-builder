@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JacksonYamlTests {
+
+    Action myAction;
+
     @Test
     public void fromYamlToObject() throws JsonProcessingException {
         String yamlStr = """
@@ -84,7 +87,7 @@ public class JacksonYamlTests {
     }
 
     @Test
-    public void checkYAMLBlockLiteral() throws JsonProcessingException {
+    public void checkScriptTextBlock_YAMLRendering() throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper(
             new YAMLFactory()
@@ -128,13 +131,14 @@ public class JacksonYamlTests {
             finally: false
             """;
 
-        Action myAction = new Action();
+        myAction = new Action();
+        myAction.setId(1);
         myAction.setScript(bashScript);
         assertEquals(expectedYaml,mapper.writeValueAsString(myAction));
     }
 
     @Test
-    public void checkYAMLScriptWithCarriageReturn() throws JsonProcessingException {
+    public void checkScriptWithCRMultiLines_YAMLRendering() throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper(
             new YAMLFactory()
@@ -152,7 +156,7 @@ public class JacksonYamlTests {
             "fi\n";
 
         String expectedYaml = """
-            id: 2
+            id: 1
             name: null
             ref: null
             script: |
@@ -176,7 +180,50 @@ public class JacksonYamlTests {
             finally: false
             """;
 
-        Action myAction = new Action();
+        myAction = new Action();
+        myAction.setId(1);
+        myAction.setScript(bashScript);
+        assertEquals(expectedYaml,mapper.writeValueAsString(myAction));
+    }
+
+    @Test
+    public void checkOneLineScriptWithCR_YAMLRendering() throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper(
+            new YAMLFactory()
+                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)  // Disable "---"
+                .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)      // Use block style for multi-line strings
+        );
+
+        String bashScript = "#!/usr/bin/env bash\nset -e\nmkdir -p ~/.ssh\nif [ -e \"/ssh/error\" ]; then\n  #no server could be provisioned\n  cat /ssh/error\n  exit 1\nfi\n";
+
+        String expectedYaml = """
+            id: 1
+            name: null
+            ref: null
+            script: |
+              #!/usr/bin/env bash
+              set -e
+              mkdir -p ~/.ssh
+              if [ -e "/ssh/error" ]; then
+                #no server could be provisioned
+                cat /ssh/error
+                exit 1
+              fi
+            scriptFileUrl: null
+            runAfter: null
+            image: null
+            params: null
+            workspaces: null
+            volumes: null
+            args: null
+            when: null
+            results: null
+            finally: false
+            """;
+
+        myAction = new Action();
+        myAction.setId(1);
         myAction.setScript(bashScript);
         assertEquals(expectedYaml,mapper.writeValueAsString(myAction));
     }
