@@ -216,6 +216,9 @@ cat ${SOURCE_PATH}/images.json | jq -c '.images[]' | while read -r image; do
   STACK_DIR=${SOURCE_PATH}/${CONFIG_DIR}
   mkdir -p "${STACK_DIR}/${OUTPUT_DIR}"
 
+  # Copy the images.json file to the stack folder otherwise docker build will fail:
+  ${SOURCE_PATH}/images.json ${STACK_DIR}
+
   args=(
     --config "${STACK_DIR}/stack.toml"
     --build-output "${STACK_DIR}/${OUTPUT_DIR}/build.oci"
