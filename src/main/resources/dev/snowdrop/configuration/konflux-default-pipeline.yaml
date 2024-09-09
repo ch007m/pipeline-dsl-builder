@@ -26,6 +26,8 @@ job:
   name: default-konflux
   description: Default konflux pipeline
 
+  timeout: "0h5m0s"
+
   annotations:
     - "build.appstudio.redhat.com/commit_sha": "{{revision}}"
     - "build.appstudio.redhat.com/target_branch": "{{target_branch}}"

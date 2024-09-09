@@ -234,7 +234,7 @@ public class Pipelines implements JobProvider {
                        Stream.concat(defaultPipelineRun.getSpec().getParams().stream(), pipelineParams.stream())
                            .collect(Collectors.toList())
                    ) // Merge default params with user's parameters
-                   //.withTimeouts(populateTimeOut("1h0m0s"))
+                   .withTimeouts(defaultPipelineRun.getSpec().getTimeouts()) // Default timeout
                    .withNewPipelineSpec()
                       .withResults(defaultPipelineRun.getSpec().getPipelineSpec().getResults())
                       .withFinally(defaultPipelineRun.getSpec().getPipelineSpec().getFinally())
@@ -259,7 +259,7 @@ public class Pipelines implements JobProvider {
                 .withNewSpec()
                    .withWorkspaces(pipelineWorkspaces)
                    .withParams(pipelineParams)
-                   .withTimeouts(populateTimeOut("1h0m0s"))
+                   .withTimeouts(populateTimeOut(defaultCfg.getJob().getTimeout()))
                    .withNewPipelineSpec()
                       .withResults(pipelineResults)
                       .withFinally(finallyTasks)
