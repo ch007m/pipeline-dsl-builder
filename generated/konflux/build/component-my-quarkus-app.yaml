@@ -1,0 +1,17 @@
+apiVersion: "appstudio.redhat.com/v1alpha1"
+kind: "Component"
+metadata:
+  annotations:
+    build.appstudio.openshift.io/request: "configure-pac"
+    image.redhat.com/generate: "{\"visibility\":\"public\"}"
+  name: "my-quarkus-app"
+  namespace: "user-ns1"
+spec:
+  application: "my-quarkus"
+  componentName: "my-quarkus-app"
+  source:
+    git:
+      context: "."
+      dockerfileUrl: "src/main/docker/Dockerfile.jvm"
+      revision: "main"
+      url: "https://github.com/ch007m/new-quarkus-app-1"
