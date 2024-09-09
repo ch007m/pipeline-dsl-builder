@@ -9,8 +9,6 @@ import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Repository;
 import dev.snowdrop.model.konflux.Application;
 import dev.snowdrop.model.konflux.Component;
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -127,13 +125,59 @@ public class JacksonYamlTests {
             args: null
             when: null
             results: null
-            finally: false  
+            finally: false
             """;
 
         Action myAction = new Action();
         myAction.setScript(bashScript);
+        assertEquals(expectedYaml,mapper.writeValueAsString(myAction));
+    }
 
-        String yamlOutput = mapper.writeValueAsString(myAction);
-        assertEquals(expectedYaml,yamlOutput);
+    @Test
+    public void checkYAMLScriptWithCarriageReturn() throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper(
+            new YAMLFactory()
+                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)  // Disable "---"
+                .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)      // Use block style for multi-line strings
+        );
+
+        String bashScript = "#!/usr/bin/env bash\n" +
+            "set -e\n" +
+            "mkdir -p ~/.ssh\n" +
+            "if [ -e \"/ssh/error\" ]; then\n" +
+            "  #no server could be provisioned\n" +
+            "  cat /ssh/error\n" +
+            "  exit 1\n" +
+            "fi\n";
+
+        String expectedYaml = """
+            id: 2
+            name: null
+            ref: null
+            script: |
+              #!/usr/bin/env bash
+              set -e
+              mkdir -p ~/.ssh
+              if [ -e "/ssh/error" ]; then
+                #no server could be provisioned
+                cat /ssh/error
+                exit 1
+              fi
+            scriptFileUrl: null
+            runAfter: null
+            image: null
+            params: null
+            workspaces: null
+            volumes: null
+            args: null
+            when: null
+            results: null
+            finally: false
+            """;
+
+        Action myAction = new Action();
+        myAction.setScript(bashScript);
+        assertEquals(expectedYaml,mapper.writeValueAsString(myAction));
     }
 }
