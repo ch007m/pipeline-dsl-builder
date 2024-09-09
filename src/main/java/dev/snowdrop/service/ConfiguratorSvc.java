@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 
+import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.*;
 import static dev.snowdrop.service.FileUtilSvc.readFileFromResources;
 
 @ApplicationScoped
@@ -102,8 +103,9 @@ public class ConfiguratorSvc {
             // Convert the resource to YAML
             ObjectMapper mapper = new ObjectMapper(
                 new YAMLFactory()
-                    .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-                    .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
+                    .disable(WRITE_DOC_START_MARKER)
+                    .disable(SPLIT_LINES)
+                    .enable(LITERAL_BLOCK_STYLE)
             );
             mapper.writeValue(pathToYaml.toFile(), resource);
 
