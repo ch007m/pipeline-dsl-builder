@@ -19,6 +19,11 @@ job:
   name: buildpack-remote
   description: PipelineRun using the pack cli to build the builder image remotely
 
+  workspaces:
+    - name: ssh
+      volumeSources:
+      - secret: multi-platform-ssh-$(context.taskRun.name)
+
   params:
     # Buildpack params
     - source-dir: "source"
@@ -29,19 +34,26 @@ job:
         - create
         - builder
         - --config
-        - $(workspaces.source.path)/$(params.SOURCE_SUBPATH)/builder.toml
+        - $(workspaces.source.path)/builder.toml
 
   actions:
     - name: pack
+      runAfter: prefetch-dependencies # TODO: IS there a better way to set such a value : default or not
+      image: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_VERSION: "v0.35.1"
+        - DOCKER_HOST: ""
+        - SOURCE_SUBPATH: "."
         #- DOCKER_HOST: $(tasks.virtualmachine.results.ip)
         #- PACK_CMD_FLAGS:
         #    - "$(params.packCmdBuilderFlags)"
       workspaces:
         - name: source
           workspace: workspace
+        - name: ssh
+          workspace: ssh
+
       results:
         - IMAGE_URL: "Image repository where the built image was pushed"
         - IMAGE_DIGEST: "Digest of the image just built"
@@ -49,9 +61,18 @@ job:
 
       args:
         - "$(params.packCmdBuilderFlags)"
+
       script: |
         #!/usr/bin/env bash
         set -e
+        mkdir -p ~/.ssh
+        if [ -e "/ssh/error" ]; then
+          #no server could be provisioned
+          cat /ssh/error
+          exit 1
+        fi
+        export SSH_HOST=$(cat /ssh/host)
+        cp /ssh/id_rsa ~/.ssh
         
         echo "Installing pack ..."
         curl -sSL "https://github.com/buildpacks/pack/releases/download/$(params.PACK_CLI_VERSION)/pack-$(params.PACK_CLI_VERSION)-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
