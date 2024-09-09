@@ -100,16 +100,25 @@ public class JacksonYamlTests {
               cat /ssh/error
               exit 1
             fi
-            export SSH_HOST=$(cat /ssh/host)
-            cp /ssh/id_rsa ~/.ssh
-            chmod 0400 ~/.ssh/id_rsa"
+            """;
+
+        String expectedYaml = """
+            script: |
+              #!/usr/bin/env bash
+              set -e
+              mkdir -p ~/.ssh
+              if [ -e "/ssh/error" ]; then
+                #no server could be provisioned
+                cat /ssh/error
+                exit 1
+              fi
             """;
 
         MyScript script = new MyScript();
         script.setScript(bashScript);
 
         String yamlOutput = mapper.writeValueAsString(script);
-        System.out.println(yamlOutput);
+        assertEquals(expectedYaml,yamlOutput);
     }
 }
 
