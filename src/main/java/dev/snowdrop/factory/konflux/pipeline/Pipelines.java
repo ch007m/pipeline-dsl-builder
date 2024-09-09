@@ -91,12 +91,8 @@ public class Pipelines implements JobProvider {
                 Skip this step for finally tasks as not needed
              */
             String runAfter = null;
-            if (!action.isFinally()) {
-                if (action.getRunAfter() != null) {
-                    runAfter = action.getRunAfter();
-                } else {
-                    runAfter = "prefetch-dependencies";
-                }
+            if (!action.isFinally() && action.getRunAfter() != null) {
+                runAfter = action.getRunAfter();
             }
 
             List<String> args = new ArrayList<>();
@@ -230,8 +226,14 @@ public class Pipelines implements JobProvider {
                    .withNamespace(cfg.getNamespace()) // User's namespace
                 .endMetadata()
                 .withNewSpec()
-                   .withWorkspaces(defaultPipelineRun.getSpec().getWorkspaces()) // Default workspaces
-                   .withParams(defaultPipelineRun.getSpec().getParams()) // Default params
+                   .withWorkspaces(
+                       Stream.concat(defaultPipelineRun.getSpec().getWorkspaces().stream(), pipelineWorkspaces.stream())
+                           .collect(Collectors.toList())
+                   )  // Merge default workspaces with user's workspace
+                   .withParams(
+                       Stream.concat(defaultPipelineRun.getSpec().getParams().stream(), pipelineParams.stream())
+                           .collect(Collectors.toList())
+                   ) // Merge default params with user's parameters
                    //.withTimeouts(populateTimeOut("1h0m0s"))
                    .withNewPipelineSpec()
                       .withResults(defaultPipelineRun.getSpec().getPipelineSpec().getResults())
