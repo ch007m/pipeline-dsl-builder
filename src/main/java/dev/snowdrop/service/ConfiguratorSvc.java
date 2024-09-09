@@ -104,7 +104,6 @@ public class ConfiguratorSvc {
             ObjectMapper mapper = new ObjectMapper(
                 new YAMLFactory()
                     .disable(WRITE_DOC_START_MARKER)
-                    .disable(SPLIT_LINES)
                     .enable(LITERAL_BLOCK_STYLE)
             );
             mapper.writeValue(pathToYaml.toFile(), resource);

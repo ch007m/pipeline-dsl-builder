@@ -48,7 +48,7 @@ public class TektonResource {
             action.getWorkspaces().forEach(wks -> {
                 taskWorkspaces.add(new WorkspaceDeclarationBuilder()
                     .withName(wks.getName())
-                    // TODO: Should we also uspport to define a volume to mount
+                    // TODO: Should we also support to define a volume to mount
                     .build());
             });
         }
