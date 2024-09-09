@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Repository;
 import dev.snowdrop.model.konflux.Application;
 import dev.snowdrop.model.konflux.Component;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -103,6 +106,9 @@ public class JacksonYamlTests {
             """;
 
         String expectedYaml = """
+            id: 1
+            name: null
+            ref: null
             script: |
               #!/usr/bin/env bash
               set -e
@@ -112,24 +118,22 @@ public class JacksonYamlTests {
                 cat /ssh/error
                 exit 1
               fi
+            scriptFileUrl: null
+            runAfter: null
+            image: null
+            params: null
+            workspaces: null
+            volumes: null
+            args: null
+            when: null
+            results: null
+            finally: false  
             """;
 
-        MyScript script = new MyScript();
-        script.setScript(bashScript);
+        Action myAction = new Action();
+        myAction.setScript(bashScript);
 
-        String yamlOutput = mapper.writeValueAsString(script);
+        String yamlOutput = mapper.writeValueAsString(myAction);
         assertEquals(expectedYaml,yamlOutput);
-    }
-}
-
-class MyScript {
-    private String script;
-
-    public String getScript() {
-        return script;
-    }
-
-    public void setScript(String script) {
-        this.script = script;
     }
 }
