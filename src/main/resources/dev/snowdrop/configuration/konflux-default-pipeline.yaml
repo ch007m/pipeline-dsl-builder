@@ -60,7 +60,6 @@ job:
     - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
     - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
     - BASE_IMAGES_DIGESTS: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
-
     - CHAINS-GIT_URL: "$(tasks.git-clone.results.url)"
     - CHAINS-GIT_COMMIT: "$(tasks.git-clone.results.commit)"
 
@@ -75,7 +74,7 @@ job:
         - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1
 
-    - name: show-summary
+    - name: summary # show-summary ! name of the task is summary while bundle name is task-summary.
       finally: true
       params:
         - pipelinerun-name: "$(context.pipelineRun.name)"
@@ -109,10 +108,6 @@ job:
         - name: basic-auth
           workspace: git-auth
 
-    - name: build-container # dummy task to be replaced with the user's tasks
-      runAfter: prefetch-dependencies
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2
-
     - name: prefetch-dependencies
       runAfter: git-clone #clone-repository
       when: # TODO: Do we support notin ?
@@ -125,6 +120,10 @@ job:
           workspace: workspace
         - name: git-basic-auth
           workspace: git-auth
+
+    - name: build-container # dummy task to be replaced with the user's tasks
+      runAfter: prefetch-dependencies
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2
 
     - name: build-image-index
       runAfter: build-container
@@ -173,7 +172,7 @@ job:
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1
 
     - name: sast-snyk-check
-      runAfter: build-container
+      runAfter: git-clone
       when:
         - "$(params.skip-checks): true"
       params:
