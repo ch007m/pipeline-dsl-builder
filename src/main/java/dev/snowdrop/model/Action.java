@@ -19,8 +19,10 @@ public class Action {
     private String script;
     private String scriptFileUrl;
     private String runAfter;
+    private String image;
     private List<Map<String, Object>> params;
     private List<Workspace> workspaces;
+    private List<Volume> volumes;
     private List<String> args;
     private List<String> when;
     private List<Map<String, String>> results;
