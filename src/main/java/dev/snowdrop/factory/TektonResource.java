@@ -90,7 +90,7 @@ public class TektonResource {
                     .addNewStep()
                       .withName("run-script")
                       .withArgs(args)
-                      .withImage(action.IMAGES.get(STEP_SCRIPT_IMAGE))
+                      .withImage(action.getImage() != null ? action.getImage() : action.IMAGES.get(STEP_SCRIPT_IMAGE))
                       .withScript(embeddedScript)
                     .endStep()
                     .withResults(results)
