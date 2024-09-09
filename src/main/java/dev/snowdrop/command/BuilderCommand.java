@@ -12,6 +12,7 @@ import picocli.CommandLine.Option;
 
 import java.nio.file.Paths;
 
+import static dev.snowdrop.factory.Type.KONFLUX;
 import static dev.snowdrop.factory.konflux.builder.ComponentBuilder.createComponent;
 import static dev.snowdrop.factory.konflux.builder.ApplicationBuilder.createApplication;
 
@@ -35,16 +36,30 @@ public class BuilderCommand implements Runnable {
         logger.debug("#### Output path: {}", outputPath);
 
         // Parse and validate the user's configuration file
-        Configurator cfg = configuratorSvc.loadConfiguration(configuration);
-        // Set the outputPath (used to extract tasks from oci bundles, etc.) to the configurator object
-        cfg.setOutputPath(outputPath);
+        Configurator cfg = null;
+        try {
+            cfg = configuratorSvc.loadConfiguration(configuration);
+            // Set the outputPath (used to extract tasks from oci bundles, etc.) to the configurator object
+            cfg.setOutputPath(outputPath);
+        } catch (Exception e) {
+            logger.error("Error loading configuration", e);
+            System.exit(1);
+        }
 
         // Load the default Pipeline configuration using the yaml file loaded from the resources folder
         // TODO: To be documented, reviewed & tested
-        configuratorSvc.loadDefaultConfiguration(cfg);
-        // Populate the default Pipeline object that we will use
-        // as template tlo add the user's tasks, etc
-        configuratorSvc.populateDefaultPipeline();
+        if (configuratorSvc.loadDefaultConfiguration(cfg)) {
+            // Populate the default Pipeline object that we will use
+            // as template tlo add the user's tasks, etc
+            configuratorSvc.populateDefaultPipeline();
+        } else {
+            if (cfg.getType().toUpperCase().equals(KONFLUX.name())) {
+                logger.error("The default configuration file do not exist or cannot not be loaded. This file is mandatory for Konflux");
+                System.exit(1);
+            } else {
+                logger.warn("No configuration file found for Tekton");
+            }
+        }
 
         if (cfg == null) {
             logger.error("Configuration file cannot be empty !");

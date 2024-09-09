@@ -1,5 +1,6 @@
 package dev.snowdrop.service;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
@@ -41,14 +42,20 @@ public class ConfiguratorSvc {
     }
 
     // TODO: To be reviewed as code will fail when there is no default config file, which is certainly an option
-    public void loadDefaultConfiguration(Configurator cfg) {
+    public Boolean loadDefaultConfiguration(Configurator cfg) {
         if (defaultConfigurator == null) {
             String cfgFileName = String.format("%s-default-pipeline.yaml",cfg.getType());
-            String configYaml = readFileFromResources("dev/snowdrop/configuration/" + cfgFileName);
-            logger.info("#### Default configuration loaded: {}", "dev/snowdrop/configuration/" + cfgFileName);
-            defaultConfigurator = loadConfiguration(configYaml);
+            try {
+                String configYaml = readFileFromResources("dev/snowdrop/configuration/" + cfgFileName);
+                logger.info("#### Default configuration loaded: {}", "dev/snowdrop/configuration/" + cfgFileName);
+                defaultConfigurator = loadConfiguration(configYaml);
+            } catch (Exception e) {
+                logger.warn("Default configuration file {} don't exist for or cannot be loaded :",cfgFileName);
+                return false;
+            }
             defaultConfigurator.setOutputPath(cfg.getOutputPath());
         }
+        return true;
     }
 
     public void populateDefaultPipeline() {
@@ -58,17 +65,17 @@ public class ConfiguratorSvc {
         }
     }
 
-    public Configurator loadConfiguration(String input) {
+    public Configurator loadConfiguration(String input) throws Exception {
         Configurator configurator = new Configurator();
         try {
             configurator = loadYaml(input);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         }
         return configurator;
     }
 
-    public static Configurator loadYaml(Object input) {
+    public static Configurator loadYaml(Object input) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         try {
             if (input instanceof String) {
@@ -86,9 +93,10 @@ public class ConfiguratorSvc {
             } else {
                 throw new IllegalArgumentException("Input must be a valid file path or YAML content as String.");
             }
+        } catch (JsonMappingException ex) {
+            throw ex;
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw e;
         }
     }
 

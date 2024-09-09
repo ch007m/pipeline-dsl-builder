@@ -15,7 +15,7 @@ public class FileUtilSvc {
    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
    private static final String SCRIPTS_PATH = "scripts/";
 
-   public static String readFileFromResources(String filePath) {
+   public static String readFileFromResources(String filePath) throws IOException {
       ClassLoader classLoader = FileUtilSvc.class.getClassLoader();
       try {
          InputStream inputStream = classLoader.getResourceAsStream(filePath);
@@ -31,7 +31,7 @@ public class FileUtilSvc {
          }
          return content.toString().trim();
       } catch (IOException e) {
-          throw new RuntimeException(e);
+          throw new IOException(e);
       }
    }
 
