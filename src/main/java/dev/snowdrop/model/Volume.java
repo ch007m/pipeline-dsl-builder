@@ -10,6 +10,8 @@ public class Volume {
     private String storage;
     private String accessMode;
     private String secret;
+    private String configMap;
+    private String emptyDir;
     private String mountPath;
     private Boolean readOnly = true;
 

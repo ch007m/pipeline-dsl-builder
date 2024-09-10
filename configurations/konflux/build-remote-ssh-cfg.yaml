@@ -18,7 +18,7 @@ job:
   resourceType: PipelineRun
   name: buildpack-remote
   description: PipelineRun using the pack cli to build the builder image remotely
-  timeout: "0h10m0s"
+  timeout: "0h15m0s"
 
   workspaces:
     - name: ssh

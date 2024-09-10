@@ -151,13 +151,31 @@ public class TektonResource {
         Optional.ofNullable(taskVolumes)
             .filter(list -> !list.isEmpty())
             .ifPresent(list -> list.forEach(v -> {
-                volumes.add(new VolumeBuilder()
-                    .withName(v.getName())
-                        // TODO: Improve the code to support to mount different types: ConfigMap, etc
-                        .withSecret(new SecretVolumeSourceBuilder()
-                            .withSecretName(v.getSecret())
-                            .build())
-                    .build());
+                VolumeBuilder volumeBuilder = new VolumeBuilder();
+
+                // Secret
+                if (v.getSecret() != null) {
+                    volumeBuilder.withSecret(new SecretVolumeSourceBuilder()
+                        .withSecretName(v.getSecret())
+                        .build());
+                    volumes.add(volumeBuilder.build());
+                }
+
+                // EmptyDir
+                if (v.getEmptyDir() != null) {
+                    volumeBuilder
+                        .withNewEmptyDir();
+                    volumes.add(volumeBuilder.build());
+                }
+
+                // ConfigMap
+                // TODO: To be tested
+                if (v.getConfigMap() != null) {
+                    volumeBuilder.withConfigMap(new ConfigMapVolumeSourceBuilder()
+                        .withName(v.getConfigMap())
+                        .build());
+                    volumes.add(volumeBuilder.build());
+                }
             }));
         return volumes;
     }
