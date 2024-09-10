@@ -20,11 +20,6 @@ job:
   description: PipelineRun using the pack cli to build the builder image remotely
   timeout: "0h15m0s"
 
-  workspaces:
-    - name: ssh
-      secret:
-        name: multi-platform-ssh-$(context.taskRun.name)
-
   params:
     # Remote SSH params
     - PLATFORM: linux-mlarge/amd64 # We need it in order to configure the multi-arch-platform controller properly - see: https://github.com/redhat-appstudio/infra-deployments/blob/main/components/multi-platform-controller/production/host-config.yaml
@@ -162,8 +157,10 @@ job:
         export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
         pack builder create $(params.IMAGE) --config builder.toml -v
         
+        set -x
         container=$(buildah from --pull-never $IMAGE)
         buildah mount $container
+        set +x
         
         REMOTESSHEOF
         chmod +x scripts/script-build.sh

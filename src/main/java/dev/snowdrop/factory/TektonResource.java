@@ -155,8 +155,10 @@ public class TektonResource {
 
                 // Secret
                 if (v.getSecret() != null) {
-                    volumeBuilder.withSecret(new SecretVolumeSourceBuilder()
-                        .withSecretName(v.getSecret())
+                    volumeBuilder
+                        .withName(v.getName())
+                        .withSecret(new SecretVolumeSourceBuilder()
+                          .withSecretName(v.getSecret())
                         .build());
                     volumes.add(volumeBuilder.build());
                 }
@@ -164,6 +166,7 @@ public class TektonResource {
                 // EmptyDir
                 if (v.getEmptyDir() != null) {
                     volumeBuilder
+                        .withName(v.getName())
                         .withNewEmptyDir();
                     volumes.add(volumeBuilder.build());
                 }
@@ -171,8 +174,10 @@ public class TektonResource {
                 // ConfigMap
                 // TODO: To be tested
                 if (v.getConfigMap() != null) {
-                    volumeBuilder.withConfigMap(new ConfigMapVolumeSourceBuilder()
-                        .withName(v.getConfigMap())
+                    volumeBuilder
+                        .withName(v.getName())
+                        .withConfigMap(new ConfigMapVolumeSourceBuilder()
+                          .withName(v.getConfigMap())
                         .build());
                     volumes.add(volumeBuilder.build());
                 }
