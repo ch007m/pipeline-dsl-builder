@@ -131,28 +131,34 @@ public class TektonResource {
     public static List<VolumeMount> populateTaskVolumeMounts(Action action) {
         List<Volume> taskVolumes = action.getVolumes();
         List<VolumeMount> volumeMounts = new ArrayList<>();
-        taskVolumes.forEach(v -> {
-            volumeMounts.add(new VolumeMountBuilder()
-                .withName(v.getName())
-                .withMountPath(v.getMountPath())
-                .withReadOnly(v.getReadOnly())
-                .build());
-        });
+
+        Optional.ofNullable(taskVolumes)
+            .filter(list -> !list.isEmpty())
+            .ifPresent(list -> list.forEach(v -> {
+                volumeMounts.add(new VolumeMountBuilder()
+                    .withName(v.getName())
+                    .withMountPath(v.getMountPath())
+                    .withReadOnly(v.getReadOnly())
+                    .build());
+            }));
         return volumeMounts;
     }
 
     public static List<io.fabric8.kubernetes.api.model.Volume> populateTaskVolumes(Action action) {
         List<Volume> taskVolumes = action.getVolumes();
         List<io.fabric8.kubernetes.api.model.Volume> volumes = new ArrayList<>();
-        taskVolumes.forEach(v -> {
-            volumes.add(new VolumeBuilder()
-                .withName(v.getName())
-                    // TODO: Improve the code to support to mount different types: ConfigMap, etc
-                    .withSecret(new SecretVolumeSourceBuilder()
-                        .withSecretName(v.getSecret())
-                        .build())
-                .build());
-        });
+
+        Optional.ofNullable(taskVolumes)
+            .filter(list -> !list.isEmpty())
+            .ifPresent(list -> list.forEach(v -> {
+                volumes.add(new VolumeBuilder()
+                    .withName(v.getName())
+                        // TODO: Improve the code to support to mount different types: ConfigMap, etc
+                        .withSecret(new SecretVolumeSourceBuilder()
+                            .withSecretName(v.getSecret())
+                            .build())
+                    .build());
+            }));
         return volumes;
     }
 
