@@ -27,17 +27,6 @@ job:
     # Konflux param
     - output-image: quay.io/redhat-user-workloads/cmoullia-tenant/konflux-demo/buildpack-remote:{{revision}}
 
-    # Buildpack params
-    - source-dir: "source"
-    - imageUrl: "buildpacksio/pack"
-    - imageTag: "latest"
-    - packCmdBuilderFlags:
-        - builder
-        - create
-        - builder
-        - --config
-        - $(workspaces.source.path)/builder.toml
-
   actions:
     - name: pack
       runAfter: prefetch-dependencies # TODO: IS there a better way to set such a value : default or not
@@ -45,13 +34,11 @@ job:
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_VERSION: "v0.35.1"
-        - DOCKER_HOST: ""
         - SOURCE_SUBPATH: "."
         - IMAGE: "$(params.output-image)"
         - PLATFORM: "$(params.PLATFORM)"
-        #- DOCKER_HOST: $(tasks.virtualmachine.results.ip)
-        #- PACK_CMD_FLAGS:
-        #    - "$(params.packCmdBuilderFlags)"
+        - BUILD_ARGS:
+            - "-v"
       workspaces:
         - name: source
           workspace: workspace
@@ -62,7 +49,7 @@ job:
         - BASE_IMAGES_DIGESTS: "Digests of the base images used for build"
 
       args:
-        - "$(params.packCmdBuilderFlags)"
+        - $(params.BUILD_ARGS[*])
 
       #scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/ssh-remote.sh
       volumes:
@@ -113,24 +100,22 @@ job:
         mkdir -p ${USER_BIN_DIR}
         mkdir -p ${BUILDPACK_PROJECTS}
         
-        export PATH=$PATH:${USER_BIN_DIR}
+        export PATH=$PATH:${USER_BIN_DIR}     
+        
+        echo "### Podman status ###"
+        podman version
+        echo "## Status of the service ##"
+        systemctl status podman.socket
+        systemctl --user start podman.socket
+        systemctl status podman.socket
+        ls -la $XDG_RUNTIME_DIR/podman
         
         curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ${TEMP_DIR} --no-same-owner -xzv pack
         mv ${TEMP_DIR}/pack ${USER_BIN_DIR}
         
         echo "### Pack version ###"
         pack --version
-        pack config experimental true        
-        
-        echo "### Podman version ###"
-        podman version
-        podman info
-        
-        echo "## Status of the service ##"
-        systemctl status podman.socket
-        systemctl --user start podman.socket
-        systemctl status podman.socket
-        ls -la $XDG_RUNTIME_DIR/podman
+        pack config experimental true   
         
         echo "### Go version ###"
         curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar -C ${TEMP_DIR} -xz go
@@ -143,24 +128,22 @@ job:
         export GOROOT=${USER_BIN_DIR}/go
         export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
         go version
-        
-        # echo "### Git version ###"
-        # sudo yum install git => NOT ALLOWED
-        # yum install git => This command has to be run with superuser privileges 
-        # git version
-        
+
         echo "### Build the builder image using pack"
         curl -sSL https://github.com/paketo-community/builder-ubi-base/tarball/main | tar -xz -C ${TEMP_DIR}
         mv ${TEMP_DIR}/paketo-community-builder-ubi-base-* ${BUILDPACK_PROJECTS}/builder-ubi-base
         cd ${BUILDPACK_PROJECTS}/builder-ubi-base
         
-        export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
-        pack builder create $(params.IMAGE) --config builder.toml -v
+        BUILD_ARGS=()
+        for build_arg in "$@"; do
+          BUILD_ARGS+=(" $build_arg")
+        done        
         
-        set -x
+        export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+        pack builder create $(params.IMAGE) --config builder.toml "${BUILD_ARGS[@]}"
+        
         container=$(buildah from --pull-never $IMAGE)
         buildah mount $container
-        set +x
         
         REMOTESSHEOF
         chmod +x scripts/script-build.sh
