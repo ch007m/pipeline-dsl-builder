@@ -30,9 +30,8 @@ job:
       image: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
       params:
         # Konflux
-        - IMAGE: "$(params.output-image)"
         - PLATFORM: linux-root/amd64 # linux-mlarge/amd64 # We need it in order to configure the multi-arch-platform controller properly - see: https://github.com/redhat-appstudio/infra-deployments/blob/main/components/multi-platform-controller/production/host-config.yaml
-
+        - IMAGE: "$(params.output-image)"
         # Image to use to execute remotely the SSH script using podman run
         - BUILDER_IMAGE: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
         # Buildpack
@@ -51,6 +50,7 @@ job:
       envs:
         - BUILDER_IMAGE: $(params.BUILDER_IMAGE)
         - PLATFORM: $(params.PLATFORM)
+        - IMAGE: $(params.IMAGE)
 
       args:
         - $(params.BUILD_ARGS)
@@ -61,6 +61,9 @@ job:
           mountPath: /ssh
           # readOnly: true ==> The default value is true
           secret: "multi-platform-ssh-$(context.taskRun.name)"
+        - name: shared
+          mountPath: /shared
+          emptyDir: "{}"
 
       script: |
         #!/usr/bin/env bash
@@ -91,6 +94,10 @@ job:
         echo "$BUILD_DIR"
         ssh $SSH_ARGS "$SSH_HOST" mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
         
+        echo "rsync shared folders ..."
+        rsync -ra /shared/ "$SSH_HOST:$BUILD_DIR/volumes/shared/"
+        rsync -ra "/tekton/results/" "$SSH_HOST:$BUILD_DIR/results/"
+        
         cat >scripts/script-build.sh <<'REMOTESSHEOF'
         #!/bin/sh
         TEMP_DIR="$HOME/tmp"
@@ -108,15 +115,22 @@ job:
         
         echo "### Podman status ###"
         podman version
-        echo "## Status of the service ##"
-        systemctl status podman.socket
+        echo "## Status of the podman service ##"
         systemctl --user start podman.socket
         systemctl status podman.socket
         ls -la $XDG_RUNTIME_DIR/podman
         
-        echo "Hack to be able to install builldah ..."
-        sudo podman run -v /etc:/hostetc ubi9 sed -s 's|usr/bin/podman|usr/bin/dnf /usr/bin/podman|g'
-        dnf -y install buildah
+        #echo "## Launch socat to expose the podman socket"
+        #socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock &
+        
+        #echo "IP address of the host machine"
+        #HOST_IP=$(hostname -I | awk '{print $1}')
+        #echo "Host IP: $HOST_IP"
+        
+        # echo "Hack to be able to install buildah ..."
+        # sudo podman run -v /etc:/hostetc ubi9 sed -s 's|usr/bin/podman|usr/bin/dnf /usr/bin/podman|g'
+        # sudo podman run -v /etc:/hostetc ubi9 cat /etc/sudoers
+        # sudo dnf -y install buildah
         
         curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ${TEMP_DIR} --no-same-owner -xzv pack
         mv ${TEMP_DIR}/pack ${USER_BIN_DIR}
@@ -152,30 +166,46 @@ job:
           echo "arg: $arg"
         done
         
-        #set -o verbose
-        export DOCKER_HOST=unix://var/run/podman/podman.sock
-        pack builder create $(params.IMAGE) --config builder.toml "${BUILD_ARGS[@]}"
+        set -o verbose
+        export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+        # export DOCKER_HOST=tcp://${HOST_IP}:2376
+        pack builder create ${IMAGE} --config builder.toml "${BUILD_ARGS[@]}"
         
-        container=$(buildah from --pull-never $IMAGE)
-        buildah mount $container
-        buildah push "$IMAGE" "oci:konflux-final-image:$IMAGE"
-        #set +o verbose
+        container=$(podman create ${IMAGE})
+        echo "Container: $container"
+        podman mount $container | tee /shared/container_path
+        # delete symlinks - they may point outside the container rootfs, messing with SBOM scanners
+        find $(cat /shared/container_path) -xtype l -delete
+        echo $container >/shared/container_name
+        
+        podman push "$IMAGE" "oci:konflux-final-image:$IMAGE"
+        
+        #container=$(buildah from --pull-never $IMAGE)
+        #buildah mount $container | tee /shared/container_path
+        #buildah push "$IMAGE" "oci:konflux-final-image:$IMAGE"
+        set +o verbose
         
         REMOTESSHEOF
         chmod +x scripts/script-build.sh
         
         rsync -ra scripts "$SSH_HOST:$BUILD_DIR"
         rsync -ra "$HOME/.docker/" "$SSH_HOST:$BUILD_DIR/.docker/"
-        
-        ssh $SSH_ARGS "$SSH_HOST" "bash -s" <scripts/script-build.sh
-        #ssh $SSH_ARGS "$SSH_HOST" $PORT_FORWARD podman run $PODMAN_PORT_FORWARD \
+
+        # DON'T WORK AS DOCKER PACK CANNOT ACCESS DOCKER HOST
+        # ssh $SSH_ARGS "$SSH_HOST" $PORT_FORWARD podman run $PODMAN_PORT_FORWARD \
         #    -v "$BUILD_DIR/scripts:/scripts:Z" \
         #    -v "$BUILD_DIR/.docker/:/root/.docker:Z" \
+        #    -v "$BUILD_DIR/volumes/shared:/shared:Z" \
         #    --user=0 --rm "$BUILDER_IMAGE" /scripts/script-build.sh
+        
+        ssh $SSH_ARGS "$SSH_HOST" "bash -s" <scripts/script-build.sh
         
         echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
         echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
         echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
+        
+        rsync -ra "$SSH_HOST:$BUILD_DIR/volumes/shared/" /shared/
+        rsync -ra "$SSH_HOST:$BUILD_DIR/results/" "/tekton/results/"
         
 
         
