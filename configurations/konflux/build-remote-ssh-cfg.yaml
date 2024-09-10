@@ -23,7 +23,7 @@ job:
   params:
     # Remote SSH params
     - PLATFORM: linux-mlarge/amd64 # We need it in order to configure the multi-arch-platform controller properly - see: https://github.com/redhat-appstudio/infra-deployments/blob/main/components/multi-platform-controller/production/host-config.yaml
-
+    - BUILDER_IMAGE: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
     # Konflux param
     - output-image: quay.io/redhat-user-workloads/cmoullia-tenant/konflux-demo/buildpack-remote:{{revision}}
 
@@ -32,11 +32,11 @@ job:
       runAfter: prefetch-dependencies # TODO: IS there a better way to set such a value : default or not
       image: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
       params:
-        - PACK_SOURCE_DIR: "$(params.source-dir)"
-        - PACK_CLI_VERSION: "v0.35.1"
-        - SOURCE_SUBPATH: "."
+        # Konflux
         - IMAGE: "$(params.output-image)"
         - PLATFORM: "$(params.PLATFORM)"
+        # Buildpack
+        - PACK_CLI_VERSION: "v0.35.1"
         - BUILD_ARGS:
             - "-v"
       workspaces:
@@ -49,7 +49,7 @@ job:
         - BASE_IMAGES_DIGESTS: "Digests of the base images used for build"
 
       args:
-        - $(params.BUILD_ARGS[*])
+        - $(params.BUILD_ARGS)
 
       #scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/ssh-remote.sh
       volumes:
@@ -81,11 +81,11 @@ job:
         export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
         mkdir -p scripts
         
-        echo "### List files under /ssh"
-        ls -la /ssh
+        PORT_FORWARD=""
+        PODMAN_PORT_FORWARD=""
         
         echo "$BUILD_DIR"
-        ssh $SSH_ARGS "$SSH_HOST"  mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
+        ssh $SSH_ARGS "$SSH_HOST" mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
         
         cat >scripts/script-build.sh <<'REMOTESSHEOF'
         #!/bin/sh
@@ -93,7 +93,7 @@ job:
         USER_BIN_DIR="$HOME/bin"
         BUILDPACK_PROJECTS="$HOME/buildpack-repo"
         
-        PACK_CLI_VERSION="v0.35.1"
+        PACK_CLI_VERSION="$(params.PACK_CLI_VERSION)"
         GO_VERSION="1.23.0"
         
         mkdir -p ${TEMP_DIR}
@@ -136,18 +136,32 @@ job:
         
         BUILD_ARGS=()
         for build_arg in "$@"; do
-          BUILD_ARGS+=(" $build_arg")
-        done        
+          BUILD_ARGS+=("$build_arg")
+        done
+        
+        echo "Build arguments to be passed to the pack CLI"
+        for arg in "${BUILD_ARGS[@]}"; do
+          echo "arg: $arg"
+        done
         
         export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+        set -o verbose
         pack builder create $(params.IMAGE) --config builder.toml "${BUILD_ARGS[@]}"
         
         container=$(buildah from --pull-never $IMAGE)
         buildah mount $container
+        buildah push "$IMAGE" "oci:konflux-final-image:$IMAGE"
+        set +o verbose
         
         REMOTESSHEOF
         chmod +x scripts/script-build.sh
-        ssh $SSH_ARGS "$SSH_HOST" "bash -s" <scripts/script-build.sh
+        
+        rsync -ra scripts "$SSH_HOST:$BUILD_DIR"
+        
+        #ssh $SSH_ARGS "$SSH_HOST" "bash -s" <scripts/script-build.sh
+        ssh $SSH_ARGS "$SSH_HOST" $PORT_FORWARD podman run $PODMAN_PORT_FORWARD \
+            -v "$BUILD_DIR/scripts:/scripts:Z" \
+            --user=0 --rm "$BUILDER_IMAGE" /scripts/script-build.sh
         
         echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
         echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
