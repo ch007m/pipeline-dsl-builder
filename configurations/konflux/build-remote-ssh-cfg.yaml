@@ -69,7 +69,7 @@ job:
       volumes:
         - name: ssh
           mountPath: /ssh
-          accessMode: ReadOnly
+          # readOnly: true ==> The default value is true
           secret: "multi-platform-ssh-$(context.taskRun.name)"
 
       script: |

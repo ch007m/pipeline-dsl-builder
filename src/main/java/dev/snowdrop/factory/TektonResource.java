@@ -92,8 +92,10 @@ public class TektonResource {
                       .withArgs(args)
                       .withImage(action.getImage() != null ? action.getImage() : action.IMAGES.get(STEP_SCRIPT_IMAGE))
                       .withScript(embeddedScript)
+                      .withVolumeMounts(populateTaskVolumeMounts(action)) // Volum(s) to be mounted from Volume(s) declared at the task level: secret, configMap, etc
                     .endStep()
                     .withResults(results)
+                    .withVolumes(populateTaskVolumes(action)) // Volumes used by the steps
                     .build())
             .build();
         // @formatter:on
@@ -124,6 +126,34 @@ public class TektonResource {
             .build();
             // @formatter:on
         return pipelineTask;
+    }
+
+    public static List<VolumeMount> populateTaskVolumeMounts(Action action) {
+        List<Volume> taskVolumes = action.getVolumes();
+        List<VolumeMount> volumeMounts = new ArrayList<>();
+        taskVolumes.forEach(v -> {
+            volumeMounts.add(new VolumeMountBuilder()
+                .withName(v.getName())
+                .withMountPath(v.getMountPath())
+                .withReadOnly(v.getReadOnly())
+                .build());
+        });
+        return volumeMounts;
+    }
+
+    public static List<io.fabric8.kubernetes.api.model.Volume> populateTaskVolumes(Action action) {
+        List<Volume> taskVolumes = action.getVolumes();
+        List<io.fabric8.kubernetes.api.model.Volume> volumes = new ArrayList<>();
+        taskVolumes.forEach(v -> {
+            volumes.add(new VolumeBuilder()
+                .withName(v.getName())
+                    // TODO: Improve the code to support to mount different types: ConfigMap, etc
+                    .withSecret(new SecretVolumeSourceBuilder()
+                        .withSecretName(v.getSecret())
+                        .build())
+                .build());
+        });
+        return volumes;
     }
 
     public static List<WorkspacePipelineTaskBinding> populateTaskWorkspaces(Action action, Map<String, Workspace> jobWorkspacesMap, List<WorkspaceDeclaration> taskWorkspaces) {

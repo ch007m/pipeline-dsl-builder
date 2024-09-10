@@ -11,6 +11,7 @@ public class Volume {
     private String accessMode;
     private String secret;
     private String mountPath;
+    private Boolean readOnly = true;
 
     public static String STORAGE = "storage";
 }
