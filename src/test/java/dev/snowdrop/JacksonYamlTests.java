@@ -126,6 +126,7 @@ public class JacksonYamlTests {
             workspaces: null
             volumes: null
             args: null
+            envs: null
             when: null
             results: null
             finally: false
@@ -175,6 +176,7 @@ public class JacksonYamlTests {
             workspaces: null
             volumes: null
             args: null
+            envs: null
             when: null
             results: null
             finally: false
@@ -217,6 +219,7 @@ public class JacksonYamlTests {
             workspaces: null
             volumes: null
             args: null
+            envs: null
             when: null
             results: null
             finally: false

@@ -24,6 +24,7 @@ public class Action {
     private List<Workspace> workspaces;
     private List<Volume> volumes;
     private List<String> args;
+    private List<Map<String, String>> envs;
     private List<String> when;
     private List<Map<String, String>> results;
 

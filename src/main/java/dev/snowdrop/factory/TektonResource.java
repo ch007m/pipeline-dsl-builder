@@ -96,6 +96,9 @@ public class TektonResource {
                     .endStep()
                     .withResults(results)
                     .withVolumes(populateTaskVolumes(action)) // Volumes used by the steps
+                    .withStepTemplate(new StepTemplateBuilder()
+                        .addAllToEnv(populateStepEnvVars(action))
+                        .build())
                     .build())
             .build();
         // @formatter:on
@@ -142,6 +145,19 @@ public class TektonResource {
                     .build());
             }));
         return volumeMounts;
+    }
+
+    public static List<EnvVar> populateStepEnvVars(Action action) {
+        List<EnvVar> envVars = new ArrayList<>();
+        for (Map<String, String> hash : action.getEnvs()) {
+            hash.forEach((key, val) -> {
+                envVars.add(new EnvVarBuilder()
+                    .withName(key)
+                    .withValue(val)
+                    .build());
+            });
+        }
+        return envVars;
     }
 
     public static List<io.fabric8.kubernetes.api.model.Volume> populateTaskVolumes(Action action) {
