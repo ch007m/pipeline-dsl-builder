@@ -234,7 +234,7 @@ public class Pipelines implements JobProvider {
                        Stream.concat(defaultPipelineRun.getSpec().getParams().stream(), pipelineParams.stream())
                            .collect(Collectors.toList())
                    ) // Merge default params with user's parameters
-                   .withTimeouts(defaultPipelineRun.getSpec().getTimeouts()) // Default timeout
+                   .withTimeouts( cfg.getJob().getTimeout() != null ? populateTimeOut(cfg.getJob().getTimeout()) : defaultPipelineRun.getSpec().getTimeouts()) // Default timeout
                    .withNewPipelineSpec()
                       .withResults(defaultPipelineRun.getSpec().getPipelineSpec().getResults())
                       .withFinally(defaultPipelineRun.getSpec().getPipelineSpec().getFinally())
