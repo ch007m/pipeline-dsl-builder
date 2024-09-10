@@ -65,6 +65,7 @@ job:
           secret: "multi-platform-ssh-$(context.taskRun.name)"
         - name: shared
           mountPath: /shared
+          readOnly: false
           emptyDir: "{}"
 
       script: |
