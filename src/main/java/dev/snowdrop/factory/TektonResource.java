@@ -92,7 +92,7 @@ public class TektonResource {
                       .withArgs(args)
                       .withImage(action.getImage() != null ? action.getImage() : action.IMAGES.get(STEP_SCRIPT_IMAGE))
                       .withScript(embeddedScript)
-                      .withVolumeMounts(populateTaskVolumeMounts(action)) // Volum(s) to be mounted from Volume(s) declared at the task level: secret, configMap, etc
+                      .withVolumeMounts(populateTaskVolumeMounts(action)) // Volume(s) to be mounted from Volume(s) declared at the task level: secret, configMap, etc
                     .endStep()
                     .withResults(results)
                     .withVolumes(populateTaskVolumes(action)) // Volumes used by the steps
@@ -149,13 +149,15 @@ public class TektonResource {
 
     public static List<EnvVar> populateStepEnvVars(Action action) {
         List<EnvVar> envVars = new ArrayList<>();
-        for (Map<String, String> hash : action.getEnvs()) {
-            hash.forEach((key, val) -> {
-                envVars.add(new EnvVarBuilder()
-                    .withName(key)
-                    .withValue(val)
-                    .build());
-            });
+        if (action.getEnvs() != null && !action.getEnvs().isEmpty()) {
+            for (Map<String, String> hash : action.getEnvs()) {
+                hash.forEach((key, val) -> {
+                    envVars.add(new EnvVarBuilder()
+                        .withName(key)
+                        .withValue(val)
+                        .build());
+                });
+            }
         }
         return envVars;
     }
@@ -183,7 +185,7 @@ public class TektonResource {
                 if (v.getEmptyDir() != null) {
                     volumeBuilder
                         .withName(v.getName())
-                        .withNewEmptyDir();
+                        .withEmptyDir(new EmptyDirVolumeSourceBuilder().build());
                     volumes.add(volumeBuilder.build());
                 }
 

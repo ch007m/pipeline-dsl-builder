@@ -31,11 +31,11 @@ job:
       params:
         # Konflux
         - PLATFORM: linux-root/amd64 # linux-mlarge/amd64 # We need it in order to configure the multi-arch-platform controller properly - see: https://github.com/redhat-appstudio/infra-deployments/blob/main/components/multi-platform-controller/production/host-config.yaml
-        - IMAGE: "$(params.output-image)"
         # Image to use to execute remotely the SSH script using podman run
         - BUILDER_IMAGE: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
         # Buildpack
         - PACK_CLI_VERSION: "v0.35.1"
+        - GO_VERSION: "1.23.0"
         - BUILD_ARGS:
             - "-v"
       workspaces:
@@ -47,10 +47,12 @@ job:
         - IMAGE_DIGEST: "Digest of the image just built"
         - BASE_IMAGES_DIGESTS: "Digests of the base images used for build"
 
-      envs:
-        - BUILDER_IMAGE: $(params.BUILDER_IMAGE)
-        - PLATFORM: $(params.PLATFORM)
-        - IMAGE: $(params.IMAGE)
+      # env var ar not injected within the tekton's pod running the script
+      #envs:
+      #   - BUILDER_IMAGE: $(params.BUILDER_IMAGE)
+      #   - PLATFORM: $(params.PLATFORM)
+      #   - IMAGE: $(params.output-image)
+      #   - PACK_CLI_VERSION: $(params.PACK_CLI_VERSION)
 
       args:
         - $(params.BUILD_ARGS)
@@ -70,6 +72,7 @@ job:
         #set -o verbose
         set -eu
         set -o pipefail
+        
         mkdir -p ~/.ssh
         if [ -e "/ssh/error" ]; then
           #no server could be provisioned
@@ -86,6 +89,7 @@ job:
         export SSH_HOST=$(cat /ssh/host)
         export BUILD_DIR=$(cat /ssh/user-dir)
         export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
+        
         mkdir -p scripts
         
         PORT_FORWARD=""
@@ -100,12 +104,19 @@ job:
         
         cat >scripts/script-build.sh <<'REMOTESSHEOF'
         #!/bin/sh
+        
+        # Set the env vars here as stepTemplate don't work
+        export BUILDER_IMAGE=$(params.BUILDER_IMAGE)
+        export PLATFORM=$(params.PLATFORM)
+        export IMAGE=$(params.output-image)
+        export PACK_CLI_VERSION=$(params.PACK_CLI_VERSION)
+        export GO_VERSION=$(params.GO_VERSION)
+        
         TEMP_DIR="$HOME/tmp"
         USER_BIN_DIR="$HOME/bin"
         BUILDPACK_PROJECTS="$HOME/buildpack-repo"
         
-        PACK_CLI_VERSION="$(params.PACK_CLI_VERSION)"
-        GO_VERSION="1.23.0"
+        printenv
         
         mkdir -p ${TEMP_DIR}
         mkdir -p ${USER_BIN_DIR}
@@ -173,6 +184,9 @@ job:
         
         container=$(podman create ${IMAGE})
         echo "Container: $container"
+        
+        touch /shared/container_path
+        podman unshare
         podman mount $container | tee /shared/container_path
         # delete symlinks - they may point outside the container rootfs, messing with SBOM scanners
         find $(cat /shared/container_path) -xtype l -delete
