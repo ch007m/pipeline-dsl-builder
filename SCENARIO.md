@@ -76,6 +76,7 @@ spec:
     tasks:
     - name: "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -93,6 +94,7 @@ spec:
       runAfter:
       - "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -174,6 +176,7 @@ spec:
     tasks:
     - name: "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -246,6 +249,7 @@ spec:
     tasks:
     - name: "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -258,6 +262,7 @@ spec:
       runAfter:
       - "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -335,6 +340,7 @@ spec:
     tasks:
     - name: "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -347,6 +353,7 @@ spec:
       runAfter:
       - "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -416,6 +423,7 @@ spec:
     tasks:
     - name: "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -914,6 +922,7 @@ spec:
       - name: "value"
         value: "Aurea"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -967,6 +976,7 @@ spec:
     tasks:
     - name: "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -1035,6 +1045,7 @@ spec:
       - name: "value"
         value: "Aurea"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -1165,8 +1176,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
@@ -1307,6 +1316,7 @@ spec:
           name: "IMAGE_DIGEST"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        stepTemplate: {}
         steps:
         - args:
           - "$(params.packCmdBuilderFlags)"
@@ -1697,8 +1707,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
@@ -1839,6 +1847,7 @@ spec:
           name: "IMAGE_DIGEST"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        stepTemplate: {}
         steps:
         - args:
           - "$(params.packCmdBuilderFlags)"
@@ -2157,8 +2166,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
@@ -2299,6 +2306,7 @@ spec:
           name: "IMAGE_DIGEST"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        stepTemplate: {}
         steps:
         - args:
           - "$(params.packCmdBuilderFlags)"
@@ -2629,8 +2637,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
@@ -2771,6 +2777,7 @@ spec:
           name: "IMAGE_DIGEST"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        stepTemplate: {}
         steps:
         - args:
           - "$(params.packCmdBuilderFlags)"
@@ -3089,8 +3096,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
@@ -3234,6 +3239,7 @@ spec:
           name: "IMAGE_DIGEST"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        stepTemplate: {}
         steps:
         - args:
           - "$(params.packCmdBuilderFlags)"
@@ -3457,98 +3463,209 @@ job:
   resourceType: PipelineRun
   name: buildpack-remote
   description: PipelineRun using the pack cli to build the builder image remotely
-
-  workspaces:
-    - name: ssh
-      secret:
-        name: multi-platform-ssh-$(context.taskRun.name)
+  timeout: "0h15m0s"
 
   params:
-    # Buildpack params
-    - source-dir: "source"
-    - imageUrl: "buildpacksio/pack"
-    - imageTag: "latest"
-    - packCmdBuilderFlags:
-        - builder
-        - create
-        - builder
-        - --config
-        - $(workspaces.source.path)/builder.toml
+    # Konflux param
+    - output-image: quay.io/redhat-user-workloads/cmoullia-tenant/konflux-demo/buildpack-remote:{{revision}}
 
   actions:
     - name: pack
       runAfter: prefetch-dependencies # TODO: IS there a better way to set such a value : default or not
       image: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
       params:
-        - PACK_SOURCE_DIR: "$(params.source-dir)"
+        # Konflux
+        - PLATFORM: linux-root/amd64 # linux-mlarge/amd64 # We need it in order to configure the multi-arch-platform controller properly - see: https://github.com/redhat-appstudio/infra-deployments/blob/main/components/multi-platform-controller/production/host-config.yaml
+        # Image to use to execute remotely the SSH script using podman run
+        - BUILDER_IMAGE: quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275
+        # Buildpack
         - PACK_CLI_VERSION: "v0.35.1"
-        - DOCKER_HOST: ""
-        - SOURCE_SUBPATH: "."
-        #- DOCKER_HOST: $(tasks.virtualmachine.results.ip)
-        #- PACK_CMD_FLAGS:
-        #    - "$(params.packCmdBuilderFlags)"
+        - GO_VERSION: "1.23.0"
+        - BUILD_ARGS:
+            - "-v"
       workspaces:
         - name: source
           workspace: workspace
-        - name: ssh
-          workspace: ssh
 
       results:
         - IMAGE_URL: "Image repository where the built image was pushed"
         - IMAGE_DIGEST: "Digest of the image just built"
         - BASE_IMAGES_DIGESTS: "Digests of the base images used for build"
 
+      # env var ar not injected within the tekton's pod running the script
+      #envs:
+      #   - BUILDER_IMAGE: $(params.BUILDER_IMAGE)
+      #   - PLATFORM: $(params.PLATFORM)
+      #   - IMAGE: $(params.output-image)
+      #   - PACK_CLI_VERSION: $(params.PACK_CLI_VERSION)
+
       args:
-        - "$(params.packCmdBuilderFlags)"
+        - $(params.BUILD_ARGS)
 
       #scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/ssh-remote.sh
+      volumes:
+        - name: ssh
+          mountPath: /ssh
+          # readOnly: true ==> The default value is true
+          secret: "multi-platform-ssh-$(context.taskRun.name)"
+        - name: shared
+          mountPath: /shared
+          readOnly: false
+          emptyDir: "{}"
+
       script: |
         #!/usr/bin/env bash
-        set -e
+        #set -o verbose
+        set -eu
+        set -o pipefail
+        
         mkdir -p ~/.ssh
         if [ -e "/ssh/error" ]; then
           #no server could be provisioned
           cat /ssh/error
-          exit 1
+        exit 1
+        elif [ -e "/ssh/otp" ]; then
+          curl --cacert /ssh/otp-ca -XPOST -d @/ssh/otp $(cat /ssh/otp-server) >~/.ssh/id_rsa
+          echo "" >> ~/.ssh/id_rsa
+        else
+          cp /ssh/id_rsa ~/.ssh
         fi
-        export SSH_HOST=$(cat /ssh/host)
-        cp /ssh/id_rsa ~/.ssh
-        
         chmod 0400 ~/.ssh/id_rsa
+        
+        export SSH_HOST=$(cat /ssh/host)
         export BUILD_DIR=$(cat /ssh/user-dir)
         export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
+        
+        mkdir -p scripts
+        
+        PORT_FORWARD=""
+        PODMAN_PORT_FORWARD=""
+        
         echo "$BUILD_DIR"
-        ssh $SSH_ARGS "$SSH_HOST"  mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
+        ssh $SSH_ARGS "$SSH_HOST" mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
         
-        ## TO BE REVIEWED ==>
-        echo "Installing pack ..."
-        curl -sSL "https://github.com/buildpacks/pack/releases/download/$(params.PACK_CLI_VERSION)/pack-$(params.PACK_CLI_VERSION)-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
+        echo "rsync shared folders ..."
+        rsync -ra /shared/ "$SSH_HOST:$BUILD_DIR/volumes/shared/"
+        rsync -ra "/tekton/results/" "$SSH_HOST:$BUILD_DIR/results/"
         
-        echo "Checking pack ..."
+        cat >scripts/script-build.sh <<'REMOTESSHEOF'
+        #!/bin/sh
+        
+        # Set the env vars here as stepTemplate don't work
+        export BUILDER_IMAGE=$(params.BUILDER_IMAGE)
+        export PLATFORM=$(params.PLATFORM)
+        export IMAGE=$(params.output-image)
+        export PACK_CLI_VERSION=$(params.PACK_CLI_VERSION)
+        export GO_VERSION=$(params.GO_VERSION)
+        
+        TEMP_DIR="$HOME/tmp"
+        USER_BIN_DIR="$HOME/bin"
+        BUILDPACK_PROJECTS="$HOME/buildpack-repo"
+        
+        printenv
+        
+        mkdir -p ${TEMP_DIR}
+        mkdir -p ${USER_BIN_DIR}
+        mkdir -p ${BUILDPACK_PROJECTS}
+        
+        export PATH=$PATH:${USER_BIN_DIR}     
+        
+        echo "### Podman status ###"
+        podman version
+        echo "## Status of the podman service ##"
+        systemctl --user start podman.socket
+        systemctl status podman.socket
+        ls -la $XDG_RUNTIME_DIR/podman
+        
+        #echo "## Launch socat to expose the podman socket"
+        #socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock &
+        
+        #echo "IP address of the host machine"
+        #HOST_IP=$(hostname -I | awk '{print $1}')
+        #echo "Host IP: $HOST_IP"
+        
+        # echo "Hack to be able to install buildah ..."
+        # sudo podman run -v /etc:/hostetc ubi9 sed -s 's|usr/bin/podman|usr/bin/dnf /usr/bin/podman|g'
+        # sudo podman run -v /etc:/hostetc ubi9 cat /etc/sudoers
+        # sudo dnf -y install buildah
+        
+        curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ${TEMP_DIR} --no-same-owner -xzv pack
+        mv ${TEMP_DIR}/pack ${USER_BIN_DIR}
+        
+        echo "### Pack version ###"
         pack --version
-        pack config experimental true
+        pack config experimental true   
+        
+        echo "### Go version ###"
+        curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar -C ${TEMP_DIR} -xz go
+        mkdir -p ${USER_BIN_DIR}/go
+        mv ${TEMP_DIR}/go ${USER_BIN_DIR}
+        chmod +x ${USER_BIN_DIR}/go
+        
+        mkdir -p $HOME/workspace
+        export GOPATH=$HOME/workspace
+        export GOROOT=${USER_BIN_DIR}/go
+        export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+        go version
 
-        #export DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376
-        #echo "DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376"
-
-        # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
-        echo "Getting the arguments ..."
-        for cmd_arg in "$@"; do
-          CLI_ARGS+=("$cmd_arg")
+        echo "### Build the builder image using pack"
+        curl -sSL https://github.com/paketo-community/builder-ubi-base/tarball/main | tar -xz -C ${TEMP_DIR}
+        mv ${TEMP_DIR}/paketo-community-builder-ubi-base-* ${BUILDPACK_PROJECTS}/builder-ubi-base
+        cd ${BUILDPACK_PROJECTS}/builder-ubi-base
+        
+        BUILD_ARGS=()
+        for build_arg in "$@"; do
+          BUILD_ARGS+=("$build_arg")
         done
         
-        echo "Here are the arguments to be passed to the pack CLI"
-        for i in "$CLI_ARGS[@]"; do
-          echo "arg: $i"
+        echo "Build arguments to be passed to the pack CLI"
+        for arg in "${BUILD_ARGS[@]}"; do
+          echo "arg: $arg"
         done
         
-        echo "Building the builder image ..."
-        echo "pack ${CLI_ARGS[@]}"
-        pack "${CLI_ARGS[@]}"
+        set -o verbose
+        export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+        # export DOCKER_HOST=tcp://${HOST_IP}:2376
+        pack builder create ${IMAGE} --config builder.toml "${BUILD_ARGS[@]}"
+        
+        container=$(podman create ${IMAGE})
+        echo "Container: $container"
+        
+        touch /shared/container_path
+        podman unshare
+        podman mount $container | tee /shared/container_path
+        # delete symlinks - they may point outside the container rootfs, messing with SBOM scanners
+        find $(cat /shared/container_path) -xtype l -delete
+        echo $container >/shared/container_name
+        
+        podman push "$IMAGE" "oci:konflux-final-image:$IMAGE"
+        
+        #container=$(buildah from --pull-never $IMAGE)
+        #buildah mount $container | tee /shared/container_path
+        #buildah push "$IMAGE" "oci:konflux-final-image:$IMAGE"
+        set +o verbose
+        
+        REMOTESSHEOF
+        chmod +x scripts/script-build.sh
+        
+        rsync -ra scripts "$SSH_HOST:$BUILD_DIR"
+        rsync -ra "$HOME/.docker/" "$SSH_HOST:$BUILD_DIR/.docker/"
+
+        # DON'T WORK AS DOCKER PACK CANNOT ACCESS DOCKER HOST
+        # ssh $SSH_ARGS "$SSH_HOST" $PORT_FORWARD podman run $PODMAN_PORT_FORWARD \
+        #    -v "$BUILD_DIR/scripts:/scripts:Z" \
+        #    -v "$BUILD_DIR/.docker/:/root/.docker:Z" \
+        #    -v "$BUILD_DIR/volumes/shared:/shared:Z" \
+        #    --user=0 --rm "$BUILDER_IMAGE" /scripts/script-build.sh
+        
+        ssh $SSH_ARGS "$SSH_HOST" "bash -s" <scripts/script-build.sh
         
         echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
         echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
         echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
+        
+        rsync -ra "$SSH_HOST:$BUILD_DIR/volumes/shared/" /shared/
+        rsync -ra "$SSH_HOST:$BUILD_DIR/results/" "/tekton/results/"
         
 
         
@@ -3587,8 +3704,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
@@ -3597,19 +3712,8 @@ spec:
     value: "false"
   - name: "prefetch-input"
     value: ""
-  - name: "source-dir"
-    value: "source"
-  - name: "imageUrl"
-    value: "buildpacksio/pack"
-  - name: "imageTag"
-    value: "latest"
-  - name: "packCmdBuilderFlags"
-    value:
-    - "builder"
-    - "create"
-    - "builder"
-    - "--config"
-    - "$(workspaces.source.path)/builder.toml"
+  - name: "output-image"
+    value: "quay.io/redhat-user-workloads/cmoullia-tenant/konflux-demo/buildpack-remote:{{revision}}"
   pipelineSpec:
     finally:
     - name: "show-sbom"
@@ -3718,14 +3822,17 @@ spec:
         workspace: "git-auth"
     - name: "build-container"
       params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
+      - name: "PLATFORM"
+        value: "linux-root/amd64"
+      - name: "BUILDER_IMAGE"
+        value: "quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275"
       - name: "PACK_CLI_VERSION"
         value: "v0.35.1"
-      - name: "DOCKER_HOST"
-        value: ""
-      - name: "SOURCE_SUBPATH"
-        value: "."
+      - name: "GO_VERSION"
+        value: "1.23.0"
+      - name: "BUILD_ARGS"
+        value:
+        - "-v"
       runAfter:
       - "prefetch-dependencies"
       taskSpec:
@@ -3736,63 +3843,94 @@ spec:
           name: "IMAGE_DIGEST"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        stepTemplate: {}
         steps:
         - args:
-          - "$(params.packCmdBuilderFlags)"
+          - "$(params.BUILD_ARGS)"
           image: "quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275"
           name: "run-script"
-          script: |
-            #!/usr/bin/env bash
-            set -e
-            mkdir -p ~/.ssh
-            if [ -e "/ssh/error" ]; then
-              #no server could be provisioned
-              cat /ssh/error
-              exit 1
-            fi
-            export SSH_HOST=$(cat /ssh/host)
-            cp /ssh/id_rsa ~/.ssh
-
-            chmod 0400 ~/.ssh/id_rsa
-            export BUILD_DIR=$(cat /ssh/user-dir)
-            export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
-            echo "$BUILD_DIR"
-            ssh $SSH_ARGS "$SSH_HOST"  mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
-
-            ## TO BE REVIEWED ==>
-            echo "Installing pack ..."
-            curl -sSL "https://github.com/buildpacks/pack/releases/download/$(params.PACK_CLI_VERSION)/pack-$(params.PACK_CLI_VERSION)-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
-
-            echo "Checking pack ..."
-            pack --version
-            pack config experimental true
-
-            #export DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376
-            #echo "DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376"
-
-            # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
-            echo "Getting the arguments ..."
-            for cmd_arg in "$@"; do
-              CLI_ARGS+=("$cmd_arg")
-            done
-
-            echo "Here are the arguments to be passed to the pack CLI"
-            for i in "$CLI_ARGS[@]"; do
-              echo "arg: $i"
-            done
-
-            echo "Building the builder image ..."
-            echo "pack ${CLI_ARGS[@]}"
-            pack "${CLI_ARGS[@]}"
-
-            echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
-            echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
-            echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
+          script: "#!/usr/bin/env bash\n#set -o verbose\nset -eu\nset -o pipefail\n\
+            \nmkdir -p ~/.ssh\nif [ -e \"/ssh/error\" ]; then\n  #no server could\
+            \ be provisioned\n  cat /ssh/error\nexit 1\nelif [ -e \"/ssh/otp\" ];\
+            \ then\n  curl --cacert /ssh/otp-ca -XPOST -d @/ssh/otp $(cat /ssh/otp-server)\
+            \ >~/.ssh/id_rsa\n  echo \"\" >> ~/.ssh/id_rsa\nelse\n  cp /ssh/id_rsa\
+            \ ~/.ssh\nfi\nchmod 0400 ~/.ssh/id_rsa\n\nexport SSH_HOST=$(cat /ssh/host)\n\
+            export BUILD_DIR=$(cat /ssh/user-dir)\nexport SSH_ARGS=\"-o StrictHostKeyChecking=no\
+            \ -o ServerAliveInterval=60 -o ServerAliveCountMax=10\"\n\nmkdir -p scripts\n\
+            \nPORT_FORWARD=\"\"\nPODMAN_PORT_FORWARD=\"\"\n\necho \"$BUILD_DIR\"\n\
+            ssh $SSH_ARGS \"$SSH_HOST\" mkdir -p \"$BUILD_DIR/workspaces\" \"$BUILD_DIR/scripts\"\
+            \ \"$BUILD_DIR/volumes\"\n\necho \"rsync shared folders ...\"\nrsync -ra\
+            \ /shared/ \"$SSH_HOST:$BUILD_DIR/volumes/shared/\"\nrsync -ra \"/tekton/results/\"\
+            \ \"$SSH_HOST:$BUILD_DIR/results/\"\n\ncat >scripts/script-build.sh <<'REMOTESSHEOF'\n\
+            #!/bin/sh\n\n# Set the env vars here as stepTemplate don't work\nexport\
+            \ BUILDER_IMAGE=$(params.BUILDER_IMAGE)\nexport PLATFORM=$(params.PLATFORM)\n\
+            export IMAGE=$(params.output-image)\nexport PACK_CLI_VERSION=$(params.PACK_CLI_VERSION)\n\
+            export GO_VERSION=$(params.GO_VERSION)\n\nTEMP_DIR=\"$HOME/tmp\"\nUSER_BIN_DIR=\"\
+            $HOME/bin\"\nBUILDPACK_PROJECTS=\"$HOME/buildpack-repo\"\n\nprintenv\n\
+            \nmkdir -p ${TEMP_DIR}\nmkdir -p ${USER_BIN_DIR}\nmkdir -p ${BUILDPACK_PROJECTS}\n\
+            \nexport PATH=$PATH:${USER_BIN_DIR}     \n\necho \"### Podman status ###\"\
+            \npodman version\necho \"## Status of the podman service ##\"\nsystemctl\
+            \ --user start podman.socket\nsystemctl status podman.socket\nls -la $XDG_RUNTIME_DIR/podman\n\
+            \n#echo \"## Launch socat to expose the podman socket\"\n#socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0\
+            \ unix:/run/user/1000/podman/podman.sock &\n\n#echo \"IP address of the\
+            \ host machine\"\n#HOST_IP=$(hostname -I | awk '{print $1}')\n#echo \"\
+            Host IP: $HOST_IP\"\n\n# echo \"Hack to be able to install buildah ...\"\
+            \n# sudo podman run -v /etc:/hostetc ubi9 sed -s 's|usr/bin/podman|usr/bin/dnf\
+            \ /usr/bin/podman|g'\n# sudo podman run -v /etc:/hostetc ubi9 cat /etc/sudoers\n\
+            # sudo dnf -y install buildah\n\ncurl -sSL \"https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz\"\
+            \ | tar -C ${TEMP_DIR} --no-same-owner -xzv pack\nmv ${TEMP_DIR}/pack\
+            \ ${USER_BIN_DIR}\n\necho \"### Pack version ###\"\npack --version\npack\
+            \ config experimental true   \n\necho \"### Go version ###\"\ncurl -sSL\
+            \ \"https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz\" | tar -C ${TEMP_DIR}\
+            \ -xz go\nmkdir -p ${USER_BIN_DIR}/go\nmv ${TEMP_DIR}/go ${USER_BIN_DIR}\n\
+            chmod +x ${USER_BIN_DIR}/go\n\nmkdir -p $HOME/workspace\nexport GOPATH=$HOME/workspace\n\
+            export GOROOT=${USER_BIN_DIR}/go\nexport PATH=$PATH:$GOROOT/bin:$GOPATH/bin\n\
+            go version\n\necho \"### Build the builder image using pack\"\ncurl -sSL\
+            \ https://github.com/paketo-community/builder-ubi-base/tarball/main |\
+            \ tar -xz -C ${TEMP_DIR}\nmv ${TEMP_DIR}/paketo-community-builder-ubi-base-*\
+            \ ${BUILDPACK_PROJECTS}/builder-ubi-base\ncd ${BUILDPACK_PROJECTS}/builder-ubi-base\n\
+            \nBUILD_ARGS=()\nfor build_arg in \"$@\"; do\n  BUILD_ARGS+=(\"$build_arg\"\
+            )\ndone\n\necho \"Build arguments to be passed to the pack CLI\"\nfor\
+            \ arg in \"${BUILD_ARGS[@]}\"; do\n  echo \"arg: $arg\"\ndone\n\nset -o\
+            \ verbose\nexport DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock\n\
+            # export DOCKER_HOST=tcp://${HOST_IP}:2376\npack builder create ${IMAGE}\
+            \ --config builder.toml \"${BUILD_ARGS[@]}\"\n\ncontainer=$(podman create\
+            \ ${IMAGE})\necho \"Container: $container\"\n\ntouch /shared/container_path\n\
+            podman unshare\npodman mount $container | tee /shared/container_path\n\
+            # delete symlinks - they may point outside the container rootfs, messing\
+            \ with SBOM scanners\nfind $(cat /shared/container_path) -xtype l -delete\n\
+            echo $container >/shared/container_name\n\npodman push \"$IMAGE\" \"oci:konflux-final-image:$IMAGE\"\
+            \n\n#container=$(buildah from --pull-never $IMAGE)\n#buildah mount $container\
+            \ | tee /shared/container_path\n#buildah push \"$IMAGE\" \"oci:konflux-final-image:$IMAGE\"\
+            \nset +o verbose\n\nREMOTESSHEOF\nchmod +x scripts/script-build.sh\n\n\
+            rsync -ra scripts \"$SSH_HOST:$BUILD_DIR\"\nrsync -ra \"$HOME/.docker/\"\
+            \ \"$SSH_HOST:$BUILD_DIR/.docker/\"\n\n# DON'T WORK AS DOCKER PACK CANNOT\
+            \ ACCESS DOCKER HOST\n# ssh $SSH_ARGS \"$SSH_HOST\" $PORT_FORWARD podman\
+            \ run $PODMAN_PORT_FORWARD \\\n#    -v \"$BUILD_DIR/scripts:/scripts:Z\"\
+            \ \\\n#    -v \"$BUILD_DIR/.docker/:/root/.docker:Z\" \\\n#    -v \"$BUILD_DIR/volumes/shared:/shared:Z\"\
+            \ \\\n#    --user=0 --rm \"$BUILDER_IMAGE\" /scripts/script-build.sh\n\
+            \nssh $SSH_ARGS \"$SSH_HOST\" \"bash -s\" <scripts/script-build.sh\n\n\
+            echo -n \"URL of the image build is : quarkus-hello:1.0\" | tee \"$(results.IMAGE_URL.path)\"\
+            \necho -n \"sha256ddddddddddddddddddddd\" | tee \"$(results.IMAGE_DIGEST.path)\"\
+            \necho -n \"sha256eeeeeeeeeeeeeeeeeeeeee\" | tee \"$(results.BASE_IMAGES_DIGESTS.path)\"\
+            \n\nrsync -ra \"$SSH_HOST:$BUILD_DIR/volumes/shared/\" /shared/\nrsync\
+            \ -ra \"$SSH_HOST:$BUILD_DIR/results/\" \"/tekton/results/\"\n"
+          volumeMounts:
+          - mountPath: "/ssh"
+            name: "ssh"
+            readOnly: true
+          - mountPath: "/shared"
+            name: "shared"
+            readOnly: false
+        volumes:
+        - name: "ssh"
+          secret:
+            secretName: "multi-platform-ssh-$(context.taskRun.name)"
+        - emptyDir: {}
+          name: "shared"
       workspaces:
       - name: "source"
         workspace: "workspace"
-      - name: "ssh"
-        workspace: "ssh"
     - name: "build-image-index"
       params:
       - name: "IMAGE"
@@ -3927,7 +4065,7 @@ spec:
           value: "task"
         resolver: "bundles"
   timeouts:
-    pipeline: "300000000000ns"
+    pipeline: "900000000000ns"
   workspaces:
   - name: "workspace"
     volumeClaimTemplate:
@@ -3942,8 +4080,5 @@ spec:
   - name: "git-auth"
     secret:
       secretName: "{{ git_auth_secret }}"
-  - name: "ssh"
-    secret:
-      secretName: "multi-platform-ssh-$(context.taskRun.name)"
 
 ```

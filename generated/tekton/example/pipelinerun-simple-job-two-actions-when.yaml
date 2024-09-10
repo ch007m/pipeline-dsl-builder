@@ -18,6 +18,7 @@ spec:
     tasks:
     - name: "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
@@ -30,6 +31,7 @@ spec:
       runAfter:
       - "say-hello"
       taskSpec:
+        stepTemplate: {}
         steps:
         - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
           name: "run-script"
