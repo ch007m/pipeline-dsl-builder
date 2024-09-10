@@ -10,6 +10,7 @@ public class Volume {
     private String storage;
     private String accessMode;
     private String secret;
+    private String mountPath;
 
     public static String STORAGE = "storage";
 }
