@@ -29,6 +29,9 @@ job:
     # Remote SSH params
     - PLATFORM: linux-mlarge/amd64 # We need it in order to configure the multi-arch-platform controller properly - see: https://github.com/redhat-appstudio/infra-deployments/blob/main/components/multi-platform-controller/production/host-config.yaml
 
+    # Konflux param
+    - output-image: quay.io/redhat-user-workloads/cmoullia-tenant/konflux-demo/buildpack-remote:{{revision}}
+
     # Buildpack params
     - source-dir: "source"
     - imageUrl: "buildpacksio/pack"
@@ -49,6 +52,7 @@ job:
         - PACK_CLI_VERSION: "v0.35.1"
         - DOCKER_HOST: ""
         - SOURCE_SUBPATH: "."
+        - IMAGE: "$(params.output-image)"
         - PLATFORM: "$(params.PLATFORM)"
         #- DOCKER_HOST: $(tasks.virtualmachine.results.ip)
         #- PACK_CMD_FLAGS:
@@ -154,10 +158,12 @@ job:
         curl -sSL https://github.com/paketo-community/builder-ubi-base/tarball/main | tar -xz -C ${TEMP_DIR}
         mv ${TEMP_DIR}/paketo-community-builder-ubi-base-* ${BUILDPACK_PROJECTS}/builder-ubi-base
         cd ${BUILDPACK_PROJECTS}/builder-ubi-base
-        ls
         
         export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
-        pack builder create builder --config builder.toml -vv
+        pack builder create $(params.IMAGE) --config builder.toml -v
+        
+        container=$(buildah from --pull-never $IMAGE)
+        buildah mount $container
         
         REMOTESSHEOF
         chmod +x scripts/script-build.sh
