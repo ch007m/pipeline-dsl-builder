@@ -23,8 +23,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
