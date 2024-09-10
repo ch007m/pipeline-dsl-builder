@@ -51,7 +51,6 @@ job:
   params:
     - git-url: "{{source_url}}"
     - revision: "{{revision}}"
-    - output-image: "quay.io/ch007m/builder-ubi-base:{{revision}}"
     - image-expires-after: "5d"
     - build-image-index: ""
     # We need the following parameters when defined part of the PipelineSpec with default value and used by a task
