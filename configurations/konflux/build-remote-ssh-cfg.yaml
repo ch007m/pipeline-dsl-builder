@@ -48,14 +48,15 @@ job:
         - BASE_IMAGES_DIGESTS: "Digests of the base images used for build"
 
       # env var ar not injected within the tekton's pod running the script
-      #envs:
-      #   - BUILDER_IMAGE: $(params.BUILDER_IMAGE)
-      #   - PLATFORM: $(params.PLATFORM)
-      #   - IMAGE: $(params.output-image)
-      #   - PACK_CLI_VERSION: $(params.PACK_CLI_VERSION)
+      envs:
+        - BUILDER_IMAGE: $(params.BUILDER_IMAGE)
+        - PLATFORM: $(params.PLATFORM)
+        - IMAGE: $(params.output-image)
+        - PACK_CLI_VERSION: $(params.PACK_CLI_VERSION)
+        - GO_VERSION: $(params.GO_VERSION)
 
       args:
-        - $(params.BUILD_ARGS)
+        - $(params.BUILD_ARGS[*])
 
       #scriptFileUrl: https://raw.githubusercontent.com/ch007m/pipeline-dsl-builder/main/scripts/ssh-remote.sh
       volumes:
@@ -87,6 +88,12 @@ job:
         fi
         chmod 0400 ~/.ssh/id_rsa
         
+        # Export the args passed using the BUILD_ARGS env var that we will use within the bash script executed remotely
+        export BUILD_ARGS="$@"
+        echo "## Start :: echo build_args"
+        echo $BUILD_ARGS
+        echo "## End :: echo build_args"
+
         export SSH_HOST=$(cat /ssh/host)
         export BUILD_DIR=$(cat /ssh/user-dir)
         export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
@@ -107,34 +114,34 @@ job:
         #!/bin/sh
         
         # Set the env vars here as stepTemplate don't work
-        export BUILDER_IMAGE=$(params.BUILDER_IMAGE)
-        export PLATFORM=$(params.PLATFORM)
-        export IMAGE=$(params.output-image)
-        export PACK_CLI_VERSION=$(params.PACK_CLI_VERSION)
-        export GO_VERSION=$(params.GO_VERSION)
+        # export BUILDER_IMAGE=$(params.BUILDER_IMAGE)
+        # export PLATFORM=$(params.PLATFORM)
+        # export IMAGE=$(params.output-image)
+        # export PACK_CLI_VERSION=$(params.PACK_CLI_VERSION)
+        # export GO_VERSION=$(params.GO_VERSION)
         
         TEMP_DIR="$HOME/tmp"
         USER_BIN_DIR="$HOME/bin"
         BUILDPACK_PROJECTS="$HOME/buildpack-repo"
-       
-        # printenv
  
         mkdir -p ${TEMP_DIR}
         mkdir -p ${USER_BIN_DIR}
         mkdir -p ${BUILDPACK_PROJECTS}
+        mkdir -p ${HOME}/shared
  
         export PATH=$PATH:${USER_BIN_DIR}
  
         echo "### Podman status ###"
         podman version
+
         echo "## Status of the podman service ##"
         systemctl --user start podman.socket
         systemctl status podman.socket
-        ls -la $XDG_RUNTIME_DIR/podman
- 
+        # ls -la $XDG_RUNTIME_DIR/podman
+
         #echo "## Launch socat to expose the podman socket"
         #socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock &
- 
+
         #echo "IP address of the host machine"
         #HOST_IP=$(hostname -I | awk '{print $1}')
         #echo "Host IP: $HOST_IP"
@@ -168,45 +175,62 @@ job:
         mv ${TEMP_DIR}/paketo-community-builder-ubi-base-* ${BUILDPACK_PROJECTS}/builder-ubi-base
         cd ${BUILDPACK_PROJECTS}/builder-ubi-base
  
-        BUILD_ARGS=()
-        for build_arg in "$@"; do
-          BUILD_ARGS+=("$build_arg")
-        done
- 
-        echo "Build arguments to be passed to the pack CLI"
-        for arg in "${BUILD_ARGS[@]}"; do
-          echo "arg: $arg"
-        done
- 
-        set -o verbose
-        export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+        # Not needed as we pass the BUIDL_ARGS using Tekton's env var
+        # BUILD_ARGS=()
+        #for build_arg in "$@"; do
+        #  BUILD_ARGS+=("$build_arg")
+        #done
+
+        #echo "Build arguments to be passed to the pack CLI"
+        #for arg in "${BUILD_ARGS[@]}"; do
+        #  echo "arg: $arg"
+        #done
+
         # export DOCKER_HOST=tcp://${HOST_IP}:2376
-        pack builder create ${IMAGE} --config builder.toml "${BUILD_ARGS[@]}"
- 
+
+        for build_arg in "${BUILD_ARGS[@]}"; do
+          PACK_ARGS+=" $build_arg"
+        done
+
+        echo "## Start :: Echo args to be passed to pack"
+        echo $PACK_ARGS
+        echo "## End :: Echo args to be passed to pack"
+
+        export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+        echo "pack builder create ${IMAGE} --config builder.toml ${PACK_ARGS}"
+        pack builder create ${IMAGE} --config builder.toml ${PACK_ARGS}
+
         container=$(podman create ${IMAGE})
         echo "Container: $container"
- 
-        touch $BUILD_DIR/volumes/shared/container_path
+
+        touch ${HOME}/shared/container_path
         podman unshare
-        podman mount $container | tee $BUILD_DIR/volumes/shared/container_path
+        podman mount $container | tee ${HOME}/shared/container_path
+
         # delete symlinks - they may point outside the container rootfs, messing with SBOM scanners
-        find $(cat $BUILD_DIR/volumes/shared/container_path) -xtype l -delete
-        echo $container > $BUILD_DIR/volumes/shared/container_name
- 
+        find $(cat ${HOME}/shared/container_path) -xtype l -delete
+
+        echo $container > ${HOME}/shared/container_name
+
         podman push "$IMAGE" "oci:konflux-final-image:$IMAGE"
+        echo "## List konflux-final-image"
         ls -la konflux-final-image
-        ls -la $BUILD_DIR/volumes/shared
- 
-        #container=$(buildah from --pull-never $IMAGE)
-        #buildah mount $container | tee /shared/container_path
-        #buildah push "$IMAGE" "oci:konflux-final-image:$IMAGE"
-        set +o verbose
- 
+
+        echo "## List ${HOME}/shared/container_path"
+        ls -la ${HOME}/shared/container_path
+
+        echo "## Show ${HOME}/shared/container_name"
+        cat ${HOME}/shared/container_name
+
         REMOTESSHEOF
         chmod +x scripts/script-build.sh
- 
+
         rsync -ra scripts "$SSH_HOST:$BUILD_DIR"
         rsync -ra "$HOME/.docker/" "$SSH_HOST:$BUILD_DIR/.docker/"
+
+        ssh $SSH_ARGS "$SSH_HOST" \
+          "FOO=$FOO BAR=$BAR BUILDER_IMAGE=$BUILDER_IMAGE PLATFORM=$PLATFORM IMAGE=$IMAGE PACK_CLI_VERSION=$PACK_CLI_VERSION GO_VERSION=$GO_VERSION BUILD_ARGS=$BUILD_ARGS" \
+           scripts/script-build.sh
 
         # DON'T WORK AS PACK CANNOT ACCESS DOCKER HOST
         # ssh $SSH_ARGS "$SSH_HOST" $PORT_FORWARD podman run $PODMAN_PORT_FORWARD \
@@ -214,14 +238,12 @@ job:
         #    -v "$BUILD_DIR/.docker/:/root/.docker:Z" \
         #    -v "$BUILD_DIR/volumes/shared:/shared:Z" \
         #    --user=0 --rm "$BUILDER_IMAGE" /scripts/script-build.sh
- 
-        ssh $SSH_ARGS "$SSH_HOST" "bash -s" <scripts/script-build.sh
- 
+
         echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
         echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
         echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
- 
-        rsync -ra "$SSH_HOST:$BUILD_DIR/volumes/shared/" /shared/
+
+        rsync -ra "$SSH_HOST:$BUILD_DIR/shared/" /shared/
         rsync -ra "$SSH_HOST:$BUILD_DIR/results/" "/tekton/results/"
         
 
