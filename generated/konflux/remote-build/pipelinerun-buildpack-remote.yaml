@@ -23,8 +23,6 @@ spec:
     value: "{{source_url}}"
   - name: "revision"
     value: "{{revision}}"
-  - name: "output-image"
-    value: "quay.io/ch007m/builder-ubi-base:{{revision}}"
   - name: "image-expires-after"
     value: "5d"
   - name: "build-image-index"
@@ -33,19 +31,8 @@ spec:
     value: "false"
   - name: "prefetch-input"
     value: ""
-  - name: "source-dir"
-    value: "source"
-  - name: "imageUrl"
-    value: "buildpacksio/pack"
-  - name: "imageTag"
-    value: "latest"
-  - name: "packCmdBuilderFlags"
-    value:
-    - "builder"
-    - "create"
-    - "builder"
-    - "--config"
-    - "$(workspaces.source.path)/builder.toml"
+  - name: "output-image"
+    value: "quay.io/redhat-user-workloads/cmoullia-tenant/konflux-demo/buildpack-remote:{{revision}}"
   pipelineSpec:
     finally:
     - name: "show-sbom"
@@ -154,14 +141,17 @@ spec:
         workspace: "git-auth"
     - name: "build-container"
       params:
-      - name: "PACK_SOURCE_DIR"
-        value: "$(params.source-dir)"
+      - name: "PLATFORM"
+        value: "linux-mlarge/amd64"
+      - name: "BUILDER_IMAGE"
+        value: "quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275"
       - name: "PACK_CLI_VERSION"
         value: "v0.35.1"
-      - name: "DOCKER_HOST"
-        value: ""
-      - name: "SOURCE_SUBPATH"
-        value: "."
+      - name: "GO_VERSION"
+        value: "1.23.0"
+      - name: "BUILD_ARGS"
+        value:
+        - "-v"
       runAfter:
       - "prefetch-dependencies"
       taskSpec:
@@ -172,63 +162,215 @@ spec:
           name: "IMAGE_DIGEST"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        stepTemplate:
+          env:
+          - name: "BUILDER_IMAGE"
+            value: "$(params.BUILDER_IMAGE)"
+          - name: "PLATFORM"
+            value: "$(params.PLATFORM)"
+          - name: "IMAGE"
+            value: "$(params.output-image)"
+          - name: "PACK_CLI_VERSION"
+            value: "$(params.PACK_CLI_VERSION)"
+          - name: "GO_VERSION"
+            value: "$(params.GO_VERSION)"
         steps:
         - args:
-          - "$(params.packCmdBuilderFlags)"
+          - "$(params.BUILD_ARGS[*])"
           image: "quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275"
           name: "run-script"
           script: |
             #!/usr/bin/env bash
-            set -e
+            #set -o verbose
+            set -eu
+            set -o pipefail
+
             mkdir -p ~/.ssh
             if [ -e "/ssh/error" ]; then
               #no server could be provisioned
               cat /ssh/error
-              exit 1
+            exit 1
+            elif [ -e "/ssh/otp" ]; then
+              curl --cacert /ssh/otp-ca -XPOST -d @/ssh/otp $(cat /ssh/otp-server) >~/.ssh/id_rsa
+              echo "" >> ~/.ssh/id_rsa
+            else
+              cp /ssh/id_rsa ~/.ssh
             fi
-            export SSH_HOST=$(cat /ssh/host)
-            cp /ssh/id_rsa ~/.ssh
-
             chmod 0400 ~/.ssh/id_rsa
+
+            # Export the args passed using the BUILD_ARGS env var that we will use within the bash script executed remotely
+            export BUILD_ARGS="$@"
+            echo "## Start :: echo build_args"
+            echo $BUILD_ARGS
+            echo "## End :: echo build_args"
+
+            export SSH_HOST=$(cat /ssh/host)
             export BUILD_DIR=$(cat /ssh/user-dir)
             export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
+
+            mkdir -p scripts
+
+            PORT_FORWARD=""
+            PODMAN_PORT_FORWARD=""
+
             echo "$BUILD_DIR"
-            ssh $SSH_ARGS "$SSH_HOST"  mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
+            ssh $SSH_ARGS "$SSH_HOST" mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
 
-            ## TO BE REVIEWED ==>
-            echo "Installing pack ..."
-            curl -sSL "https://github.com/buildpacks/pack/releases/download/$(params.PACK_CLI_VERSION)/pack-$(params.PACK_CLI_VERSION)-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
+            echo "rsync shared folders ..."
+            rsync -ra "/shared/" "$SSH_HOST:$BUILD_DIR/volumes/shared/"
+            rsync -ra "/tekton/results/" "$SSH_HOST:$BUILD_DIR/results/"
 
-            echo "Checking pack ..."
+            cat >scripts/script-build.sh <<'REMOTESSHEOF'
+            #!/bin/sh
+
+            # Set the env vars here as stepTemplate don't work
+            # export BUILDER_IMAGE=$(params.BUILDER_IMAGE)
+            # export PLATFORM=$(params.PLATFORM)
+            # export IMAGE=$(params.output-image)
+            # export PACK_CLI_VERSION=$(params.PACK_CLI_VERSION)
+            # export GO_VERSION=$(params.GO_VERSION)
+
+            TEMP_DIR="$HOME/tmp"
+            USER_BIN_DIR="$HOME/bin"
+            BUILDPACK_PROJECTS="$HOME/buildpack-repo"
+
+            mkdir -p ${TEMP_DIR}
+            mkdir -p ${USER_BIN_DIR}
+            mkdir -p ${BUILDPACK_PROJECTS}
+            mkdir -p ${HOME}/shared
+
+            export PATH=$PATH:${USER_BIN_DIR}
+
+            echo "### Podman status ###"
+            podman version
+
+            echo "## Status of the podman service ##"
+            systemctl --user start podman.socket
+            systemctl status podman.socket
+            # ls -la $XDG_RUNTIME_DIR/podman
+
+            #echo "## Launch socat to expose the podman socket"
+            #socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock &
+
+            #echo "IP address of the host machine"
+            #HOST_IP=$(hostname -I | awk '{print $1}')
+            #echo "Host IP: $HOST_IP"
+
+            # echo "Hack to be able to install buildah ..."
+            # sudo podman run -v /etc:/hostetc ubi9 sed -s 's|usr/bin/podman|usr/bin/dnf /usr/bin/podman|g'
+            # sudo podman run -v /etc:/hostetc ubi9 cat /etc/sudoers
+            # sudo dnf -y install buildah
+
+            curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ${TEMP_DIR} --no-same-owner -xzv pack
+            mv ${TEMP_DIR}/pack ${USER_BIN_DIR}
+
+            echo "### Pack version ###"
             pack --version
             pack config experimental true
 
-            #export DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376
-            #echo "DOCKER_HOST=tcp://$(params.DOCKER_HOST):2376"
+            echo "### Go version ###"
+            curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar -C ${TEMP_DIR} -xz go
+            mkdir -p ${USER_BIN_DIR}/go
+            mv ${TEMP_DIR}/go ${USER_BIN_DIR}
+            chmod +x ${USER_BIN_DIR}/go
 
-            # We cannot get the array from the params PACK_CMD_FLAGS within the bash script as substitution don't work in this case !!
-            echo "Getting the arguments ..."
-            for cmd_arg in "$@"; do
-              CLI_ARGS+=("$cmd_arg")
+            mkdir -p $HOME/workspace
+            export GOPATH=$HOME/workspace
+            export GOROOT=${USER_BIN_DIR}/go
+            export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+            go version
+
+            echo "### Build the builder image using pack"
+            curl -sSL https://github.com/paketo-community/builder-ubi-base/tarball/main | tar -xz -C ${TEMP_DIR}
+            mv ${TEMP_DIR}/paketo-community-builder-ubi-base-* ${BUILDPACK_PROJECTS}/builder-ubi-base
+            cd ${BUILDPACK_PROJECTS}/builder-ubi-base
+
+            # Not needed as we pass the BUIDL_ARGS using Tekton's env var
+            # BUILD_ARGS=()
+            #for build_arg in "$@"; do
+            #  BUILD_ARGS+=("$build_arg")
+            #done
+
+            #echo "Build arguments to be passed to the pack CLI"
+            #for arg in "${BUILD_ARGS[@]}"; do
+            #  echo "arg: $arg"
+            #done
+
+            # export DOCKER_HOST=tcp://${HOST_IP}:2376
+
+            for build_arg in "${BUILD_ARGS[@]}"; do
+              PACK_ARGS+=" $build_arg"
             done
 
-            echo "Here are the arguments to be passed to the pack CLI"
-            for i in "$CLI_ARGS[@]"; do
-              echo "arg: $i"
-            done
+            echo "## Start :: Echo args to be passed to pack"
+            echo $PACK_ARGS
+            echo "## End :: Echo args to be passed to pack"
 
-            echo "Building the builder image ..."
-            echo "pack ${CLI_ARGS[@]}"
-            pack "${CLI_ARGS[@]}"
+            export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
+            echo "pack builder create ${IMAGE} --config builder.toml ${PACK_ARGS}"
+            pack builder create ${IMAGE} --config builder.toml ${PACK_ARGS}
+
+            container=$(podman create ${IMAGE})
+            echo "Container: $container"
+
+            touch ${HOME}/shared/container_path
+            podman unshare
+            podman mount $container | tee ${HOME}/shared/container_path
+
+            # delete symlinks - they may point outside the container rootfs, messing with SBOM scanners
+            find $(cat ${HOME}/shared/container_path) -xtype l -delete
+
+            echo $container > ${HOME}/shared/container_name
+
+            podman push "$IMAGE" "oci:konflux-final-image:$IMAGE"
+            echo "## List konflux-final-image"
+            ls -la konflux-final-image
+
+            echo "## List ${HOME}/shared/container_path"
+            ls -la ${HOME}/shared/container_path
+
+            echo "## Show ${HOME}/shared/container_name"
+            cat ${HOME}/shared/container_name
+
+            REMOTESSHEOF
+            chmod +x scripts/script-build.sh
+
+            rsync -ra scripts "$SSH_HOST:$BUILD_DIR"
+            rsync -ra "$HOME/.docker/" "$SSH_HOST:$BUILD_DIR/.docker/"
+
+            ssh $SSH_ARGS "$SSH_HOST" \
+              "FOO=$FOO BAR=$BAR BUILDER_IMAGE=$BUILDER_IMAGE PLATFORM=$PLATFORM IMAGE=$IMAGE PACK_CLI_VERSION=$PACK_CLI_VERSION GO_VERSION=$GO_VERSION BUILD_ARGS=$BUILD_ARGS" \
+               scripts/script-build.sh
+
+            # DON'T WORK AS PACK CANNOT ACCESS DOCKER HOST
+            # ssh $SSH_ARGS "$SSH_HOST" $PORT_FORWARD podman run $PODMAN_PORT_FORWARD \
+            #    -v "$BUILD_DIR/scripts:/scripts:Z" \
+            #    -v "$BUILD_DIR/.docker/:/root/.docker:Z" \
+            #    -v "$BUILD_DIR/volumes/shared:/shared:Z" \
+            #    --user=0 --rm "$BUILDER_IMAGE" /scripts/script-build.sh
 
             echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
             echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
             echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
+
+            rsync -ra "$SSH_HOST:$BUILD_DIR/shared/" /shared/
+            rsync -ra "$SSH_HOST:$BUILD_DIR/results/" "/tekton/results/"
+          volumeMounts:
+          - mountPath: "/ssh"
+            name: "ssh"
+            readOnly: true
+          - mountPath: "/shared"
+            name: "shared"
+            readOnly: false
+        volumes:
+        - name: "ssh"
+          secret:
+            secretName: "multi-platform-ssh-$(context.taskRun.name)"
+        - emptyDir: {}
+          name: "shared"
       workspaces:
       - name: "source"
         workspace: "workspace"
-      - name: "ssh"
-        workspace: "ssh"
     - name: "build-image-index"
       params:
       - name: "IMAGE"
@@ -363,7 +505,7 @@ spec:
           value: "task"
         resolver: "bundles"
   timeouts:
-    pipeline: "300000000000ns"
+    pipeline: "900000000000ns"
   workspaces:
   - name: "workspace"
     volumeClaimTemplate:
@@ -378,6 +520,3 @@ spec:
   - name: "git-auth"
     secret:
       secretName: "{{ git_auth_secret }}"
-  - name: "ssh"
-    secret:
-      secretName: "multi-platform-ssh-$(context.taskRun.name)"
