@@ -190,11 +190,12 @@ job:
         - image-url: "$(tasks.build-container.results.IMAGE_URL)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1
 
-    - name: sbom-json-check
-      runAfter: build-container
-      when:
-        - "$(params.skip-checks): false"
-      params:
-        - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
-        - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1
+    # Deprecated since Sep 2024
+    # - name: sbom-json-check
+    #   runAfter: build-container
+    #   when:
+    #     - "$(params.skip-checks): false"
+    #   params:
+    #     - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    #     - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
+    #   ref: bundle://quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1
