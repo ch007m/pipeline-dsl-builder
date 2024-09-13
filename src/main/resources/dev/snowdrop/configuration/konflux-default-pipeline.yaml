@@ -138,9 +138,6 @@ job:
         - IMAGES:
           - "$(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1
-      workspaces:
-        - name: workspace
-          workspace: workspace
 
     - name: source-build # Konflux name is : build-source-image !!
       runAfter: build-container
