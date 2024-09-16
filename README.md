@@ -55,7 +55,7 @@ Next, check the pipeline(s) generated under `./out/flows/<domain>`
 
 **Remark**: Use the parameter `-h` to get the help usage of the application
 
-The `configurations` folder proposes different YAML configurations of what you can do :-)
+The [configurations](./configurations) folder proposes different YAML config examples of what you can do :-)
 
 ## Some scenario ideas
 
