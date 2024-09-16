@@ -1,6 +1,6 @@
 # Tekton Pipeline YAML Generator
 
-![e2e testing workflow](https://github.com/ch007m/pipeline-dsl-builder/blob/main/.github/workflows/e2e-testing.yaml/badge.svg)
+![e2e testing workflow](https://github.com/ch007m/pipeline-dsl-builder/actions/workflows/e2e-testing.yaml/badge.svg)
 
 The goal of this Quarkus Application is to simplify the life of the users when they play with Tekton or any compliant project like [Konflux](https://konflux-ci.dev/) which uses an opinionated pipeline's [template](https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml) to generate the required Tekton YAML
 resources.
