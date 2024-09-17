@@ -280,6 +280,62 @@ spec:
     pipeline: "300000000000ns"
 
 ```
+#### Simple example of a Tekton pipeline echoing a message
+
+Command to be executed: 
+```bash
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/simple-job-fetch-file-script-cfg.yaml
+```
+using as configuration: 
+```yaml
+# configurations/tekton/simple-job-fetch-file-script-cfg.yaml
+
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+type: tekton
+# The domain allows to organize the resources, tasks to be generated
+domain: example
+
+job:
+  name: simple-job-fetch-file-script
+  description: Simple example of a Tekton pipeline echoing a message
+  resourceType: PipelineRun
+
+  actions:
+    - name: say-hello
+      scriptFileUrl: file://scripts/echo.sh
+```
+Generated file: 
+```yaml
+# generated/tekton/example/pipelinerun-simple-job-fetch-file-script.yaml
+
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "simple-job-fetch-file-script"
+spec:
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        stepTemplate: {}
+        steps:
+        - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
+
+            set -e
+            echo "Say Hello"
+  timeouts:
+    pipeline: "300000000000ns"
+
+```
 #### Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye
 
 Command to be executed: 
@@ -1377,9 +1433,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "source-build"
       params:
       - name: "BINARY_IMAGE"
@@ -1466,23 +1519,6 @@ spec:
           value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1"
         - name: "name"
           value: "clamav-scan"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-    - name: "sbom-json-check"
-      params:
-      - name: "IMAGE_DIGEST"
-        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-      - name: "IMAGE_URL"
-        value: "$(tasks.build-container.results.IMAGE_URL)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1"
-        - name: "name"
-          value: "sbom-json-check"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -1908,9 +1944,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "source-build"
       params:
       - name: "BINARY_IMAGE"
@@ -1997,23 +2030,6 @@ spec:
           value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1"
         - name: "name"
           value: "clamav-scan"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-    - name: "sbom-json-check"
-      params:
-      - name: "IMAGE_DIGEST"
-        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-      - name: "IMAGE_URL"
-        value: "$(tasks.build-container.results.IMAGE_URL)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1"
-        - name: "name"
-          value: "sbom-json-check"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -2367,9 +2383,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "source-build"
       params:
       - name: "BINARY_IMAGE"
@@ -2456,23 +2469,6 @@ spec:
           value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1"
         - name: "name"
           value: "clamav-scan"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-    - name: "sbom-json-check"
-      params:
-      - name: "IMAGE_DIGEST"
-        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-      - name: "IMAGE_URL"
-        value: "$(tasks.build-container.results.IMAGE_URL)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1"
-        - name: "name"
-          value: "sbom-json-check"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -2838,9 +2834,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "source-build"
       params:
       - name: "BINARY_IMAGE"
@@ -2927,23 +2920,6 @@ spec:
           value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1"
         - name: "name"
           value: "clamav-scan"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-    - name: "sbom-json-check"
-      params:
-      - name: "IMAGE_DIGEST"
-        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-      - name: "IMAGE_URL"
-        value: "$(tasks.build-container.results.IMAGE_URL)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1"
-        - name: "name"
-          value: "sbom-json-check"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -3304,9 +3280,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "source-build"
       params:
       - name: "BINARY_IMAGE"
@@ -3393,23 +3366,6 @@ spec:
           value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1"
         - name: "name"
           value: "clamav-scan"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-    - name: "sbom-json-check"
-      params:
-      - name: "IMAGE_DIGEST"
-        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-      - name: "IMAGE_URL"
-        value: "$(tasks.build-container.results.IMAGE_URL)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1"
-        - name: "name"
-          value: "sbom-json-check"
         - name: "kind"
           value: "task"
         resolver: "bundles"
@@ -4100,9 +4056,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "source-build"
       params:
       - name: "BINARY_IMAGE"
@@ -4189,23 +4142,6 @@ spec:
           value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1"
         - name: "name"
           value: "clamav-scan"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-    - name: "sbom-json-check"
-      params:
-      - name: "IMAGE_DIGEST"
-        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-      - name: "IMAGE_URL"
-        value: "$(tasks.build-container.results.IMAGE_URL)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1"
-        - name: "name"
-          value: "sbom-json-check"
         - name: "kind"
           value: "task"
         resolver: "bundles"
