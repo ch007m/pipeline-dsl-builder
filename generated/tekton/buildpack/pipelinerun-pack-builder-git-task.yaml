@@ -58,11 +58,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "data-store"
-        workspace: "data-store"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
     - name: "list-source-workspace"
       runAfter:
       - "fetch-packconfig-registrysecret"
@@ -75,11 +70,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "source-dir"
-        workspace: "source-dir"
-      - name: "pack-workspace"
-        workspace: "pack-workspace"
     - name: "pack-builder"
       params:
       - name: "PACK_SOURCE_DIR"
