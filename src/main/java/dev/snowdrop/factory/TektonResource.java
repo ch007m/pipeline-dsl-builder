@@ -347,22 +347,24 @@ public class TektonResource {
 
             // If there is a workspace but no volume's type specified, then we will create a default volumeClaimTemplate
             // using as Default: 1Gi and ReadWriteOnce
-            binding.withVolumeClaimTemplate(
-                new PersistentVolumeClaimBuilder()
-                    .editOrNewSpec()
-                    .withResources(
-                        new VolumeResourceRequirementsBuilder()
-                            .addToRequests(
-                                STORAGE,
-                                new Quantity("1Gi"))
-                            .build()
-                    )
-                    .addToAccessModes("ReadWriteOnce")
-                    .endSpec()
-                    .build()
-            );
-            // @formatter:on
-            workspaceList.add(binding.build());
+            if (wk.getVolumeClaimTemplate() == null && wk.getSecret() == null && wk.getConfigMap() == null && wk.getVolumeSources() == null) {
+                binding.withVolumeClaimTemplate(
+                    new PersistentVolumeClaimBuilder()
+                        .editOrNewSpec()
+                        .withResources(
+                            new VolumeResourceRequirementsBuilder()
+                                .addToRequests(
+                                    STORAGE,
+                                    new Quantity("1Gi"))
+                                .build()
+                        )
+                        .addToAccessModes("ReadWriteOnce")
+                        .endSpec()
+                        .build()
+                );
+                // @formatter:on
+                workspaceList.add(binding.build());
+            }
         }
         return workspaceList;
     }

@@ -20,15 +20,6 @@ job:
   name: quarkus-1-on-push
   description: PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
-  workspaces:
-  - name: workspace
-    volumeClaimTemplate:
-      storage: 1Gi
-      accessMode: ReadWriteOnce
-  - name: git-auth
-    secret:
-      name: "{{ git_auth_secret }}"
-
   results:
     - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
     - IMAGE_DIGEST: "$(tasks.build-container.results.IMAGE_DIGEST)"
