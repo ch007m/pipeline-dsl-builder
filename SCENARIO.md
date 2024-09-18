@@ -491,11 +491,11 @@ job:
         - name: output
           workspace: source-dir
     - name: fetch-packconfig-registrysecret
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25
     - name: list-source-workspace
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25
     - name: pack-builder
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25
       params:
         - PACK_SOURCE_DIR: "$(params.source-dir)"
         - PACK_CLI_IMAGE: "$(params.imageUrl)"
@@ -565,7 +565,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25"
         - name: "name"
           value: "fetch-packconfig-registrysecret"
         - name: "kind"
@@ -582,7 +582,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25"
         - name: "name"
           value: "list-source-workspace"
         - name: "kind"
@@ -613,7 +613,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25"
         - name: "name"
           value: "pack-builder"
         - name: "kind"
@@ -709,9 +709,9 @@ job:
         - name: output
           workspace: source-dir
     - name: fetch-packconfig-registrysecret
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25
     - name: list-source-workspace
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25
     - name: pack-builder
       ref: url://https://raw.githubusercontent.com/redhat-buildpacks/catalog/main/tekton/task/pack-builder/0.1/pack-builder.yml
       params:
@@ -783,7 +783,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25"
         - name: "name"
           value: "fetch-packconfig-registrysecret"
         - name: "kind"
@@ -800,7 +800,7 @@ spec:
       taskRef:
         params:
         - name: "bundle"
-          value: "quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4"
+          value: "quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25"
         - name: "name"
           value: "list-source-workspace"
         - name: "kind"
@@ -2122,7 +2122,7 @@ job:
   #
   actions:
     - name: pack
-      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:bc130944a4ee377846abd2ffe9add0c8ad1dff571089d4e0b590e0c446660ac4
+      ref: bundle://quay.io/ch007m/tekton-bundle:latest@sha256:42f0acaefdfbb345fb76c34910f4f7f358908602d3e8f83e4616218685e34b25
       workspaces:
         - name: source-dir
           workspace: workspace
