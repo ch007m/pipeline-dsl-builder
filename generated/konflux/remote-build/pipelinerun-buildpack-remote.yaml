@@ -395,9 +395,6 @@ spec:
         - name: "kind"
           value: "task"
         resolver: "bundles"
-      workspaces:
-      - name: "workspace"
-        workspace: "workspace"
     - name: "source-build"
       params:
       - name: "BINARY_IMAGE"
@@ -484,23 +481,6 @@ spec:
           value: "quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1"
         - name: "name"
           value: "clamav-scan"
-        - name: "kind"
-          value: "task"
-        resolver: "bundles"
-    - name: "sbom-json-check"
-      params:
-      - name: "IMAGE_DIGEST"
-        value: "$(tasks.build-container.results.IMAGE_DIGEST)"
-      - name: "IMAGE_URL"
-        value: "$(tasks.build-container.results.IMAGE_URL)"
-      runAfter:
-      - "build-container"
-      taskRef:
-        params:
-        - name: "bundle"
-          value: "quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1"
-        - name: "name"
-          value: "sbom-json-check"
         - name: "kind"
           value: "task"
         resolver: "bundles"
