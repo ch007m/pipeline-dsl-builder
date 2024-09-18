@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.snowdrop.model.Action.STEP_SCRIPT_IMAGE;
+import static dev.snowdrop.model.Volume.STORAGE;
 
 public class TektonResource {
 
@@ -291,27 +292,6 @@ public class TektonResource {
             WorkspaceBindingBuilder binding = new WorkspaceBindingBuilder();
             binding.withName(wk.getName());
 
-            if (wk.getVolumeClaimTemplate() != null) {
-                Volume v = wk.getVolumeClaimTemplate();
-                // @formatter:off
-                binding.withVolumeClaimTemplate(
-                    new PersistentVolumeClaimBuilder()
-                        .editOrNewSpec()
-                        .withResources(
-                            new VolumeResourceRequirementsBuilder()
-                                .addToRequests(
-                                    v.STORAGE,
-                                    new Quantity(v.getStorage()))
-                                .build()
-                        )
-                        .addToAccessModes(v.getAccessMode())
-                        .endSpec()
-                        .build()
-                );
-                // @formatter:on
-                workspaceList.add(binding.build());
-            }
-
             // If volumes size > 0 than we assume that the user would like to use: Projected
             if (wk.getVolumeSources() != null && wk.getVolumeSources().size() > 0) {
                 ProjectedVolumeSourceBuilder pvsb = new ProjectedVolumeSourceBuilder();
@@ -343,6 +323,46 @@ public class TektonResource {
                     .build());
                 workspaceList.add(binding.build());
             }
+
+            if (wk.getVolumeClaimTemplate() != null) {
+                Volume v = wk.getVolumeClaimTemplate();
+                // @formatter:off
+                binding.withVolumeClaimTemplate(
+                    new PersistentVolumeClaimBuilder()
+                        .editOrNewSpec()
+                        .withResources(
+                            new VolumeResourceRequirementsBuilder()
+                                .addToRequests(
+                                    STORAGE,
+                                    new Quantity(v.getStorage()))
+                                .build()
+                        )
+                        .addToAccessModes(v.getAccessMode())
+                        .endSpec()
+                        .build()
+                );
+                // @formatter:on
+                workspaceList.add(binding.build());
+            }
+
+            // If there is a workspace but no volume's type specified, then we will create a default volumeClaimTemplate
+            // using as Default: 1Gi and ReadWriteOnce
+            binding.withVolumeClaimTemplate(
+                new PersistentVolumeClaimBuilder()
+                    .editOrNewSpec()
+                    .withResources(
+                        new VolumeResourceRequirementsBuilder()
+                            .addToRequests(
+                                STORAGE,
+                                new Quantity("1Gi"))
+                            .build()
+                    )
+                    .addToAccessModes("ReadWriteOnce")
+                    .endSpec()
+                    .build()
+            );
+            // @formatter:on
+            workspaceList.add(binding.build());
         }
         return workspaceList;
     }

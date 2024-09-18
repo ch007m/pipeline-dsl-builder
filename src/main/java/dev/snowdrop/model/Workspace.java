@@ -10,7 +10,9 @@ import java.util.List;
 public class Workspace {
     private String name;
     private String workspace;
+    private String kind;
     private Volume volumeClaimTemplate;
+
     private List<Volume> volumeSources;
     private Secret secret;
     private ConfigMap configMap;

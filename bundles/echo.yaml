@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: echo-message
+spec:
+  steps:
+    - image: "quay.io/centos/centos:latest"
+      script: |-
+        #!/usr/bin/env bash
+
+        set -e
+
+        echo "Hello from an OCI bundle task"

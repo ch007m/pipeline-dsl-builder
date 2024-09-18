@@ -9,9 +9,6 @@ job:
   resourceType: PipelineRun
   workspaces:
     - name: shared-wks
-      volumeClaimTemplate:
-        storage: 1Gi
-        accessMode: ReadWriteOnce
 
   actions:
     - name: say-hello
