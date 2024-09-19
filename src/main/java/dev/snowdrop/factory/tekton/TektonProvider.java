@@ -1,10 +1,8 @@
-package dev.snowdrop.factory.tekton.pipeline;
+package dev.snowdrop.factory.tekton;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import dev.snowdrop.factory.AnnotationsProviderFactory;
-import dev.snowdrop.factory.JobProvider;
-import dev.snowdrop.factory.LabelsProviderFactory;
+import dev.snowdrop.factory.Provider;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.*;
 import dev.snowdrop.service.UriParserSvc;
@@ -22,16 +20,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.TektonResource.*;
+import static dev.snowdrop.factory.tekton.PipelineBuilder.generatePipeline;
+import static dev.snowdrop.factory.tekton.PipelineRunBuilder.generatePipelineRun;
+import static dev.snowdrop.factory.tekton.TaskRunBuilder.generateTaskRun;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
-public class Pipelines implements JobProvider {
+public class TektonProvider implements Provider {
 
-    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
+    private static final Logger logger = LoggerFactory.getLogger(TektonProvider.class);
     private static Type TYPE;
 
     @Override
-    public HasMetadata buildResource(Configurator cfg, String resourceType) {
+    public HasMetadata buildResource(Configurator cfg, String tektonResourceType) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
         @SuppressWarnings("unchecked")
         PipelineTask aTask;
@@ -52,7 +53,6 @@ public class Pipelines implements JobProvider {
             .stream()
             .collect(Collectors.toMap(Action::getId, id -> id));
 
-        String tektonResourceType = cfg.getJob().getResourceType().toLowerCase();
         if (tektonResourceType == null) {
             throw new RuntimeException("Missing tekton resource type");
         }
@@ -171,56 +171,17 @@ public class Pipelines implements JobProvider {
 
         switch (tektonResourceType) {
             case "pipelinerun":
-                return generatePipelineRun(cfg, tasks, pipelineParams, pipelineWorkspaces, pipelineResults);
+                return generatePipelineRun(TYPE, cfg, tasks, pipelineParams, pipelineWorkspaces, pipelineResults);
 
             case "pipeline":
-                return generatePipeline(cfg, tasks, pipelineWorkspaces);
+                return generatePipeline(TYPE, cfg, tasks, pipelineWorkspaces);
+
+            case "taskrun":
+                return generateTaskRun(TYPE, cfg, pipelineWorkspaces);
 
             default:
                 throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
         }
     }
-
-    public static PipelineRun generatePipelineRun(Configurator cfg, List<PipelineTask> tasks, List<Param> params, List<WorkspaceBinding> pipelineWorkspaces, List<PipelineResult> pipelineResults) {
-        // @formatter:off
-        PipelineRun pipelineRun = new PipelineRunBuilder()
-          .withNewMetadata()
-             .withName(cfg.getJob().getName())
-             .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-             .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
-             .withNamespace(cfg.getNamespace())
-          .endMetadata()
-          .withNewSpec()
-             .withParams(params)
-             .withWorkspaces(pipelineWorkspaces)
-             .withTimeouts(populateTimeOut(cfg.getJob().getTimeout()))
-             .withNewPipelineSpec()
-                .withResults(pipelineResults)
-                .withTasks(tasks)
-             .endPipelineSpec()
-          .endSpec()
-          .build();
-        // @formatter:on
-        return pipelineRun;
-    }
-
-    public static Pipeline generatePipeline(Configurator cfg, List<PipelineTask> tasks, List<WorkspaceBinding> pipelineWorkspaces) {
-        // TODO: To be reviewed
-        // @formatter:off
-        Pipeline pipeline = new PipelineBuilder()
-            .withNewMetadata()
-               .withName(cfg.getJob().getName())
-               .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-               .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
-               .withNamespace(cfg.getNamespace())
-            .endMetadata()
-            .withNewSpec()
-               .withTasks(tasks)
-            .endSpec()
-            .build();
-        // @formatter:on
-        return pipeline;
-    }
-
 
 }

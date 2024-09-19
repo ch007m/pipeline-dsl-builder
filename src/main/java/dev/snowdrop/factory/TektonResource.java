@@ -26,18 +26,23 @@ public class TektonResource {
     public static HasMetadata create(Configurator cfg) {
         String DOMAIN = cfg.getDomain().toUpperCase();
         Type PROVIDER = Type.valueOf(cfg.getType().toUpperCase());
+        String RESOURCE_TYPE = cfg.getJob().getResourceType();
 
         if (PROVIDER == null) {
-            throw new RuntimeException("Missing type/provider");
+            throw new RuntimeException("Missing type/provider: tekton or konflux");
         }
 
         if (DOMAIN == null) {
             throw new RuntimeException("Missing domain");
         }
 
-        return JobFactory
+        if (RESOURCE_TYPE == null) {
+            throw new RuntimeException("Missing tekton resource type: pipelinerun taskrun, etc");
+        }
+
+        return ResourceFactory
             .withProvider(PROVIDER)
-            .withResourceType(cfg.getJob().getResourceType())
+            .withResourceType(RESOURCE_TYPE)
             .buildResource(cfg);
     }
 

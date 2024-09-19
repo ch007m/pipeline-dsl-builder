@@ -3,20 +3,20 @@ package dev.snowdrop.factory;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 
-public class JobBuilder {
-    private final JobProvider jobProvider;
+public class Builder {
+    private final Provider provider;
     private String resourceType;
 
-    public JobBuilder(JobProvider jobProvider) {
-        this.jobProvider = jobProvider;
+    public Builder(Provider provider) {
+        this.provider = provider;
     }
 
-    public JobBuilder withResourceType(String resourceType) {
+    public Builder withResourceType(String resourceType) {
         this.resourceType = resourceType;
         return this;
     }
 
     public HasMetadata buildResource(Configurator cfg) {
-        return jobProvider.buildResource(cfg, resourceType);
+        return provider.buildResource(cfg, resourceType);
     }
 }

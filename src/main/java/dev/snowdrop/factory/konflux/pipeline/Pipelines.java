@@ -2,7 +2,7 @@ package dev.snowdrop.factory.konflux.pipeline;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import dev.snowdrop.factory.JobProvider;
+import dev.snowdrop.factory.Provider;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.*;
 import dev.snowdrop.service.ConfiguratorSvc;
@@ -30,7 +30,7 @@ import static dev.snowdrop.factory.konflux.pipeline.Labels.generateLabels;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
-public class Pipelines implements JobProvider {
+public class Pipelines implements Provider {
 
     private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
     private static Type TYPE = null;
