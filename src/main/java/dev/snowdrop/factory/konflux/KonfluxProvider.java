@@ -25,6 +25,7 @@ import static dev.snowdrop.factory.WorkflowResource.*;
 //import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
 //import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 // import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
+import static dev.snowdrop.factory.WorkfowResourceBuilder.*;
 import static dev.snowdrop.factory.konflux.pipeline.Annotations.generateAnnotations;
 import static dev.snowdrop.factory.konflux.pipeline.Labels.generateLabels;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;

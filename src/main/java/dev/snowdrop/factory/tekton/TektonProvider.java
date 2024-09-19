@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.snowdrop.factory.WorkflowResource.*;
+import static dev.snowdrop.factory.WorkfowResourceBuilder.*;
 import static dev.snowdrop.factory.tekton.PipelineBuilder.generatePipeline;
 import static dev.snowdrop.factory.tekton.PipelineRunBuilder.generatePipelineRun;
 import static dev.snowdrop.factory.tekton.TaskRunBuilder.generateTaskRun;

@@ -8,7 +8,7 @@ import io.fabric8.tekton.pipeline.v1.*;
 
 import java.util.List;
 
-import static dev.snowdrop.factory.WorkflowResource.populateTimeOut;
+import static dev.snowdrop.factory.WorkfowResourceBuilder.populateTimeOut;
 
 public class PipelineRunBuilder {
     public static PipelineRun generatePipelineRun(Type TYPE, Configurator cfg, List<PipelineTask> tasks, List<Param> params, List<WorkspaceBinding> pipelineWorkspaces, List<PipelineResult> pipelineResults) {
