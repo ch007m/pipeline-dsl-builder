@@ -1,4 +1,4 @@
-package dev.snowdrop.factory.tekton.pipeline;
+package dev.snowdrop.factory.tekton;
 
 import dev.snowdrop.model.Bundle;
 import io.fabric8.tekton.pipeline.v1.ParamValue;

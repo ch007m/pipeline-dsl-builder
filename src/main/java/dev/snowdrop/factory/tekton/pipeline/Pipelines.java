@@ -31,7 +31,7 @@ public class Pipelines implements JobProvider {
     private static Type TYPE;
 
     @Override
-    public HasMetadata generatePipeline(Configurator cfg) {
+    public HasMetadata buildResource(Configurator cfg, String resourceType) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
         @SuppressWarnings("unchecked")
         PipelineTask aTask;

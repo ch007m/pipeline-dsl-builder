@@ -1,6 +1,6 @@
 package dev.snowdrop.factory;
 
-import dev.snowdrop.factory.tekton.pipeline.TaskRefResolver;
+import dev.snowdrop.factory.tekton.TaskRefResolver;
 import dev.snowdrop.model.*;
 import dev.snowdrop.model.ConfigMap;
 import dev.snowdrop.model.Secret;
@@ -24,20 +24,21 @@ public class TektonResource {
     private static final Logger logger = LoggerFactory.getLogger(TektonResource.class);
 
     public static HasMetadata create(Configurator cfg) {
-        String domain = cfg.getDomain().toUpperCase();
-        Type TYPE = Type.valueOf(cfg.getType().toUpperCase());
+        String DOMAIN = cfg.getDomain().toUpperCase();
+        Type PROVIDER = Type.valueOf(cfg.getType().toUpperCase());
 
-        if (TYPE == null) {
+        if (PROVIDER == null) {
             throw new RuntimeException("Missing type/provider");
         }
 
-        if (domain == null) {
+        if (DOMAIN == null) {
             throw new RuntimeException("Missing domain");
         }
 
         return JobFactory
-            .withType(TYPE)
-            .generatePipeline(cfg);
+            .withProvider(PROVIDER)
+            .withResourceType(cfg.getJob().getResourceType())
+            .buildResource(cfg);
     }
 
     public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<String> args, List<When> when, Map<String, Workspace> jobWorkspacesMap, List<TaskResult> results) {

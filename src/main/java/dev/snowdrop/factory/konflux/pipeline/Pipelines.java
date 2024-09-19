@@ -2,9 +2,7 @@ package dev.snowdrop.factory.konflux.pipeline;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import dev.snowdrop.factory.AnnotationsProviderFactory;
 import dev.snowdrop.factory.JobProvider;
-import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.*;
 import dev.snowdrop.service.ConfiguratorSvc;
@@ -42,7 +40,7 @@ public class Pipelines implements JobProvider {
     List<PipelineTask> tasks = new ArrayList<>();
 
     @Override
-    public HasMetadata generatePipeline(Configurator cfg) {
+    public HasMetadata buildResource(Configurator cfg, String resourceType) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
         PipelineTask aTask;
