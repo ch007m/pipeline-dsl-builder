@@ -8,7 +8,7 @@ import jakarta.inject.Inject;
 import picocli.CommandLine;
 
 @QuarkusMain
-public class TektonApp {
+public class WorkflowApp {
     public static void main(String[] args) {
         Quarkus.run(AppCommands.class, args);
     }

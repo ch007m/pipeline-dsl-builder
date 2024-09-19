@@ -39,7 +39,7 @@ public class OCIBundleFetchCommand implements Runnable {
             List<Manifest.Layer> filteredLayers = filterLayersUsingAnnotation(TASK_DIGEST_ANNOTATION, layers, path);
 
             filteredLayers.stream().forEach(layer -> {
-                String blobFile = Paths.get(path , "blobs/sha256" , layer.getDigest().substring(7, layer.getDigest().length())).toString();
+                String blobFile = Paths.get(path , "blobs/sha256" , layer.getDigest().substring(7)).toString();
 
                 // Extract from the BLOB file the task(s)
                 List<String> jsonFiles = extractTasksFromBlob(new File(blobFile));

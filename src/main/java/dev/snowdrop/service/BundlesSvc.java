@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class BundlesSvc {
     private static BundlesSvc bundlesSvc;
-    private static Map<String, Bundle> bundles = new HashMap<>();
+    private static final Map<String, Bundle> bundles = new HashMap<>();
 
     private BundlesSvc() {
         initBundlesFromDefaultCfg();

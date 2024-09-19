@@ -39,7 +39,7 @@ public class CodeGeneratorSvc {
          javaCode.append(".build());\n");
       }
 
-      System.out.println(javaCode.toString());
+      System.out.println(javaCode);
    }
 
    public static void generateTaskFromYAML(String resourcePath) {

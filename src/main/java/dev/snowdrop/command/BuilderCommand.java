@@ -1,6 +1,6 @@
 package dev.snowdrop.command;
 
-import dev.snowdrop.factory.TektonResource;
+import dev.snowdrop.factory.WorkflowResource;
 import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
@@ -81,7 +81,7 @@ public class BuilderCommand implements Runnable {
         String resourcesPath = Paths.get(cfg.getOutputPath(), cfg.getType(), cfg.getDomain()).toString();
 
         // Use the factory to generate the resources according to the provider and the type
-        ConfiguratorSvc.writeYaml(TektonResource.create(cfg), resourcesPath);
+        ConfiguratorSvc.writeYaml(WorkflowResource.create(cfg), resourcesPath);
 
         // TODO: Is it the best place to create such YAML resources. To be reviewed
         if (cfg.getApplication() != null && cfg.getApplication().isEnable()) {

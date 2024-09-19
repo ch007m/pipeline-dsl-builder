@@ -100,7 +100,7 @@ public class RemoteTaskSvc {
                     List<Manifest.Layer> filteredLayers = filterLayersUsingAnnotation(TASK_DIGEST_ANNOTATION, layers, bundlePath);
 
                     filteredLayers.stream().forEach(layer -> {
-                        String blobFile = Paths.get(bundlePath, "blobs/sha256", layer.getDigest().substring(7, layer.getDigest().length())).toString();
+                        String blobFile = Paths.get(bundlePath, "blobs/sha256", layer.getDigest().substring(7)).toString();
 
                         // Extract from the BLOB file the task(s)
                         List<String> jsonFiles = extractTasksFromBlob(new File(blobFile));
@@ -186,7 +186,7 @@ public class RemoteTaskSvc {
             ManifestEntry manifestEntry = index.getManifests().get(0);
             String mediaType = manifestEntry.getMediaType();
             AtomicReference<String> digest = new AtomicReference<>(manifestEntry.getDigest());
-            String sha256 = digest.get().substring(7, digest.get().length());
+            String sha256 = digest.get().substring(7);
 
             logger.info("mediaType: " + mediaType);
             logger.info("digest: " + digest);

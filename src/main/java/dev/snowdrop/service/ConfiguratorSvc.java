@@ -3,9 +3,8 @@ package dev.snowdrop.service;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import dev.snowdrop.command.BuilderCommand;
-import dev.snowdrop.factory.TektonResource;
+import dev.snowdrop.factory.WorkflowResource;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -61,7 +60,7 @@ public class ConfiguratorSvc {
     public void populateDefaultPipeline() {
         if (defaultPipeline == null) {
             // Let's create the default Pipeline
-            defaultPipeline = TektonResource.create(defaultConfigurator);
+            defaultPipeline = WorkflowResource.create(defaultConfigurator);
         }
     }
 
@@ -78,8 +77,7 @@ public class ConfiguratorSvc {
     public static Configurator loadYaml(Object input) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         try {
-            if (input instanceof String) {
-                String str = (String) input;
+            if (input instanceof String str) {
 
                 // Check if the string represents a file path or YAML content
                 File file = new File(str);

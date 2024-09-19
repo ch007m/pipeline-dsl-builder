@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 import static dev.snowdrop.model.Action.STEP_SCRIPT_IMAGE;
 import static dev.snowdrop.model.Volume.STORAGE;
 
-public class TektonResource {
+public class WorkflowResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(TektonResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowResource.class);
 
     public static HasMetadata create(Configurator cfg) {
         String DOMAIN = cfg.getDomain().toUpperCase();
@@ -97,7 +97,7 @@ public class TektonResource {
                     .addNewStep()
                       .withName("run-script")
                       .withArgs(args)
-                      .withImage(action.getImage() != null ? action.getImage() : action.IMAGES.get(STEP_SCRIPT_IMAGE))
+                      .withImage(action.getImage() != null ? action.getImage() : Action.IMAGES.get(STEP_SCRIPT_IMAGE))
                       .withScript(embeddedScript)
                       .withVolumeMounts(populateTaskVolumeMounts(action)) // Volume(s) to be mounted from Volume(s) declared at the task level: secret, configMap, etc
                     .endStep()
@@ -384,8 +384,7 @@ public class TektonResource {
                         paramValue = new ParamValue((String) val);
                     } else if (val instanceof Boolean) {
                         paramValue = new ParamValue(Boolean.toString((Boolean) val));
-                    } else if (val instanceof List<?>) {
-                        List<?> rawList = (List<?>) val;
+                    } else if (val instanceof List<?> rawList) {
                         List<String> stringList = rawList.stream()
                             .filter(String.class::isInstance)
                             .map(String.class::cast)

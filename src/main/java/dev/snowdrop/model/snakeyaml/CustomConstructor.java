@@ -18,11 +18,10 @@ public class CustomConstructor extends Constructor {
     public Object newInstance(Node node) {
         if (node.getNodeId() == NodeId.mapping) {
             MappingNode mappingNode = (MappingNode) node;
-            Object result = (Node) node;
+            Object result = node;
 
             //
-            if (result instanceof Repository) {
-                Repository repository = (Repository) result;
+            if (result instanceof Repository repository) {
                 // Process `repository` as needed
                 repository.setDockerfilePath(((Repository) result).getDockerfileUrl());
             }
