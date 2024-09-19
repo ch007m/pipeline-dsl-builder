@@ -37,7 +37,7 @@ public class TektonResource {
         }
 
         if (RESOURCE_TYPE == null) {
-            throw new RuntimeException("Missing tekton resource type: pipelinerun taskrun, etc");
+            throw new RuntimeException("Missing workflow resource type: pipelinerun taskrun, etc");
         }
 
         return new WorkflowBuilder()
