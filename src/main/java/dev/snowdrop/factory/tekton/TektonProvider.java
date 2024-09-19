@@ -34,9 +34,8 @@ public class TektonProvider implements Provider {
     @Override
     public HasMetadata buildResource(Configurator cfg, String tektonResourceType) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
-        @SuppressWarnings("unchecked")
-        PipelineTask aTask;
 
+        PipelineTask aTask;
         List<Action> actions = cfg.getJob().getActions();
         List<PipelineTask> tasks = new ArrayList<>();
         List<PipelineTask> finallyTasks = new ArrayList<>();
