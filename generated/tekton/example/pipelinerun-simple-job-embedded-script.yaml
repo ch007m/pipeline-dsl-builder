@@ -8,7 +8,6 @@ metadata:
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-embedded-script"
-  namespace: "user"
 spec:
   pipelineSpec:
     tasks:
