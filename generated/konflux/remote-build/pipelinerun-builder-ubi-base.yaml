@@ -7,15 +7,15 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: "event == 'push' && target_branch\
       \ == 'main'"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    build.appstudio.openshift.io/repo: "https://github.com/paketo-community/builder-ubi-base?rev={{revision}}"
+    build.appstudio.openshift.io/repo: "https://github.com/redhat-buildpacks/builder-ubi-base?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "buildpack-remote"
     pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/strategy: "remote-build"
-    appstudio.openshift.io/component: "buildpack-remote"
+    appstudio.openshift.io/component: "builder-ubi-base"
     pipelines.openshift.io/used-by: "build-cloud"
     pipelines.openshift.io/runtime: "java"
-  name: "buildpack-remote"
+  name: "builder-ubi-base"
   namespace: "cmoullia-tenant"
 spec:
   params:
@@ -32,7 +32,7 @@ spec:
   - name: "prefetch-input"
     value: ""
   - name: "output-image"
-    value: "quay.io/redhat-user-workloads/cmoullia-tenant/konflux-demo/buildpack-remote:{{revision}}"
+    value: "quay.io/redhat-user-workloads/cmoullia-tenant/buildpack-remote/builder-ubi-base:{{revision}}"
   pipelineSpec:
     finally:
     - name: "show-sbom"
@@ -145,10 +145,10 @@ spec:
         value: "linux-mlarge/amd64"
       - name: "BUILDER_IMAGE"
         value: "quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275"
+      - name: "REPOSITORY_TO_FETCH"
+        value: "https://github.com/redhat-buildpacks/builder-ubi-base"
       - name: "PACK_CLI_VERSION"
         value: "v0.35.1"
-      - name: "GO_VERSION"
-        value: "1.23.0"
       - name: "BUILD_ARGS"
         value:
         - "-v"
@@ -156,35 +156,41 @@ spec:
       - "prefetch-dependencies"
       taskSpec:
         results:
-        - description: "Image repository where the built image was pushed"
+        - description: "Image repository and tag where the built image was pushed"
           name: "IMAGE_URL"
         - description: "Digest of the image just built"
           name: "IMAGE_DIGEST"
+        - description: "Image reference of the built image"
+          name: "IMAGE_REF"
         - description: "Digests of the base images used for build"
           name: "BASE_IMAGES_DIGESTS"
+        - description: "SBOM Image URL"
+          name: "SBOM_BLOB_URL"
         stepTemplate:
           env:
           - name: "BUILDER_IMAGE"
             value: "$(params.BUILDER_IMAGE)"
           - name: "PLATFORM"
             value: "$(params.PLATFORM)"
+          - name: "REPOSITORY_TO_FETCH"
+            value: "$(params.REPOSITORY_TO_FETCH)"
           - name: "IMAGE"
             value: "$(params.output-image)"
           - name: "PACK_CLI_VERSION"
             value: "$(params.PACK_CLI_VERSION)"
-          - name: "GO_VERSION"
-            value: "$(params.GO_VERSION)"
         steps:
         - args:
           - "$(params.BUILD_ARGS[*])"
           image: "quay.io/konflux-ci/buildah-task:latest@sha256:860a239c5f25376a435a514ae6d53a5c75b1fa492461d17774e9b7cb32d1e275"
           name: "run-script"
-          script: |
+          script: |-
             #!/usr/bin/env bash
-            #set -o verbose
             set -eu
             set -o pipefail
 
+            echo "##########################################################################################"
+            echo "### Step 1 :: Configure SSH and rsync folders from tekton to the VM"
+            echo "##########################################################################################"
             mkdir -p ~/.ssh
             if [ -e "/ssh/error" ]; then
               #no server could be provisioned
@@ -198,37 +204,26 @@ spec:
             fi
             chmod 0400 ~/.ssh/id_rsa
 
-            # Export the args passed using the BUILD_ARGS env var that we will use within the bash script executed remotely
-            export BUILD_ARGS="$@"
-            echo "## Start :: echo build_args"
-            echo $BUILD_ARGS
-            echo "## End :: echo build_args"
-
             export SSH_HOST=$(cat /ssh/host)
             export BUILD_DIR=$(cat /ssh/user-dir)
             export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
 
-            mkdir -p scripts
+            echo "### Export different variables which are used within the script like args, repository to fetch, etc"
+            export REPOSITORY_TO_FETCH=${REPOSITORY_TO_FETCH}
+            export BUILD_ARGS="$@"
 
-            PORT_FORWARD=""
-            PODMAN_PORT_FORWARD=""
-
-            echo "$BUILD_DIR"
             ssh $SSH_ARGS "$SSH_HOST" mkdir -p "$BUILD_DIR/workspaces" "$BUILD_DIR/scripts" "$BUILD_DIR/volumes"
 
-            echo "rsync shared folders ..."
-            rsync -ra "/shared/" "$SSH_HOST:$BUILD_DIR/volumes/shared/"
+            echo "### rsync folders from pod to VM ..."
+            rsync -ra /var/workdir/ "$SSH_HOST:$BUILD_DIR/volumes/workdir/"
             rsync -ra "/tekton/results/" "$SSH_HOST:$BUILD_DIR/results/"
 
+            echo "##########################################################################################"
+            echo "### Step 2 :: Create the bash script to be executed within the VM"
+            echo "##########################################################################################"
+            mkdir -p scripts
             cat >scripts/script-build.sh <<'REMOTESSHEOF'
             #!/bin/sh
-
-            # Set the env vars here as stepTemplate don't work
-            # export BUILDER_IMAGE=$(params.BUILDER_IMAGE)
-            # export PLATFORM=$(params.PLATFORM)
-            # export IMAGE=$(params.output-image)
-            # export PACK_CLI_VERSION=$(params.PACK_CLI_VERSION)
-            # export GO_VERSION=$(params.GO_VERSION)
 
             TEMP_DIR="$HOME/tmp"
             USER_BIN_DIR="$HOME/bin"
@@ -237,30 +232,36 @@ spec:
             mkdir -p ${TEMP_DIR}
             mkdir -p ${USER_BIN_DIR}
             mkdir -p ${BUILDPACK_PROJECTS}
-            mkdir -p ${HOME}/shared
 
             export PATH=$PATH:${USER_BIN_DIR}
 
-            echo "### Podman status ###"
+            echo "### Podman info ###"
             podman version
 
-            echo "## Status of the podman service ##"
+            echo "### Start podman.socket ##"
             systemctl --user start podman.socket
             systemctl status podman.socket
-            # ls -la $XDG_RUNTIME_DIR/podman
 
-            #echo "## Launch socat to expose the podman socket"
-            #socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock &
+            echo "### Installing jq ..."
+            curl -sSL https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64 > ${USER_BIN_DIR}/jq
+            chmod +x ${USER_BIN_DIR}/jq
 
-            #echo "IP address of the host machine"
-            #HOST_IP=$(hostname -I | awk '{print $1}')
-            #echo "Host IP: $HOST_IP"
+            echo "### Install tomlq tool ..."
+            curl -sSL https://github.com/cryptaliagy/tomlq/releases/download/0.1.6/tomlq.amd64.tgz | tar -vxz tq
+            mv tq ${USER_BIN_DIR}/tq
 
-            # echo "Hack to be able to install buildah ..."
-            # sudo podman run -v /etc:/hostetc ubi9 sed -s 's|usr/bin/podman|usr/bin/dnf /usr/bin/podman|g'
-            # sudo podman run -v /etc:/hostetc ubi9 cat /etc/sudoers
-            # sudo dnf -y install buildah
+            echo "### Install syft"
+            curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s --
+            # Not needed as syft is already saved under bin/syft => mv bin/syft ${USER_BIN_DIR}/syft
+            syft --version
 
+            echo "### Install cosign"
+            curl -O -sL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
+            mv cosign-linux-amd64 ${USER_BIN_DIR}/cosign
+            chmod +x ${USER_BIN_DIR}/cosign
+            cosign version
+
+            echo "### Install pack ###"
             curl -sSL "https://github.com/buildpacks/pack/releases/download/${PACK_CLI_VERSION}/pack-${PACK_CLI_VERSION}-linux.tgz" | tar -C ${TEMP_DIR} --no-same-owner -xzv pack
             mv ${TEMP_DIR}/pack ${USER_BIN_DIR}
 
@@ -268,106 +269,110 @@ spec:
             pack --version
             pack config experimental true
 
-            echo "### Go version ###"
-            curl -sSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar -C ${TEMP_DIR} -xz go
-            mkdir -p ${USER_BIN_DIR}/go
-            mv ${TEMP_DIR}/go ${USER_BIN_DIR}
-            chmod +x ${USER_BIN_DIR}/go
-
-            mkdir -p $HOME/workspace
-            export GOPATH=$HOME/workspace
-            export GOROOT=${USER_BIN_DIR}/go
-            export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-            go version
-
-            echo "### Build the builder image using pack"
-            curl -sSL https://github.com/paketo-community/builder-ubi-base/tarball/main | tar -xz -C ${TEMP_DIR}
-            mv ${TEMP_DIR}/paketo-community-builder-ubi-base-* ${BUILDPACK_PROJECTS}/builder-ubi-base
+            echo "### Fetch the tarball of the buildpack project to build"
+            echo "### Git repo: ${REPOSITORY_TO_FETCH}"
+            curl -sSL "${REPOSITORY_TO_FETCH}/tarball/main" | tar -xz -C ${TEMP_DIR}
+            mv ${TEMP_DIR}/redhat-buildpacks-builder-ubi-base-* ${BUILDPACK_PROJECTS}/builder-ubi-base
             cd ${BUILDPACK_PROJECTS}/builder-ubi-base
 
-            # Not needed as we pass the BUIDL_ARGS using Tekton's env var
-            # BUILD_ARGS=()
-            #for build_arg in "$@"; do
-            #  BUILD_ARGS+=("$build_arg")
-            #done
-
-            #echo "Build arguments to be passed to the pack CLI"
-            #for arg in "${BUILD_ARGS[@]}"; do
-            #  echo "arg: $arg"
-            #done
-
-            # export DOCKER_HOST=tcp://${HOST_IP}:2376
-
+            echo "### Build the builder image using pack"
             for build_arg in "${BUILD_ARGS[@]}"; do
               PACK_ARGS+=" $build_arg"
             done
 
-            echo "## Start :: Echo args to be passed to pack"
-            echo $PACK_ARGS
-            echo "## End :: Echo args to be passed to pack"
+            echo "### Pack extra args: $PACK_ARGS"
 
+            echo "### Execute: pack builder create ..."
             export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
             echo "pack builder create ${IMAGE} --config builder.toml ${PACK_ARGS}"
             pack builder create ${IMAGE} --config builder.toml ${PACK_ARGS}
 
-            container=$(podman create ${IMAGE})
-            echo "Container: $container"
-
-            touch ${HOME}/shared/container_path
-            podman unshare
-            podman mount $container | tee ${HOME}/shared/container_path
-
-            # delete symlinks - they may point outside the container rootfs, messing with SBOM scanners
-            find $(cat ${HOME}/shared/container_path) -xtype l -delete
-
-            echo $container > ${HOME}/shared/container_name
-
+            echo "### Export the image as OCI"
             podman push "$IMAGE" "oci:konflux-final-image:$IMAGE"
-            echo "## List konflux-final-image"
-            ls -la konflux-final-image
 
-            echo "## List ${HOME}/shared/container_path"
-            ls -la ${HOME}/shared/container_path
+            echo "###########################################################"
+            echo "### Export: IMAGE_URL, IMAGE_DIGEST & BASE_IMAGES_DIGESTS under: $BUILD_DIR/volumes/workdir/"
+            echo "###########################################################"
+            echo -n "$IMAGE" > $BUILD_DIR/volumes/workdir/IMAGE_URL
 
-            echo "## Show ${HOME}/shared/container_name"
-            cat ${HOME}/shared/container_name
+            BASE_IMAGE=$(tq -f builder.toml -o json 'stack' | jq -r '."build-image"')
+            podman inspect ${BASE_IMAGE} | jq -r '.[].Digest' > $BUILD_DIR/volumes/workdir/BASE_IMAGES_DIGESTS
+
+            echo "### Push the image produced and get its digest: $IMAGE"
+            podman push \
+               --digestfile $BUILD_DIR/volumes/workdir/IMAGE_DIGEST \
+               "$IMAGE"
+
+            echo "########################################"
+            echo "### Running syft on the image filesystem"
+            echo "########################################"
+            syft -v scan oci-dir:konflux-final-image -o cyclonedx-json > $BUILD_DIR/volumes/workdir/sbom-image.json
+
+            echo "### Show the content of the sbom file"
+            cat $BUILD_DIR/volumes/workdir/sbom-image.json # | jq -r '.'
+
+            {
+              echo -n "${IMAGE}@"
+              cat "$BUILD_DIR/volumes/workdir/IMAGE_DIGEST"
+            } > $BUILD_DIR/volumes/workdir/IMAGE_REF
+            echo "Image reference: $(cat $BUILD_DIR/volumes/workdir/IMAGE_REF)"
+
+            echo "########################################"
+            echo "### Add the SBOM to the image"
+            echo "########################################"
+            cosign attach sbom --sbom $BUILD_DIR/volumes/workdir/sbom-image.json --type cyclonedx $(cat $BUILD_DIR/volumes/workdir/IMAGE_REF)
 
             REMOTESSHEOF
             chmod +x scripts/script-build.sh
 
+            echo "##########################################################################################"
+            echo "### Step 3 :: Execute the bash script on the VM"
+            echo "##########################################################################################"
             rsync -ra scripts "$SSH_HOST:$BUILD_DIR"
             rsync -ra "$HOME/.docker/" "$SSH_HOST:$BUILD_DIR/.docker/"
 
             ssh $SSH_ARGS "$SSH_HOST" \
-              "FOO=$FOO BAR=$BAR BUILDER_IMAGE=$BUILDER_IMAGE PLATFORM=$PLATFORM IMAGE=$IMAGE PACK_CLI_VERSION=$PACK_CLI_VERSION GO_VERSION=$GO_VERSION BUILD_ARGS=$BUILD_ARGS" \
+              "REPOSITORY_TO_FETCH=${REPOSITORY_TO_FETCH} BUILDER_IMAGE=$BUILDER_IMAGE PLATFORM=$PLATFORM IMAGE=$IMAGE PACK_CLI_VERSION=$PACK_CLI_VERSION BUILD_ARGS=$BUILD_ARGS" BUILD_DIR=$BUILD_DIR \
                scripts/script-build.sh
 
-            # DON'T WORK AS PACK CANNOT ACCESS DOCKER HOST
-            # ssh $SSH_ARGS "$SSH_HOST" $PORT_FORWARD podman run $PODMAN_PORT_FORWARD \
-            #    -v "$BUILD_DIR/scripts:/scripts:Z" \
-            #    -v "$BUILD_DIR/.docker/:/root/.docker:Z" \
-            #    -v "$BUILD_DIR/volumes/shared:/shared:Z" \
-            #    --user=0 --rm "$BUILDER_IMAGE" /scripts/script-build.sh
+            echo "### rsync folders from VM to pod"
+            rsync -ra "$SSH_HOST:$BUILD_DIR/volumes/workdir/" "/var/workdir/"
+            rsync -ra "$SSH_HOST:$BUILD_DIR/results/"         "/tekton/results/"
 
-            echo -n "URL of the image build is : quarkus-hello:1.0" | tee "$(results.IMAGE_URL.path)"
-            echo -n "sha256ddddddddddddddddddddd" | tee "$(results.IMAGE_DIGEST.path)"
-            echo -n "sha256eeeeeeeeeeeeeeeeeeeeee" | tee "$(results.BASE_IMAGES_DIGESTS.path)"
+            echo "##########################################################################################"
+            echo "### Step 4 :: Export results to Tekton"
+            echo "##########################################################################################"
 
-            rsync -ra "$SSH_HOST:$BUILD_DIR/shared/" /shared/
-            rsync -ra "$SSH_HOST:$BUILD_DIR/results/" "/tekton/results/"
+            echo "### Export the tekton results"
+            echo "### IMAGE_URL: $(cat /var/workdir/IMAGE_URL)"
+            cat /var/workdir/IMAGE_URL > "$(results.IMAGE_URL.path)"
+
+            echo "### IMAGE_DIGEST: $(cat /var/workdir/IMAGE_DIGEST)"
+            cat /var/workdir/IMAGE_DIGEST > "$(results.IMAGE_DIGEST.path)"
+
+            echo "### IMAGE_REF: $(cat /var/workdir/IMAGE_REF)"
+            cat /var/workdir/IMAGE_REF > "$(results.IMAGE_REF.path)"
+
+            echo "### BASE_IMAGES_DIGESTS: $(cat /var/workdir/BASE_IMAGES_DIGESTS)"
+            cat /var/workdir/BASE_IMAGES_DIGESTS > "$(results.BASE_IMAGES_DIGESTS.path)"
+
+            SBOM_REPO="${IMAGE%:*}"
+            SBOM_DIGEST="$(sha256sum /var/workdir/sbom-image.json | cut -d' ' -f1)"
+            echo "### SBOM_BLOB_URL: ${SBOM_REPO}@sha256:${SBOM_DIGEST}"
+            echo -n "${SBOM_REPO}@sha256:${SBOM_DIGEST}" | tee "$(results.SBOM_BLOB_URL.path)"
           volumeMounts:
           - mountPath: "/ssh"
             name: "ssh"
             readOnly: true
-          - mountPath: "/shared"
-            name: "shared"
+          - mountPath: "/var/workdir"
+            name: "workdir"
             readOnly: false
         volumes:
         - name: "ssh"
           secret:
             secretName: "multi-platform-ssh-$(context.taskRun.name)"
         - emptyDir: {}
-          name: "shared"
+          name: "workdir"
       workspaces:
       - name: "source"
         workspace: "workspace"
