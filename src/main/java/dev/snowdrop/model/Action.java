@@ -27,6 +27,7 @@ public class Action {
     private List<Map<String, String>> envs;
     private List<String> when;
     private List<Map<String, String>> results;
+    private List<Step> steps;
 
     public static final String STEP_SCRIPT_IMAGE = "centos";
     public static Map<String, String> IMAGES = new HashMap<>();

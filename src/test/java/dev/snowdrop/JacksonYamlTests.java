@@ -59,7 +59,7 @@ public class JacksonYamlTests {
             component:
               enable: false
               name: null
-            bundles: null  
+            bundles: null
             """;
 
         Application app = new Application();
@@ -129,6 +129,7 @@ public class JacksonYamlTests {
             envs: null
             when: null
             results: null
+            steps: null
             finally: false
             """;
 
@@ -179,6 +180,7 @@ public class JacksonYamlTests {
             envs: null
             when: null
             results: null
+            steps: null
             finally: false
             """;
 
@@ -222,6 +224,7 @@ public class JacksonYamlTests {
             envs: null
             when: null
             results: null
+            steps: null
             finally: false
             """;
 
