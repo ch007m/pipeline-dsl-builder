@@ -3,8 +3,8 @@ domain: example
 
 job:
   resourceType: TaskRun
-  name: simple-action-embedded-script # name of the pipeline to be created
-  description: Simple example of a Tekton pipeline echoing a message
+  name: simple-action-embedded-script
+  description: Simple example of a Tekton task echoing a message
 
   actions:
     - name: say-hello
