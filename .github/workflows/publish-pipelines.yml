@@ -33,7 +33,7 @@ jobs:
           # Cleanup the generated folder
           rm -rf generated/**/*
           
-          cfg_files=(configurations/**/*)
+          cfg_files=(configurations/**/*.yaml)
           for f in "${cfg_files[@]}"
           do
             java -jar target/quarkus-app/quarkus-run.jar builder -o generated -c $f
