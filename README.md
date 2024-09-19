@@ -2,8 +2,7 @@
 
 ![e2e testing workflow](https://github.com/ch007m/pipeline-dsl-builder/actions/workflows/e2e-testing.yaml/badge.svg)
 
-The goal of this Quarkus Application is to simplify the life of the users when they play with Tekton or any compliant project like [Konflux](https://konflux-ci.dev/) which uses an opinionated pipeline's [template](https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml) to generate the required Tekton YAML
-resources.
+The goal of this Quarkus Application is to simplify the life of the users when they play with Tekton or any compliant "provider" like [Konflux](https://konflux-ci.dev/) which uses an opinionated pipeline's [template](https://github.com/konflux-ci/build-definitions/blob/main/pipelines/template-build/template-build.yaml) to generate the required Tekton YAML resources.
 
 The application has been designed around the following principles:
 
@@ -24,7 +23,7 @@ Git clone the project and create the jar file of the standalone Quarkus applicat
 ```
 
 Create a configuration YAML file where you define the parameters as:
- - The `pipeline` provider to be used: `konflux` or `tekton`
+ - The workflow provider to be used: `konflux` or `tekton`
  - The `domain` to group the generated files under the output path
  - A job
 ```bash
