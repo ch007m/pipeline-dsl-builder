@@ -32,7 +32,7 @@ public class TektonProvider implements Provider {
     private static Type TYPE;
 
     @Override
-    public HasMetadata buildResource(Configurator cfg, String tektonResourceType) {
+    public HasMetadata buildResource(Configurator cfg, String workflowResourceType) {
         TYPE = Type.valueOf(cfg.getType().toUpperCase());
 
         PipelineTask aTask;
@@ -52,8 +52,8 @@ public class TektonProvider implements Provider {
             .stream()
             .collect(Collectors.toMap(Action::getId, id -> id));
 
-        if (tektonResourceType == null) {
-            throw new RuntimeException("Missing tekton resource type");
+        if (workflowResourceType == null) {
+            throw new RuntimeException("Missing workflow resource type: pipeline(run), task(run)");
         }
 
         List<Map<String, String>> results = cfg.getJob().getResults();
@@ -168,7 +168,7 @@ public class TektonProvider implements Provider {
             }
         }
 
-        switch (tektonResourceType) {
+        switch (workflowResourceType) {
             case "pipelinerun":
                 return generatePipelineRun(TYPE, cfg, tasks, pipelineParams, pipelineWorkspaces, pipelineResults);
 
@@ -181,7 +181,7 @@ public class TektonProvider implements Provider {
                 return generateTaskRun(TYPE, cfg, pipelineWorkspaces);
 
             default:
-                throw new RuntimeException("Invalid type not supported: " + tektonResourceType);
+                throw new RuntimeException("Invalid type not supported: " + workflowResourceType);
         }
     }
 
