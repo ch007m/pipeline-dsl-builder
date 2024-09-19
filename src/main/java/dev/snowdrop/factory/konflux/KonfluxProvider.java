@@ -1,4 +1,4 @@
-package dev.snowdrop.factory.konflux.pipeline;
+package dev.snowdrop.factory.konflux;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -30,9 +30,9 @@ import static dev.snowdrop.factory.konflux.pipeline.Labels.generateLabels;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
-public class Pipelines implements Provider {
+public class KonfluxProvider implements Provider {
 
-    private static final Logger logger = LoggerFactory.getLogger(Pipelines.class);
+    private static final Logger logger = LoggerFactory.getLogger(KonfluxProvider.class);
     private static Type TYPE = null;
     private static final String BUILD_TASK_NAME = "build-container";
 
