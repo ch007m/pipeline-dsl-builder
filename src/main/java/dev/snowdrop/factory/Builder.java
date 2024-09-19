@@ -16,7 +16,7 @@ public class Builder {
         return this;
     }
 
-    public HasMetadata buildResource(Configurator cfg) {
+    public HasMetadata build(Configurator cfg) {
         return provider.buildResource(cfg, resourceType);
     }
 }

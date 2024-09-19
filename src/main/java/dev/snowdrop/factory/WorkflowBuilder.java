@@ -2,8 +2,8 @@ package dev.snowdrop.factory;
 
 import dev.snowdrop.factory.tekton.TektonProvider;
 
-public class ResourceFactory {
-    public static Builder withProvider(Type providerType) {
+public class WorkflowBuilder {
+    public Builder withProvider(Type providerType) {
         Provider provider = createProvider(providerType.toString()); // convert string to enum if needed
         return new Builder(provider);
     }

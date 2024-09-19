@@ -40,10 +40,10 @@ public class TektonResource {
             throw new RuntimeException("Missing tekton resource type: pipelinerun taskrun, etc");
         }
 
-        return ResourceFactory
+        return new WorkflowBuilder()
             .withProvider(PROVIDER)
             .withResourceType(RESOURCE_TYPE)
-            .buildResource(cfg);
+            .build(cfg);
     }
 
     public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<String> args, List<When> when, Map<String, Workspace> jobWorkspacesMap, List<TaskResult> results) {
