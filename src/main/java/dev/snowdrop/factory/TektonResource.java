@@ -26,7 +26,7 @@ public class TektonResource {
     public static HasMetadata create(Configurator cfg) {
         String DOMAIN = cfg.getDomain().toUpperCase();
         Type PROVIDER = Type.valueOf(cfg.getType().toUpperCase());
-        String RESOURCE_TYPE = cfg.getJob().getResourceType();
+        String RESOURCE_TYPE = cfg.getJob().getResourceType().toLowerCase();
 
         if (PROVIDER == null) {
             throw new RuntimeException("Missing type/provider: tekton or konflux");
