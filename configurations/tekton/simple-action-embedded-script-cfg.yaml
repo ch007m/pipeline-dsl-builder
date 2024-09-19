@@ -1,0 +1,15 @@
+type: tekton
+domain: example
+
+job:
+  resourceType: TaskRun
+  name: simple-action-embedded-script # name of the pipeline to be created
+  description: Simple example of a Tekton pipeline echoing a message
+
+  actions:
+    - name: say-hello
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "Say Hello"
