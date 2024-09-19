@@ -173,9 +173,11 @@ public class TektonProvider implements Provider {
             case "pipelinerun":
                 return generatePipelineRun(TYPE, cfg, tasks, pipelineParams, pipelineWorkspaces, pipelineResults);
 
+            // TODO: To be reviewed
             case "pipeline":
                 return generatePipeline(TYPE, cfg, tasks, pipelineWorkspaces);
 
+            // TODO: To be developed
             case "taskrun":
                 return generateTaskRun(TYPE, cfg, pipelineWorkspaces);
 

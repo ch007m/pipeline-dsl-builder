@@ -12,7 +12,6 @@ import java.util.List;
 
 public class PipelineBuilder {
     public static Pipeline generatePipeline(Type TYPE, Configurator cfg, List<PipelineTask> tasks, List<WorkspaceBinding> pipelineWorkspaces) {
-        // TODO: To be reviewed
         // @formatter:off
         Pipeline pipeline = new io.fabric8.tekton.pipeline.v1.PipelineBuilder()
             .withNewMetadata()
