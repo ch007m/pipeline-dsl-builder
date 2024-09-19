@@ -2278,6 +2278,60 @@ spec:
     pipeline: "300000000000ns"
 
 ```
+#### Simple example of a Tekton task echoing a message
+
+Command to be executed: 
+```bash
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/simple-action-embedded-script-cfg.yaml
+```
+using as configuration: 
+```yaml
+# configurations/tekton/simple-action-embedded-script-cfg.yaml
+
+type: tekton
+domain: example
+
+job:
+  resourceType: TaskRun
+  name: simple-action-embedded-script
+  description: Simple example of a Tekton task echoing a message
+
+  actions:
+    - name: say-hello
+      script: |
+        #!/usr/bin/env bash
+        
+        set -e
+        echo "Say Hello"
+```
+Generated file: 
+```yaml
+# generated/tekton/example/taskrun-simple-action-embedded-script.yaml
+
+apiVersion: "tekton.dev/v1"
+kind: "TaskRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton task echoing a message"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "simple-action-embedded-script"
+spec:
+  taskSpec:
+    steps:
+    - args:
+      - "args"
+      image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+      name: "say-hello"
+      script: |-
+        #!/usr/bin/env bash
+
+        set -e
+        echo "Say Hello"
+
+```
 #### Simple example of a Tekton pipeline echoing a message
 
 Command to be executed: 
@@ -2288,27 +2342,16 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-embedded-script-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: tekton
-# The domain allows to organize the resources, tasks to be generated
 domain: example
-
-# Kubernetes namespace
-namespace: user
 
 job:
   name: simple-job-embedded-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
-
-  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
 
   actions:
     - name: say-hello
-      # The ref or reference expressed using the uri://<task-name>:<url>
-      # will fetch the code of the action to be executed
-      ref:
-      # The script to be executed using a linux container
       script: |
         #!/usr/bin/env bash
         
@@ -2329,7 +2372,6 @@ metadata:
   labels:
     app.kubernetes.io/version: "0.1"
   name: "simple-job-embedded-script"
-  namespace: "user"
 spec:
   pipelineSpec:
     tasks:
