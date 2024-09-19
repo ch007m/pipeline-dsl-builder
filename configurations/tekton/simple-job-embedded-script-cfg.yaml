@@ -1,24 +1,13 @@
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 type: tekton
-# The domain allows to organize the resources, tasks to be generated
 domain: example
-
-# Kubernetes namespace
-namespace: user
 
 job:
   name: simple-job-embedded-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
-
-  # One of the supported resources: PipelineRun, Pipeline
   resourceType: PipelineRun
 
   actions:
     - name: say-hello
-      # The ref or reference expressed using the uri://<task-name>:<url>
-      # will fetch the code of the action to be executed
-      ref:
-      # The script to be executed using a linux container
       script: |
         #!/usr/bin/env bash
         
