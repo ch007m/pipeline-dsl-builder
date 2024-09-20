@@ -25,7 +25,7 @@ public class TaskRunBuilder {
               .withNamespace(cfg.getNamespace())
             .endMetadata()
             .withNewSpec()
-              .withParams(populateParams(cfg.getJob().getParams()))
+              .withParams(cfg.getJob().getParams() != null ? populateParams(cfg.getJob().getParams()) : null)
               .withWorkspaces(pipelineWorkspaces)
               //.withServiceAccountName("") //TODO
               //.withRetries(0) // TODO
