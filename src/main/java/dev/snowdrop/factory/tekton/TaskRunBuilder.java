@@ -31,9 +31,9 @@ public class TaskRunBuilder {
               //.withRetries(0) // TODO
               //.withDebug(null) // TODO
               .withNewTaskSpec()
-                .withResults(populateTaskResults(cfg.getJob().getResults()))
+                .withResults(cfg.getJob().getResults() != null ? populateTaskResults(cfg.getJob().getResults()) : null)
                 .withWorkspaces() // TODO
-                // .withParams() // TODO: Check if that make sense to support them here vs Spec level
+                // .withParams() // TODO: Check if that make sense to have them here too vs Spec level
                 .withSteps(
                     actions.stream()
                         .map(action -> new StepBuilder()
