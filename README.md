@@ -2,12 +2,12 @@
 
 ![e2e testing workflow](https://github.com/ch007m/pipeline-dsl-builder/actions/workflows/e2e-testing.yaml/badge.svg)
 
-The goal of this Quarkus Application is to simplify the life of the users when they play with a Workflow engine as Tekton, [Konflux](https://konflux-ci.dev/) to generate the required YAML resource :-)
+The Workflow YAML Generator tool simplifies the life of the users when they play with a Workflow engine as Tekton, [Konflux](https://konflux-ci.dev/) to generate their corresponding YAML resource file from a configuration file containing the definition about the Job and the actions/steps using a `common/unified` language !
 
 The application has been designed around the following principles:
 
-- Have a quarkus standalone application able to generate different Tekton resources for a specific provider: Tekton, Konflux, etc
-- Support to provide the needed parameters or configuration using a YAML configurator file
+- Have a quarkus standalone application able to generate different YAML resource files for a provider: Tekton, Konflux, etc
+- Define the Job and actions using a `common` language
 - Generate using the Fabric8 kubernetes Fluent API & Builder the resources using [Tekton model v1](https://github.com/fabric8io/kubernetes-client/tree/main/extensions/tekton/model-v1/)
 - Propose `Factories` able to generate the Tekton resources such as: params, labels, workspaces, results, finally using `defaulting` values or YAML content from the configuration file
 - Support to specify a domain/group: `example, build, etc` to organize the different resources generated
