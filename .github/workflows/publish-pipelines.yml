@@ -125,7 +125,7 @@ jobs:
             for f in ${values[$i]}; do
               title=$(cat "$f" | yq -r ".job.description")
               fileName=$(cat "$f" | yq -r ".job.name")
-              resourceprovider=$(cat "$f" | yq -r ".job.resourceType" || echo "PipelineRun")
+              resourceprovider=$(cat "$f" | yq -r ".resourceType" || echo "PipelineRun")
               
               printf '%s\n\n' "#### ${title^}" >> SCENARIO.md
               printf '%s\n' "Command to be executed: " >> SCENARIO.md
