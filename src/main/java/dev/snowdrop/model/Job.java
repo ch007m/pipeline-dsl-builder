@@ -18,9 +18,6 @@ public class Job {
    private List<Map<String, String>> annotations;
    private List<Map<String, String>> labels;
 
-   @JsonSetter(nulls = Nulls.SKIP)
-   private String resourceType = DEFAULT_RESOURCE_TYPE;
-
    private List<Map<String, Object>> params;
    private List<Workspace> workspaces;
    private List<Action> actions;
@@ -29,6 +26,5 @@ public class Job {
    @JsonSetter(nulls = Nulls.SKIP)
    private String timeout = DEFAULT_TIMEOUT;
 
-   private static String DEFAULT_RESOURCE_TYPE = "PipelineRun";
    private static String DEFAULT_TIMEOUT = "0h5m0s";
 }

@@ -12,7 +12,7 @@ public class WorkflowResource {
     public static HasMetadata create(Configurator cfg) {
         String DOMAIN = cfg.getDomain().toUpperCase();
         Type PROVIDER = Type.valueOf(cfg.getProvider().toUpperCase());
-        String RESOURCE_TYPE = cfg.getJob().getResourceType().toLowerCase();
+        String RESOURCE_TYPE = cfg.getResourceType().toLowerCase();
 
         if (PROVIDER == null) {
             throw new RuntimeException("Missing type/provider: tekton or konflux");

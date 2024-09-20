@@ -29,12 +29,12 @@ Create a configuration YAML file where you define the parameters as:
 ```bash
 cat <<EOF > my-config.yaml
 provider: tekton
+resourceType: PipelineRun
 domain: example
 
 job:
   name: simple-job-embedded-script
   description: Simple example of a Tekton pipeline echoing a message
-  resourceType: PipelineRun
 
   actions:
   - name: say-hello

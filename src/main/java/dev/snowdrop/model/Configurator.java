@@ -19,6 +19,9 @@ public class Configurator {
    private String provider = DEFAULT_TYPE;
 
    @JsonSetter(nulls = Nulls.SKIP)
+   private String resourceType = DEFAULT_RESOURCE_TYPE;
+
+   @JsonSetter(nulls = Nulls.SKIP)
    private String domain = DEFAULT_DOMAIN;
 
    private String namespace;
@@ -30,5 +33,6 @@ public class Configurator {
    private List<Bundle> bundles;
 
    private static String DEFAULT_TYPE = String.valueOf(TEKTON).toLowerCase();
+   private static String DEFAULT_RESOURCE_TYPE = "PipelineRun";
    private static String DEFAULT_DOMAIN = String.valueOf(DEMO).toLowerCase();
 }

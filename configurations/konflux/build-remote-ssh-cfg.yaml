@@ -1,5 +1,6 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: konflux
+resourceType: PipelineRun
 domain: remote-build
 namespace: cmoullia-tenant
 
@@ -15,7 +16,6 @@ component:
   enable: false
 
 job:
-  resourceType: PipelineRun
   name: builder-ubi-base
   description: PipelineRun using the pack cli to build the builder image remotely
   timeout: "0h15m0s"

@@ -1,8 +1,8 @@
 provider: tekton
+resourceType: TaskRun
 domain: example
 
 job:
-  resourceType: TaskRun
   name: simple-action-embedded-script
   description: Simple example of a Tekton task echoing a message
 

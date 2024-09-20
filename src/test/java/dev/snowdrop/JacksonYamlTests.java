@@ -43,6 +43,7 @@ public class JacksonYamlTests {
     public void fromObjectToYaml() throws JsonProcessingException {
         String yamlStr = """
             provider: "konflux"
+            resourceType: "PipelineRun"
             domain: "build"
             namespace: null
             job: null

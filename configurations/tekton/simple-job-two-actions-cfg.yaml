@@ -1,5 +1,6 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: tekton
+resourceType: PipelineRun
 # The domain allows to organize the resources, tasks to be generated
 domain: example
 
@@ -9,9 +10,6 @@ namespace: demo
 job:
   name: simple-job-two-actions # name of the pipeline to be created
   description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye
-
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
 
   actions:
     - name: say-hello

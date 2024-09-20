@@ -1,4 +1,5 @@
 provider: tekton
+resourceType: PipelineRun
 domain: example
 
 namespace: demo
@@ -6,7 +7,6 @@ namespace: demo
 job:
   name: simple-job-two-actions-wks
   description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
-  resourceType: PipelineRun
   workspaces:
     - name: shared-wks
 

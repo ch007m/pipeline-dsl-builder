@@ -1,12 +1,11 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: tekton
-# The domain allows to organize the resources, tasks to be generated
+resourceType: PipelineRun
 domain: example
 
 job:
   name: simple-job-fetch-file-script
   description: Simple example of a Tekton pipeline echoing a message
-  resourceType: PipelineRun
 
   actions:
     - name: say-hello

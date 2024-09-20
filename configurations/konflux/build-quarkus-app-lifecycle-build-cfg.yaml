@@ -1,5 +1,6 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: konflux
+resourceType: PipelineRun
 domain: build
 namespace: user-ns1
 
@@ -16,8 +17,6 @@ component:
   enable: false
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
   name: quarkus-1-on-push
   description: PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
 
