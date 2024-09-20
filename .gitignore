@@ -22,6 +22,5 @@ target/
 /TEMP.md
 /generated/bundle/
 
-# Antora doc site
-/documentation/node_modules/
-/documentation/.cache/
+# Doc site
+node_modules/
