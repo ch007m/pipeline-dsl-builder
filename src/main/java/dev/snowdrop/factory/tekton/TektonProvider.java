@@ -19,7 +19,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static dev.snowdrop.factory.WorkflowResource.*;
 import static dev.snowdrop.factory.WorkfowResourceBuilder.*;
 import static dev.snowdrop.factory.tekton.PipelineBuilder.generatePipeline;
 import static dev.snowdrop.factory.tekton.PipelineRunBuilder.generatePipelineRun;
@@ -69,7 +68,7 @@ public class TektonProvider implements Provider {
 
         List<Map<String, Object>> params = cfg.getJob().getParams();
         if (params != null && !params.isEmpty()) {
-            pipelineParams = populatePipelineParams(cfg.getJob().getParams());
+            pipelineParams = populateParams(cfg.getJob().getParams());
         }
 
         // Create a HashMap of the job workspaces using as's key the workspace's name

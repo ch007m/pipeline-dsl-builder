@@ -1,6 +1,5 @@
 package dev.snowdrop.factory;
 
-import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.factory.tekton.TaskRefResolver;
 import dev.snowdrop.model.*;
 import dev.snowdrop.model.ConfigMap;
@@ -68,7 +67,7 @@ public class WorkfowResourceBuilder {
                         .withValues(w.getValues())
                         .build())
                     .toArray(WhenExpression[]::new))
-            .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
+            .withParams(action.getParams() != null ? populateParams(action.getParams()) : null)
             .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
             .withTaskSpec(
                 new EmbeddedTaskBuilder()
@@ -110,7 +109,7 @@ public class WorkfowResourceBuilder {
             .withRunAfter(runAfter != null ? Collections.singletonList(runAfter) : null)
             .withTaskRef(TaskRefResolver.withReference(bundle, action.getName()))
             .withWorkspaces(populateTaskWorkspaces(action, jobWorkspacesMap, taskWorkspaces))
-            .withParams(action.getParams() != null ? populatePipelineParams(action.getParams()) : null)
+            .withParams(action.getParams() != null ? populateParams(action.getParams()) : null)
             .build();
         // @formatter:on
         return pipelineTask;
@@ -353,7 +352,7 @@ public class WorkfowResourceBuilder {
         return workspaceList;
     }
 
-    public static List<Param> populatePipelineParams(List<Map<String, Object>> params) {
+    public static List<Param> populateParams(List<Map<String, Object>> params) {
         List<Param> paramList = new ArrayList<>();
         for (Map<String, Object> hash : params) {
             hash.forEach((key, val) -> {

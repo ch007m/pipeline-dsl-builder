@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static dev.snowdrop.factory.WorkflowResource.*;
 //import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
 //import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
 // import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
@@ -71,7 +70,7 @@ public class KonfluxProvider implements Provider {
 
         List<Map<String, Object>> params = cfg.getJob().getParams();
         if (params != null && !params.isEmpty()) {
-            pipelineParams = populatePipelineParams(cfg.getJob().getParams());
+            pipelineParams = populateParams(cfg.getJob().getParams());
         }
 
         // Create a HashMap of the job workspaces using as's key the workspace's name

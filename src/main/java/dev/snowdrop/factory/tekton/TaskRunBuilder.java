@@ -1,19 +1,17 @@
 package dev.snowdrop.factory.tekton;
 
-import dev.snowdrop.factory.AnnotationsProviderFactory;
-import dev.snowdrop.factory.LabelsProviderFactory;
 import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.Action;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.tekton.pipeline.v1.StepBuilder;
 import io.fabric8.tekton.pipeline.v1.TaskRun;
-import io.fabric8.tekton.pipeline.v1.TaskRunDebugBuilder;
 import io.fabric8.tekton.pipeline.v1.WorkspaceBinding;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static dev.snowdrop.factory.WorkfowResourceBuilder.*;
 import static dev.snowdrop.model.Action.STEP_SCRIPT_IMAGE;
 
 public class TaskRunBuilder {
@@ -23,27 +21,28 @@ public class TaskRunBuilder {
         TaskRun taskRun = new io.fabric8.tekton.pipeline.v1.TaskRunBuilder()
             .withNewMetadata()
               .withName(cfg.getJob().getName())
-              .withLabels(LabelsProviderFactory.getProvider(TYPE).getPipelineLabels(cfg))
-              .withAnnotations(AnnotationsProviderFactory.getProvider(TYPE).getPipelineAnnotations(cfg))
+              .withLabels(Map.of("tekton.dev/taskRun",cfg.getJob().getName()))
               .withNamespace(cfg.getNamespace())
             .endMetadata()
             .withNewSpec()
-              .withParams() // TODO
-              .withWorkspaces(pipelineWorkspaces) // TODO
+              .withParams(populateParams(cfg.getJob().getParams()))
+              .withWorkspaces(pipelineWorkspaces)
               //.withServiceAccountName("") //TODO
               //.withRetries(0) // TODO
               //.withDebug(null) // TODO
               .withNewTaskSpec()
-                .withResults()
+                .withResults(populateTaskResults(cfg.getJob().getResults()))
                 .withWorkspaces() // TODO
+                // .withParams() // TODO: Check if that make sense to support them here vs Spec level
                 .withSteps(
                     actions.stream()
                         .map(action -> new StepBuilder()
                             .withName(action.getName())
-                            .withArgs("args") // TODO
-                            .withImage(action.getImage() != null ? action.getImage() : Action.IMAGES.get(STEP_SCRIPT_IMAGE)) // TODO
+                            .withArgs(action.getArgs())
+                            .withImage(action.getImage() != null ? action.getImage() : Action.IMAGES.get(STEP_SCRIPT_IMAGE))
+                            .withEnv(populateStepEnvVars(action))
                             .withScript(action.getScript())
-                            .withVolumeMounts() // TODO
+                            .withVolumeMounts(populateTaskVolumeMounts(action))
                             .build())
                         .collect(Collectors.toList()))
               .endTaskSpec()
