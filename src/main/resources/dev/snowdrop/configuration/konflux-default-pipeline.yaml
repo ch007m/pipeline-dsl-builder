@@ -1,4 +1,5 @@
 provider: konflux
+resourceType: PipelineRun
 domain: configuration
 
 repository:
@@ -22,7 +23,6 @@ bundles:
   - bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2@sha256:5d0bd592a8924451b6472696e398fa719773f819df6e8e040cd2fb2b550e0e74
 
 job:
-  resourceType: PipelineRun
   name: default-konflux
   description: Default konflux pipeline
 
