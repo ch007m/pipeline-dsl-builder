@@ -20,7 +20,7 @@ public class JacksonYamlTests {
     @Test
     public void fromYamlToObject() throws JsonProcessingException {
         String yamlStr = """
-            type: konflux
+            provider: konflux
             application:
               enable: false
             component:
@@ -42,7 +42,7 @@ public class JacksonYamlTests {
     @Test
     public void fromObjectToYaml() throws JsonProcessingException {
         String yamlStr = """
-            type: "konflux"
+            provider: "konflux"
             domain: "build"
             namespace: null
             job: null
@@ -72,7 +72,7 @@ public class JacksonYamlTests {
         repo.setUrl("http://github.com/ch007m/new-quarkus-app-1");
 
         Configurator cfg = new Configurator();
-        cfg.setType("konflux");
+        cfg.setProvider("konflux");
         cfg.setDomain("build");
 
         cfg.setApplication(app);

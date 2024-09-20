@@ -53,7 +53,7 @@ public class BuilderCommand implements Runnable {
             // as template tlo add the user's tasks, etc
             configuratorSvc.populateDefaultPipeline();
         } else {
-            if (cfg.getType().toUpperCase().equals(KONFLUX.name())) {
+            if (cfg.getProvider().toUpperCase().equals(KONFLUX.name())) {
                 logger.error("The default configuration file do not exist or cannot not be loaded. This file is mandatory for Konflux");
                 System.exit(1);
             } else {
@@ -66,11 +66,11 @@ public class BuilderCommand implements Runnable {
             System.exit(1);
         }
 
-        if (cfg.getType() == null) {
+        if (cfg.getProvider() == null) {
             logger.error("Type is missing from the configuration yaml file !");
             System.exit(1);
         } else {
-            logger.info("#### Type selected: {}", cfg.getType().toUpperCase());
+            logger.info("#### Type selected: {}", cfg.getProvider().toUpperCase());
         }
 
         if (cfg.getDomain() == null) {
@@ -78,7 +78,7 @@ public class BuilderCommand implements Runnable {
         }
         logger.info("#### Pipeline domain selected: {}", cfg.getDomain());
 
-        String resourcesPath = Paths.get(cfg.getOutputPath(), cfg.getType(), cfg.getDomain()).toString();
+        String resourcesPath = Paths.get(cfg.getOutputPath(), cfg.getProvider(), cfg.getDomain()).toString();
 
         // Use the factory to generate the resources according to the provider and the type
         ConfiguratorSvc.writeYaml(WorkflowResource.create(cfg), resourcesPath);

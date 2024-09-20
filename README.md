@@ -28,7 +28,7 @@ Create a configuration YAML file where you define the parameters as:
  - A job
 ```bash
 cat <<EOF > my-config.yaml
-type: tekton
+provider: tekton
 domain: example
 
 job:

@@ -11,7 +11,7 @@ public class WorkflowResource {
 
     public static HasMetadata create(Configurator cfg) {
         String DOMAIN = cfg.getDomain().toUpperCase();
-        Type PROVIDER = Type.valueOf(cfg.getType().toUpperCase());
+        Type PROVIDER = Type.valueOf(cfg.getProvider().toUpperCase());
         String RESOURCE_TYPE = cfg.getJob().getResourceType().toLowerCase();
 
         if (PROVIDER == null) {

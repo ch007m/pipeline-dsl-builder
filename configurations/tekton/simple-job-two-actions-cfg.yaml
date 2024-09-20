@@ -1,5 +1,5 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: tekton
+provider: tekton
 # The domain allows to organize the resources, tasks to be generated
 domain: example
 

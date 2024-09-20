@@ -33,7 +33,7 @@ public class TektonProvider implements Provider {
 
     @Override
     public HasMetadata buildResource(Configurator cfg, String workflowResourceType) {
-        TYPE = Type.valueOf(cfg.getType().toUpperCase());
+        TYPE = Type.valueOf(cfg.getProvider().toUpperCase());
 
         PipelineTask aTask;
         List<Action> actions = cfg.getJob().getActions();

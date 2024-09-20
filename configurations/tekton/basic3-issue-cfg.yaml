@@ -1,4 +1,4 @@
-type: tekton
+provider: tekton
 domain: demo
 # Such a job will not work as the [*] "notation"
 # with array param is not supported in a task's script

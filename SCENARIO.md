@@ -15,8 +15,8 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-quarkus-app-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: konflux
+# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+provider: konflux
 domain: build
 namespace: user-ns1
 
@@ -120,7 +120,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "my-quarkus"
-    pipelines.appstudio.openshift.io/type: "build"
+    pipelines.appstudio.openshift.io/provider: "build"
     pipelines.openshift.io/strategy: "build"
     appstudio.openshift.io/component: "my-quarkus-app"
     pipelines.openshift.io/used-by: "build-cloud"
@@ -461,8 +461,8 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-quarkus-app-lifecycle-extension-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: konflux
+# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+provider: konflux
 domain: build
 namespace: user-ns1
 
@@ -572,7 +572,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "my-quarkus"
-    pipelines.appstudio.openshift.io/type: "build"
+    pipelines.appstudio.openshift.io/provider: "build"
     pipelines.openshift.io/strategy: "build"
     appstudio.openshift.io/component: "my-quarkus-app"
     pipelines.openshift.io/used-by: "build-cloud"
@@ -913,8 +913,8 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-quarkus-app-lifecycle-build-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: konflux
+# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+provider: konflux
 domain: build
 namespace: user-ns1
 
@@ -992,7 +992,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "my-quarkus"
-    pipelines.appstudio.openshift.io/type: "build"
+    pipelines.appstudio.openshift.io/provider: "build"
     pipelines.openshift.io/strategy: "build"
     appstudio.openshift.io/component: "my-quarkus-app"
     pipelines.openshift.io/used-by: "build-cloud"
@@ -1335,8 +1335,8 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-remote-ssh-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: konflux
+# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+provider: konflux
 domain: remote-build
 namespace: cmoullia-tenant
 
@@ -1428,7 +1428,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/redhat-buildpacks/builder-ubi-base?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "buildpack-remote"
-    pipelines.appstudio.openshift.io/type: "build"
+    pipelines.appstudio.openshift.io/provider: "build"
     pipelines.openshift.io/strategy: "remote-build"
     appstudio.openshift.io/component: "builder-ubi-base"
     pipelines.openshift.io/used-by: "build-cloud"
@@ -1939,8 +1939,8 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-fetch-file-script-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: tekton
+# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+provider: tekton
 # The domain allows to organize the resources, tasks to be generated
 domain: example
 
@@ -1995,7 +1995,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-two-actions-worskpace-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: example
 
 namespace: demo
@@ -2111,7 +2111,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-two-actions-when-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: example
 namespace: demo
 
@@ -2202,8 +2202,8 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-two-actions-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: tekton
+# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+provider: tekton
 # The domain allows to organize the resources, tasks to be generated
 domain: example
 
@@ -2288,7 +2288,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-action-embedded-script-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: example
 
 job:
@@ -2338,7 +2338,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-embedded-script-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: example
 
 job:
@@ -2396,8 +2396,8 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-fetch-script-cfg.yaml
 
-# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: tekton
+# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+provider: tekton
 # The domain allows to organize the resources, tasks to be generated
 domain: example
 
@@ -2463,7 +2463,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/pack-builder-git-task-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: buildpack
 namespace:
 
@@ -2667,7 +2667,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/pack-builder-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: buildpack
 namespace:
 
@@ -2872,7 +2872,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/basic3-issue-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: demo
 # Such a job will not work as the [*] "notation"
 # with array param is not supported in a task's script
@@ -2945,7 +2945,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/basic1-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: demo
 job:
   resourceType: PipelineRun
@@ -2999,7 +2999,7 @@ using as configuration:
 ```yaml
 # configurations/tekton/basic2-cfg.yaml
 
-type: tekton
+provider: tekton
 domain: demo
 job:
   resourceType: PipelineRun

@@ -1,4 +1,4 @@
-type: tekton
+provider: tekton
 domain: demo
 job:
   resourceType: PipelineRun

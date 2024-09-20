@@ -41,7 +41,7 @@ public class KonfluxProvider implements Provider {
 
     @Override
     public HasMetadata buildResource(Configurator cfg, String resourceType) {
-        TYPE = Type.valueOf(cfg.getType().toUpperCase());
+        TYPE = Type.valueOf(cfg.getProvider().toUpperCase());
 
         PipelineTask aTask;
         List<Action> actions = cfg.getJob().getActions();

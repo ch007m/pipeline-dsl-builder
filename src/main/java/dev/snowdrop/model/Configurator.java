@@ -2,7 +2,6 @@ package dev.snowdrop.model;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
-import dev.snowdrop.factory.Type;
 import dev.snowdrop.model.konflux.Application;
 import dev.snowdrop.model.konflux.Component;
 import lombok.Getter;
@@ -17,7 +16,7 @@ import static dev.snowdrop.model.Domain.DEMO;
 @Getter
 public class Configurator {
    @JsonSetter(nulls = Nulls.SKIP)
-   private String type = DEFAULT_TYPE;
+   private String provider = DEFAULT_TYPE;
 
    @JsonSetter(nulls = Nulls.SKIP)
    private String domain = DEFAULT_DOMAIN;

@@ -1,5 +1,5 @@
 # The type will be used by the application to generate the resources for the selected provider: konflux, tekton
-type: konflux
+provider: konflux
 domain: remote-build
 namespace: cmoullia-tenant
 
