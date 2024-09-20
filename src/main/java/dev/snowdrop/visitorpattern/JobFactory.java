@@ -8,11 +8,7 @@ public class JobFactory {
         if (config.getResourceType().equalsIgnoreCase("PipelineRun")) {
             return new PipelineRun(config);
         } else if (config.getResourceType().equalsIgnoreCase("TaskRun")) {
-            // Convert Actions to Steps
-            List<Step> steps = config.getJob().getActions().stream()
-                .map(action -> new Step(action.getName()))
-                .collect(Collectors.toList());
-            return new TaskRun(config.getName(), steps);
+            return new TaskRun(config);
         }
         throw new IllegalArgumentException("Unknown resource type: " + config.getResourceType());
     }

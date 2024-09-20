@@ -3,23 +3,22 @@ package dev.snowdrop.visitorpattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
 @Setter
-public class TaskRun implements Visitable {
+public class TaskRun extends AbstractRun {
     private String name;
     private List<Step> steps;
+    private Configurator config;
 
-    public TaskRun(String name, List<Step> steps) {
-        this.name = name;
-        this.steps = steps;
+    public TaskRun(Configurator cfg) {
+        this.config = cfg;
     }
 
     @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
+    public AbstractRun accept(Visitor visitor) {
+        return visitor.visit(this);
     }
 
     // Other methods related to TaskRun

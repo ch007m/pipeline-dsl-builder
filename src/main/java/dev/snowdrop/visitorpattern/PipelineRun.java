@@ -7,18 +7,18 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PipelineRun implements Visitable {
-    private String name;
-    private List<Action> actions;
+public class PipelineRun extends AbstractRun {
+    public String name;
+    public List<Action> actions;
+    private Configurator config;
 
     public PipelineRun(Configurator cfg) {
-        this.name = cfg.getName();
-        this.actions = cfg.getJob().getActions();
+        this.config = cfg;
     }
 
     @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
+    public AbstractRun accept(Visitor visitor) {
+        return visitor.visit(this);
     }
 
     // Other methods related to PipelineRun

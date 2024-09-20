@@ -1,6 +1,6 @@
 package dev.snowdrop.visitorpattern;
 
 public interface Visitable {
-    void accept(Visitor visitor);
+    AbstractRun accept(Visitor visitor);
 }
 
