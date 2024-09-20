@@ -3,29 +3,31 @@ package dev.snowdrop.service;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.factory.WorkflowResource;
 import dev.snowdrop.model.Configurator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.*;
+import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.LITERAL_BLOCK_STYLE;
+import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.WRITE_DOC_START_MARKER;
 import static dev.snowdrop.service.FileUtilSvc.readFileFromResources;
 
+@Slf4j
 @ApplicationScoped
 @Setter
 @Getter
 public class ConfiguratorSvc {
 
-    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
     private static ConfiguratorSvc instance;
     public Configurator defaultConfigurator;
     public HasMetadata defaultPipeline;
@@ -46,10 +48,10 @@ public class ConfiguratorSvc {
             String cfgFileName = String.format("%s-default-pipeline.yaml",cfg.getProvider());
             try {
                 String configYaml = readFileFromResources("dev/snowdrop/configuration/" + cfgFileName);
-                logger.info("#### Default configuration loaded: {}", "dev/snowdrop/configuration/" + cfgFileName);
+                log.info("#### Default configuration loaded: {}", "dev/snowdrop/configuration/" + cfgFileName);
                 defaultConfigurator = loadConfiguration(configYaml);
             } catch (Exception e) {
-                logger.warn("Default configuration file {} don't exist for or cannot be loaded :",cfgFileName);
+                log.warn("Default configuration file {} don't exist for or cannot be loaded :",cfgFileName);
                 return false;
             }
             defaultConfigurator.setOutputPath(cfg.getOutputPath());
@@ -115,12 +117,12 @@ public class ConfiguratorSvc {
             );
             mapper.writeValue(pathToYaml.toFile(), resource);
 
-            logger.info("Path of the resource generated: {}", pathToYaml);
-            logger.debug("Generated YAML: \n{}", yamlFilePath);
+            log.info("Path of the resource generated: {}", pathToYaml);
+            log.debug("Generated YAML: \n{}", yamlFilePath);
 
         } catch (FileAlreadyExistsException e) {
             // TODO
-            logger.warn("File already exists: " + yamlFilePath);
+            log.warn("File already exists: " + yamlFilePath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

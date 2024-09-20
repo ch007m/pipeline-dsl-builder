@@ -1,9 +1,7 @@
 package dev.snowdrop.command;
 
-import dev.snowdrop.command.fetch.OCIBundleFetchCommand;
 import io.fabric8.tekton.pipeline.v1.Task;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -14,6 +12,7 @@ import java.net.URL;
 
 import static dev.snowdrop.service.CodeGeneratorSvc.*;
 
+@Slf4j
 @CommandLine.Command(name = "yamlToJava", description = "Generate a Java object from Tekton Task YAML")
 public class YamlToJavaCommand implements Runnable {
 
@@ -23,8 +22,6 @@ public class YamlToJavaCommand implements Runnable {
    @CommandLine.Option(names = {"-p", "--path"}, description = "Path of the yaml resource file to process", required = true)
    String path;
 
-   private static final Logger logger = LoggerFactory.getLogger(OCIBundleFetchCommand.class);
-
    @Override
    public void run() {
       switch (type) {
@@ -32,7 +29,7 @@ public class YamlToJavaCommand implements Runnable {
          case "tasks": generateTaskFromYAML(path); break;
          case "workspaces": generateWorkspacesFromYAML(path); break;
          case "git-task": loadYAML(path); break;
-         default: logger.warn("Unrecognized type {}", type);
+         default: log.warn("Unrecognized type {}", type);
       }
    }
 

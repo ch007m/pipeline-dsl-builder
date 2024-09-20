@@ -1,13 +1,11 @@
 package dev.snowdrop.factory;
 
-import dev.snowdrop.model.*;
-import io.fabric8.kubernetes.api.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.snowdrop.model.Configurator;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class WorkflowResource {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowResource.class);
 
     public static HasMetadata create(Configurator cfg) {
         String DOMAIN = cfg.getDomain().toUpperCase();

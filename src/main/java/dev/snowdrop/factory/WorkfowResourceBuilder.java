@@ -1,15 +1,14 @@
 package dev.snowdrop.factory;
 
 import dev.snowdrop.factory.tekton.TaskRefResolver;
-import dev.snowdrop.model.*;
 import dev.snowdrop.model.ConfigMap;
 import dev.snowdrop.model.Secret;
 import dev.snowdrop.model.Volume;
+import dev.snowdrop.model.*;
 import dev.snowdrop.service.FileUtilSvc;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.tekton.pipeline.v1.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -19,9 +18,8 @@ import java.util.stream.Collectors;
 import static dev.snowdrop.model.Action.STEP_SCRIPT_IMAGE;
 import static dev.snowdrop.model.Volume.STORAGE;
 
+@Slf4j
 public class WorkfowResourceBuilder {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkfowResourceBuilder.class);
 
     public static PipelineTask createTaskWithEmbeddedScript(Action action, String runAfter, List<String> args, List<When> when, Map<String, Workspace> jobWorkspacesMap, List<TaskResult> results) {
         String embeddedScript;
@@ -97,7 +95,7 @@ public class WorkfowResourceBuilder {
             if (wks.getSpec() != null && wks.getSpec().getWorkspaces() != null) {
                 taskWorkspaces = wks.getSpec().getWorkspaces();
             } else {
-                logger.info("No workspaces declared for the task: " + action.getName());
+                log.info("No workspaces declared for the task: " + action.getName());
             }
         }
 
@@ -211,7 +209,7 @@ public class WorkfowResourceBuilder {
                 if (wksMerged.containsKey(wksNameToSearch)) {
                     // Job's workspace and task's workspace matches
                     // We will now check if name
-                    logger.info("Match found using as key: " + wksNameToSearch);
+                    log.info("Match found using as key: " + wksNameToSearch);
 
                     Workspace wksMatching = wksMerged.get(wksNameToSearch);
 
@@ -232,7 +230,7 @@ public class WorkfowResourceBuilder {
                 if (wksMerged.containsKey(k) && jobWorkspacesMap.containsKey(k)) {
                     // Job's workspace and task's workspace matches
                     // We will now check if name
-                    logger.info("Match found using as key: " + k);
+                    log.info("Match found using as key: " + k);
 
                     Workspace wksMatching = wksMerged.get(k);
 

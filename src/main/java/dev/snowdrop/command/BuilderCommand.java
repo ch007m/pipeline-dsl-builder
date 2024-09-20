@@ -5,22 +5,20 @@ import dev.snowdrop.model.Configurator;
 import dev.snowdrop.model.Domain;
 import dev.snowdrop.service.ConfiguratorSvc;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.nio.file.Paths;
 
 import static dev.snowdrop.factory.Type.KONFLUX;
-import static dev.snowdrop.factory.konflux.builder.ComponentBuilder.createComponent;
 import static dev.snowdrop.factory.konflux.builder.ApplicationBuilder.createApplication;
+import static dev.snowdrop.factory.konflux.builder.ComponentBuilder.createComponent;
 
+@Slf4j
 @TopCommand
 @Command(name = "builder", mixinStandardHelpOptions = true, description = "Application generating Tekton Pipeline(run)s")
 public class BuilderCommand implements Runnable {
-
-    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
 
     @Option(names = {"-c", "--configuration-path"}, description = "The path of the configuration file", required = true)
     String configuration;
@@ -32,8 +30,8 @@ public class BuilderCommand implements Runnable {
 
     @Override
     public void run() {
-        logger.info("#### Configuration path: {}", configuration);
-        logger.debug("#### Output path: {}", outputPath);
+        log.info("#### Configuration path: {}", configuration);
+        log.debug("#### Output path: {}", outputPath);
 
         // Parse and validate the user's configuration file
         Configurator cfg = null;
@@ -42,7 +40,7 @@ public class BuilderCommand implements Runnable {
             // Set the outputPath (used to extract tasks from oci bundles, etc.) to the configurator object
             cfg.setOutputPath(outputPath);
         } catch (Exception e) {
-            logger.error("Error loading configuration", e);
+            log.error("Error loading configuration", e);
             System.exit(1);
         }
 
@@ -54,29 +52,29 @@ public class BuilderCommand implements Runnable {
             configuratorSvc.populateDefaultPipeline();
         } else {
             if (cfg.getProvider().toUpperCase().equals(KONFLUX.name())) {
-                logger.error("The default configuration file do not exist or cannot not be loaded. This file is mandatory for Konflux");
+                log.error("The default configuration file do not exist or cannot not be loaded. This file is mandatory for Konflux");
                 System.exit(1);
             } else {
-                logger.warn("No configuration file found for Tekton");
+                log.warn("No configuration file found for Tekton");
             }
         }
 
         if (cfg == null) {
-            logger.error("Configuration file cannot be empty !");
+            log.error("Configuration file cannot be empty !");
             System.exit(1);
         }
 
         if (cfg.getProvider() == null) {
-            logger.error("Type is missing from the configuration yaml file !");
+            log.error("Type is missing from the configuration yaml file !");
             System.exit(1);
         } else {
-            logger.info("#### Type selected: {}", cfg.getProvider().toUpperCase());
+            log.info("#### Type selected: {}", cfg.getProvider().toUpperCase());
         }
 
         if (cfg.getDomain() == null) {
             cfg.setDomain(Domain.EXAMPLE.name());
         }
-        logger.info("#### Pipeline domain selected: {}", cfg.getDomain());
+        log.info("#### Pipeline domain selected: {}", cfg.getDomain());
 
         String resourcesPath = Paths.get(cfg.getOutputPath(), cfg.getProvider(), cfg.getDomain()).toString();
 

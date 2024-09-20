@@ -9,8 +9,7 @@ import dev.snowdrop.service.ConfiguratorSvc;
 import dev.snowdrop.service.UriParserSvc;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,18 +20,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-//import static dev.snowdrop.factory.konflux.pipeline.Finally.KONFLUX_PIPELINE_FINALLY;
-//import static dev.snowdrop.factory.konflux.pipeline.Results.KONFLUX_PIPELINE_RESULTS;
-// import static dev.snowdrop.factory.konflux.pipeline.Tasks.*;
 import static dev.snowdrop.factory.WorkfowResourceBuilder.*;
 import static dev.snowdrop.factory.konflux.pipeline.Annotations.generateAnnotations;
 import static dev.snowdrop.factory.konflux.pipeline.Labels.generateLabels;
 import static dev.snowdrop.service.RemoteTaskSvc.BUNDLE_PREFIX;
 import static dev.snowdrop.service.RemoteTaskSvc.fetchExtractTask;
 
+@Slf4j
 public class KonfluxProvider implements Provider {
 
-    private static final Logger logger = LoggerFactory.getLogger(KonfluxProvider.class);
     private static Type TYPE = null;
     private static final String BUILD_TASK_NAME = "build-container";
 
@@ -121,7 +117,7 @@ public class KonfluxProvider implements Provider {
                 Bundle bundle = UriParserSvc.extract(action.getRef());
 
                 if (bundle == null) {
-                    //logger.error("Bundle reference was not parsed properly");
+                    //log.error("Bundle reference was not parsed properly");
                     throw new RuntimeException("Bundle reference was not parsed properly using: " + action.getRef());
                 } else {
                     // Fetch the content of the task using the remote URL: Git url, oci bundle, etc

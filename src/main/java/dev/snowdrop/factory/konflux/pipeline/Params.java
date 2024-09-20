@@ -1,6 +1,9 @@
 package dev.snowdrop.factory.konflux.pipeline;
 
-import io.fabric8.tekton.pipeline.v1.*;
+import io.fabric8.tekton.pipeline.v1.Param;
+import io.fabric8.tekton.pipeline.v1.ParamBuilder;
+import io.fabric8.tekton.pipeline.v1.ParamSpec;
+import io.fabric8.tekton.pipeline.v1.ParamValue;
 
 import java.util.ArrayList;
 import java.util.List;

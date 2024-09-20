@@ -8,8 +8,8 @@ import io.fabric8.tekton.pipeline.v1.PipelineTaskBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.snowdrop.service.BundlesSvc.getBundleURL;
 import static dev.snowdrop.factory.konflux.Variables.KONFLUX_TEKTON_QUAY_CATALOG;
+import static dev.snowdrop.service.BundlesSvc.getBundleURL;
 
 public class Finally {
 

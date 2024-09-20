@@ -1,6 +1,5 @@
 package dev.snowdrop.model.jackson;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -8,8 +7,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import dev.snowdrop.model.Bundle;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class BundleDeserializer extends StdDeserializer<Bundle> {
 

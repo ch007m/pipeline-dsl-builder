@@ -1,17 +1,17 @@
 package dev.snowdrop.command.fetch;
 
 import dev.snowdrop.model.oci.Manifest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 
-import java.io.*;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import static dev.snowdrop.service.RemoteTaskSvc.*;
 
+@Slf4j
 @CommandLine.Command(name = "extractBundle", description = "Fetch and extract the YAML resources from OCI bundle")
 public class OCIBundleFetchCommand implements Runnable {
 
@@ -22,8 +22,6 @@ public class OCIBundleFetchCommand implements Runnable {
 
     @CommandLine.Option(names = {"-p", "--path"}, description = "Path where files will be extracted", required = true)
     String path;
-
-    private static final Logger logger = LoggerFactory.getLogger(OCIBundleFetchCommand.class);
 
     @Override
     public void run() {
@@ -52,7 +50,7 @@ public class OCIBundleFetchCommand implements Runnable {
                 });
             });
         } else {
-            logger.error("No layers found for the oci bundle !");
+            log.error("No layers found for the oci bundle !");
         }
     }
 }

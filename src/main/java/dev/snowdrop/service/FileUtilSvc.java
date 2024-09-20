@@ -1,13 +1,9 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.command.BuilderCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,9 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class FileUtilSvc {
 
-    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
     private static final String SCRIPTS_PATH = "scripts/";
 
     public static String readFileFromResources(String filePath) throws IOException {
@@ -42,7 +38,7 @@ public class FileUtilSvc {
 
     public static String loadFileAsString(String fileName) {
         String scriptPath = SCRIPTS_PATH + fileName;
-        logger.debug("#### Script path to embed in a task: " + scriptPath);
+        log.debug("#### Script path to embed in a task: " + scriptPath);
 
         // Get the input stream for the file from the class loader
         InputStream inputStream = FileUtilSvc.class.getClassLoader().getResourceAsStream(scriptPath);
@@ -81,9 +77,9 @@ public class FileUtilSvc {
             }
 
         } else if ("file".equalsIgnoreCase(aUrl.getProtocol())) {
-            // logger.info("Current path: {}", System.getProperty("user.dir"));
+            // log.info("Current path: {}", System.getProperty("user.dir"));
             Path scriptPath = Paths.get(aUrl.getHost(), aUrl.getPath());
-            logger.info("Script file path: {}", scriptPath);
+            log.info("Script file path: {}", scriptPath);
             File scriptFile = new File(String.valueOf(scriptPath.toFile()));
             if (scriptFile.exists()) {
                 return new String(Files.readAllBytes(scriptFile.toPath()));

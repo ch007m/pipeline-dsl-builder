@@ -6,19 +6,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import dev.snowdrop.model.Bundle;
-import dev.snowdrop.model.Job;
 import dev.snowdrop.model.oci.Index;
 import dev.snowdrop.model.oci.Manifest;
 import dev.snowdrop.model.oci.ManifestEntry;
-import io.fabric8.tekton.pipeline.v1.Task;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
 import java.net.URI;
@@ -32,10 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+@Slf4j
 public class RemoteTaskSvc {
-    private static final Logger logger = LoggerFactory.getLogger(RemoteTaskSvc.class);
 
     public static final String TASK_DIGEST_ANNOTATION = "dev.tekton.image.name";
     public static String BUNDLE_PREFIX = "bundle";
@@ -54,7 +47,7 @@ public class RemoteTaskSvc {
 
         switch (b.getProtocol()) {
             case "git": {
-                logger.info("Fetching the git url: {}", b.getUri());
+                log.info("Fetching the git url: {}", b.getUri());
                 try {
                     String taskContent = FileUtilSvc.fetchUrlRawContent(b.getUri());
                     String taskFileName = Paths.get(new URI(b.getUri()).getPath()).getFileName().toString();
@@ -70,7 +63,7 @@ public class RemoteTaskSvc {
             }
 
             case "url": {
-                logger.info("Fetching the url: {}", b.getUri());
+                log.info("Fetching the url: {}", b.getUri());
                 try {
                     String taskUri = b.getUri();
                     String taskContent = FileUtilSvc.fetchUrlRawContent(taskUri);
@@ -88,7 +81,7 @@ public class RemoteTaskSvc {
 
             case "bundle": {
                 // Fetch the OCI bundle
-                logger.info("Task directory path: {}", bundlePath);
+                log.info("Task directory path: {}", bundlePath);
                 grabOCIBundle(b.getUri(), bundlePath);
 
                 // Search about Blob layers from extracted OCI bundle
@@ -111,12 +104,12 @@ public class RemoteTaskSvc {
                         });
                     });
                 } else {
-                    logger.info("No layers found for the oci bundle !");
+                    log.info("No layers found for the oci bundle !");
                 }
             }
             break;
             default: {
-                logger.info("Wrong protocol provided and not supported: {}", b.getProtocol());
+                log.info("Wrong protocol provided and not supported: {}", b.getProtocol());
             }
         }
     }
@@ -134,7 +127,7 @@ public class RemoteTaskSvc {
             String yamlFileName = Paths.get(jsonFileName).getFileName().toString().replaceFirst("[.][^.]+$", ".yaml");
             Path yamlFilePath = Paths.get(path.toString(), yamlFileName);
 
-            logger.info("Task yaml path: " + yamlFilePath);
+            log.info("Task yaml path: " + yamlFilePath);
             Files.write(yamlFilePath, yaml.getBytes());
 
         } catch (IOException ex) {
@@ -153,12 +146,12 @@ public class RemoteTaskSvc {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    logger.info(line);
+                    log.info(line);
                 }
             }
 
             int exitCode = process.waitFor();
-            logger.info("Process exited with code: " + exitCode);
+            log.info("Process exited with code: " + exitCode);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -171,7 +164,7 @@ public class RemoteTaskSvc {
             .filter(layer -> layer.getAnnotations() != null && layer.getAnnotations().containsKey(annotation))
             .peek(layer -> {
                 String layerDigest = layer.getDigest();
-                logger.info("Found task layer: " + layerDigest + " for task: " + layer.getAnnotations().get(annotation));
+                log.info("Found task layer: " + layerDigest + " for task: " + layer.getAnnotations().get(annotation));
             })
             .collect(Collectors.toList());
     }
@@ -188,14 +181,14 @@ public class RemoteTaskSvc {
             AtomicReference<String> digest = new AtomicReference<>(manifestEntry.getDigest());
             String sha256 = digest.get().substring(7);
 
-            logger.info("mediaType: " + mediaType);
-            logger.info("digest: " + digest);
-            logger.info("sha256: " + sha256);
+            log.info("mediaType: " + mediaType);
+            log.info("digest: " + digest);
+            log.info("sha256: " + sha256);
 
             Manifest manifest = new ObjectMapper().readValue(new File(path + "/blobs/sha256" + "/" + sha256), Manifest.class);
             if (manifest != null) {
                 // Searching about the layer containing the json file of the Task
-                logger.info("Manifest found within blobs folder");
+                log.info("Manifest found within blobs folder");
                 return manifest.getLayers().stream()
                     .filter(layer -> "task".equals(layer.getAnnotations().get("dev.tekton.image.kind")))
                     .collect(Collectors.toList());
@@ -230,7 +223,7 @@ public class RemoteTaskSvc {
                             fos.write(buffer, 0, length);
                         }
                     }
-                    logger.info("Path of the file extracted: " + outputFile.getAbsolutePath() + "\n");
+                    log.info("Path of the file extracted: " + outputFile.getAbsolutePath() + "\n");
                     extractedFiles.add(outputFile.getPath());
                 }
             }

@@ -1,15 +1,13 @@
 package dev.snowdrop.service;
 
-import dev.snowdrop.command.BuilderCommand;
 import dev.snowdrop.model.Bundle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class UriParserSvc {
-    private static final Logger logger = LoggerFactory.getLogger(BuilderCommand.class);
 
     public static Bundle extract(String uriToParse) {
         Bundle b = null;
@@ -28,13 +26,13 @@ public class UriParserSvc {
             String url = matcher.group(2);
 
             // Print the extracted values
-            logger.info("Protocol: " + protocol);
-            logger.info("Url: " + url);
+            log.info("Protocol: " + protocol);
+            log.info("Url: " + url);
             b = new Bundle()
                 .protocol(protocol)
                 .uri(url);
         } else {
-            logger.warn("The input string does not match the expected format.");
+            log.warn("The input string does not match the expected format.");
         }
         return b;
     }
