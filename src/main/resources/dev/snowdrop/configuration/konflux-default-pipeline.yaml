@@ -1,4 +1,4 @@
-type: konflux
+provider: konflux
 domain: configuration
 
 repository:

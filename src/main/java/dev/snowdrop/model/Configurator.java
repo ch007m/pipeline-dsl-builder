@@ -16,7 +16,7 @@ import static dev.snowdrop.model.Domain.DEMO;
 @Getter
 public class Configurator {
    @JsonSetter(nulls = Nulls.SKIP)
-   private String provider = DEFAULT_TYPE;
+   private String provider = DEFAULT_PROVIDER;
 
    @JsonSetter(nulls = Nulls.SKIP)
    private String resourceType = DEFAULT_RESOURCE_TYPE;
@@ -32,7 +32,7 @@ public class Configurator {
    private Component component;
    private List<Bundle> bundles;
 
-   private static String DEFAULT_TYPE = String.valueOf(TEKTON).toLowerCase();
+   private static String DEFAULT_PROVIDER = String.valueOf(TEKTON).toLowerCase();
    private static String DEFAULT_RESOURCE_TYPE = "PipelineRun";
    private static String DEFAULT_DOMAIN = String.valueOf(DEMO).toLowerCase();
 }

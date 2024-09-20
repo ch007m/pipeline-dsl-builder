@@ -120,7 +120,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "my-quarkus"
-    pipelines.appstudio.openshift.io/provider: "build"
+    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/strategy: "build"
     appstudio.openshift.io/component: "my-quarkus-app"
     pipelines.openshift.io/used-by: "build-cloud"
@@ -572,7 +572,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "my-quarkus"
-    pipelines.appstudio.openshift.io/provider: "build"
+    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/strategy: "build"
     appstudio.openshift.io/component: "my-quarkus-app"
     pipelines.openshift.io/used-by: "build-cloud"
@@ -992,7 +992,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/ch007m/new-quarkus-app-1?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "my-quarkus"
-    pipelines.appstudio.openshift.io/provider: "build"
+    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/strategy: "build"
     appstudio.openshift.io/component: "my-quarkus-app"
     pipelines.openshift.io/used-by: "build-cloud"
@@ -1428,7 +1428,7 @@ metadata:
     build.appstudio.openshift.io/repo: "https://github.com/redhat-buildpacks/builder-ubi-base?rev={{revision}}"
   labels:
     appstudio.openshift.io/application: "buildpack-remote"
-    pipelines.appstudio.openshift.io/provider: "build"
+    pipelines.appstudio.openshift.io/type: "build"
     pipelines.openshift.io/strategy: "remote-build"
     appstudio.openshift.io/component: "builder-ubi-base"
     pipelines.openshift.io/used-by: "build-cloud"
