@@ -21,3 +21,7 @@ target/
 /.quarkus/cli/plugins/
 /TEMP.md
 /generated/bundle/
+
+# Antora doc site
+/documentation/node_modules/
+/documentation/.cache/
