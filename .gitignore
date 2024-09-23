@@ -18,10 +18,8 @@ markdown_code_embed/
 target/
 
 # Plugin directory
-/.quarkus/cli/plugins/
 /TEMP.md
 /generated/bundle/
 
 # Doc site
 node_modules/
-/src/main/java/dev/snowdrop/visitorpattern/
