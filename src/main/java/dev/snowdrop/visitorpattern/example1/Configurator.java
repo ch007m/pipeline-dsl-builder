@@ -1,4 +1,4 @@
-package dev.snowdrop.visitorpattern;
+package dev.snowdrop.visitorpattern.example1;
 
 import lombok.Getter;
 import lombok.Setter;

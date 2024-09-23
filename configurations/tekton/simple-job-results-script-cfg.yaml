@@ -1,0 +1,14 @@
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+provider: tekton
+resourceType: PipelineRun
+domain: example
+
+job:
+  name: simple-job-results-file-script
+  description: Simple example of a Tekton pipeline echoing a message and pushing a result
+
+  actions:
+    - name: say-hello
+      results:
+        - FOO: "A Foo user"
+      scriptFileUrl: file://scripts/echo.sh

@@ -21,7 +21,7 @@ public class PipelineRunBuilder {
               .withNamespace(cfg.getNamespace())
             .endMetadata()
             .withNewSpec()
-              .withParams(params)
+              .withParams(params) // Parameters will be propagated to the tasks
               .withWorkspaces(pipelineWorkspaces)
               .withTimeouts(populateTimeOut(cfg.getJob().getTimeout()))
               .withNewPipelineSpec()

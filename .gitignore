@@ -24,3 +24,4 @@ target/
 
 # Doc site
 node_modules/
+/src/main/java/dev/snowdrop/visitorpattern/

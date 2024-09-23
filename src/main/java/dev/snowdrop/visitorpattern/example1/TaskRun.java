@@ -1,4 +1,4 @@
-package dev.snowdrop.visitorpattern;
+package dev.snowdrop.visitorpattern.example1;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,12 +7,12 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PipelineRun extends AbstractRun {
-    public String name;
-    public List<Action> actions;
+public class TaskRun extends AbstractRun {
+    private String name;
+    private List<Step> steps;
     private Configurator config;
 
-    public PipelineRun(Configurator cfg) {
+    public TaskRun(Configurator cfg) {
         this.config = cfg;
     }
 
@@ -21,5 +21,6 @@ public class PipelineRun extends AbstractRun {
         return visitor.visit(this);
     }
 
-    // Other methods related to PipelineRun
+    // Other methods related to TaskRun
 }
+

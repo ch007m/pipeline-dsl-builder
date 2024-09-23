@@ -38,34 +38,37 @@ public class TektonProvider implements Provider {
         List<Action> actions = cfg.getJob().getActions();
         List<PipelineTask> tasks = new ArrayList<>();
         List<PipelineTask> finallyTasks = new ArrayList<>();
+
         List<Param> pipelineParams = new ArrayList<>();
+        List<Map<String, Object>> params = cfg.getJob().getParams();
+
         List<WorkspaceBinding> pipelineWorkspaces = new ArrayList<>();
+        List<Workspace> wks = cfg.getJob().getWorkspaces();
+
         List<PipelineResult> pipelineResults = new ArrayList<>();
-
-        if (actions.isEmpty()) {
-            throw new RuntimeException("Actions are missing from the configuration");
-        }
-
-        Map<Integer, Action> actionOrderMap = Optional.ofNullable(cfg.getJob().getActions())
-            .orElse(Collections.emptyList()) // Handle null case by providing an empty list
-            .stream()
-            .collect(Collectors.toMap(Action::getId, id -> id));
+        List<Map<String, String>> results = cfg.getJob().getResults();
 
         if (workflowResourceType == null) {
             throw new RuntimeException("Missing workflow resource type: pipeline(run), task(run)");
         }
 
-        List<Map<String, String>> results = cfg.getJob().getResults();
+        if (actions.isEmpty()) {
+            throw new RuntimeException("Actions are missing from the configuration");
+        }
+
+        Map<Integer, Action> actionOrderMap = Optional.ofNullable(actions)
+            .orElse(Collections.emptyList()) // Handle null case by providing an empty list
+            .stream()
+            .collect(Collectors.toMap(Action::getId, id -> id));
+
         if (Optional.ofNullable(results).map(List::size).orElse(0) > 0) {
             pipelineResults = populatePipelineResults(results);
         }
 
-        List<Workspace> wks = cfg.getJob().getWorkspaces();
         if (Optional.ofNullable(wks).map(List::size).orElse(0) > 0) {
             pipelineWorkspaces = populatePipelineWorkspaces(wks);
         }
 
-        List<Map<String, Object>> params = cfg.getJob().getParams();
         if (params != null && !params.isEmpty()) {
             pipelineParams = populateParams(cfg.getJob().getParams());
         }
@@ -172,12 +175,13 @@ public class TektonProvider implements Provider {
                 return generatePipelineRun(TYPE, cfg, tasks, pipelineParams, pipelineWorkspaces, pipelineResults);
 
             // TODO: To be reviewed
+            case "taskrun":
+                return generateTaskRun(TYPE, cfg, pipelineParams, pipelineWorkspaces, null);
+
+            // TODO: To be developed
             case "pipeline":
                 return generatePipeline(TYPE, cfg, tasks, pipelineWorkspaces);
 
-            // TODO: To be developed
-            case "taskrun":
-                return generateTaskRun(TYPE, cfg, pipelineWorkspaces);
 
             default:
                 throw new RuntimeException("Invalid type not supported: " + workflowResourceType);

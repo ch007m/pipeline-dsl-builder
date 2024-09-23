@@ -1,7 +1,4 @@
-package dev.snowdrop.visitorpattern;
-
-import java.util.List;
-import java.util.stream.Collectors;
+package dev.snowdrop.visitorpattern.example1;
 
 public class JobFactory {
     public static Visitable createResource(Configurator config) {
