@@ -77,7 +77,7 @@ jobs:
             domain=$(yq eval '.domain' "$file" 2>/dev/null || echo "demo")
             
             # If either field is missing, set default values
-            provider=${provider:-"unknown_type"}
+            provider=${provider:-"unknown_provider"}
             domain=${domain:-"unknown_domain"}
             
             # Create the key as type:domain
@@ -125,7 +125,7 @@ jobs:
             for f in ${values[$i]}; do
               title=$(cat "$f" | yq -r ".job.description")
               fileName=$(cat "$f" | yq -r ".job.name")
-              resourceprovider=$(cat "$f" | yq -r ".resourceType" || echo "PipelineRun")
+              resourceProvider=$(cat "$f" | yq -r ".resourceType" || echo "PipelineRun")
               
               printf '%s\n\n' "#### ${title^}" >> SCENARIO.md
               printf '%s\n' "Command to be executed: " >> SCENARIO.md
@@ -140,7 +140,7 @@ jobs:
             
               printf '%s\n' "Generated file: " >> SCENARIO.md
               printf '%s\n' "\`\`\`yaml" >> SCENARIO.md
-              generate_path="generated/$provider/$domain/$(echo $resourceType | awk '{print tolower($0)}')-$fileName.yaml"
+              generate_path="generated/$provider/$domain/$(echo $resourceProvider | awk '{print tolower($0)}')-$fileName.yaml"
               printf '%s\n' "# $generate_path" >> SCENARIO.md
               printf '%s\n' "\`\`\`"  >> SCENARIO.md
             done
