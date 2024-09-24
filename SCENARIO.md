@@ -15,8 +15,9 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-quarkus-app-cfg.yaml
 
-# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: konflux
+resourceType: PipelineRun
 domain: build
 namespace: user-ns1
 
@@ -33,8 +34,6 @@ component:
   enable: false
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
   name: quarkus-1-on-push
   description: PipelineRun performing a build of a Quarkus application using pack CLI
 
@@ -461,8 +460,9 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-quarkus-app-lifecycle-extension-cfg.yaml
 
-# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: konflux
+resourceType: PipelineRun
 domain: build
 namespace: user-ns1
 
@@ -479,7 +479,6 @@ component:
   enable: true
 
 job:
-  resourceType: PipelineRun
   name: quarkus-1-on-push
   description: PipelineRun doing a build of a Quarkus application using buildpack - extension task
 
@@ -913,8 +912,9 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-quarkus-app-lifecycle-build-cfg.yaml
 
-# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: konflux
+resourceType: PipelineRun
 domain: build
 namespace: user-ns1
 
@@ -931,8 +931,6 @@ component:
   enable: false
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
   name: quarkus-1-on-push
   description: PipelineRun performing a build of a Quarkus application using buildpack task and lifecycle
 
@@ -1323,6 +1321,8 @@ spec:
             storage: "1Gi"
 
 ```
+## konflux
+
 ### Remote-build
 
 #### PipelineRun using the pack cli to build the builder image remotely
@@ -1335,8 +1335,9 @@ using as configuration:
 ```yaml
 # configurations/konflux/build-remote-ssh-cfg.yaml
 
-# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: konflux
+resourceType: PipelineRun
 domain: remote-build
 namespace: cmoullia-tenant
 
@@ -1352,7 +1353,6 @@ component:
   enable: false
 
 job:
-  resourceType: PipelineRun
   name: builder-ubi-base
   description: PipelineRun using the pack cli to build the builder image remotely
   timeout: "0h15m0s"
@@ -1939,15 +1939,14 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-fetch-file-script-cfg.yaml
 
-# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: tekton
-# The domain allows to organize the resources, tasks to be generated
+resourceType: PipelineRun
 domain: example
 
 job:
   name: simple-job-fetch-file-script
   description: Simple example of a Tekton pipeline echoing a message
-  resourceType: PipelineRun
 
   actions:
     - name: say-hello
@@ -1996,6 +1995,7 @@ using as configuration:
 # configurations/tekton/simple-job-two-actions-worskpace-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: example
 
 namespace: demo
@@ -2003,7 +2003,6 @@ namespace: demo
 job:
   name: simple-job-two-actions-wks
   description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye and sharing the message using a workspace
-  resourceType: PipelineRun
   workspaces:
     - name: shared-wks
 
@@ -2112,13 +2111,13 @@ using as configuration:
 # configurations/tekton/simple-job-two-actions-when-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: example
 namespace: demo
 
 job:
   name: simple-job-two-actions-when # name of the pipeline to be created
   description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye when condition is met
-  resourceType: PipelineRun
   params:
     - message: true
   actions:
@@ -2202,8 +2201,9 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-two-actions-cfg.yaml
 
-# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: tekton
+resourceType: PipelineRun
 # The domain allows to organize the resources, tasks to be generated
 domain: example
 
@@ -2213,9 +2213,6 @@ namespace: demo
 job:
   name: simple-job-two-actions # name of the pipeline to be created
   description: Simple example of a Tekton pipeline including 2 actions echoing Hello and Good bye
-
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
 
   actions:
     - name: say-hello
@@ -2289,10 +2286,10 @@ using as configuration:
 # configurations/tekton/simple-action-embedded-script-cfg.yaml
 
 provider: tekton
+resourceType: TaskRun
 domain: example
 
 job:
-  resourceType: TaskRun
   name: simple-action-embedded-script
   description: Simple example of a Tekton task echoing a message
 
@@ -2339,12 +2336,12 @@ using as configuration:
 # configurations/tekton/simple-job-embedded-script-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: example
 
 job:
   name: simple-job-embedded-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
-  resourceType: PipelineRun
 
   actions:
     - name: say-hello
@@ -2396,9 +2393,9 @@ using as configuration:
 ```yaml
 # configurations/tekton/simple-job-fetch-script-cfg.yaml
 
-# The provider defined: tekton, konflux, etc will be used by the tool to generate the resources associated
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
 provider: tekton
-# The domain allows to organize the resources, tasks to be generated
+resourceType: PipelineRun
 domain: example
 
 # Kubernetes namespace
@@ -2407,9 +2404,6 @@ namespace:
 job:
   name: simple-job-fetch-script # name of the pipeline to be created
   description: Simple example of a Tekton pipeline echoing a message
-
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
 
   actions:
     - name: say-hello
@@ -2451,6 +2445,69 @@ spec:
     pipeline: "300000000000ns"
 
 ```
+#### Simple example of a Tekton pipeline echoing a message and pushing a result
+
+Command to be executed: 
+```bash
+java -jar target/quarkus-app/quarkus-run.jar builder -o out/flows -c configurations/tekton/simple-job-results-script-cfg.yaml
+```
+using as configuration: 
+```yaml
+# configurations/tekton/simple-job-results-script-cfg.yaml
+
+# The type will be used by the application to generate the resources for the selected provider: konflux, tekton
+provider: tekton
+resourceType: PipelineRun
+domain: example
+
+job:
+  name: simple-job-results-file-script
+  description: Simple example of a Tekton pipeline echoing a message and pushing a result
+
+  actions:
+    - name: say-hello
+      results:
+        - FOO: "A Foo user"
+      scriptFileUrl: file://scripts/echo.sh
+```
+Generated file: 
+```yaml
+# generated/tekton/example/pipelinerun-simple-job-results-file-script.yaml
+
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message\
+      \ and pushing a result"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "simple-job-results-file-script"
+spec:
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        results:
+        - description: "A Foo user"
+          name: "FOO"
+        stepTemplate: {}
+        steps:
+        - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
+
+            set -e
+            echo "Say Hello"
+  timeouts:
+    pipeline: "300000000000ns"
+
+```
+## tekton
+
 ### Buildpack
 
 #### This Pipeline builds a builder image using the pack CLI.
@@ -2464,12 +2521,11 @@ using as configuration:
 # configurations/tekton/pack-builder-git-task-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: buildpack
 namespace:
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
   name: pack-builder-git-task
   description: "This Pipeline builds a builder image using the pack CLI."
   params:
@@ -2668,12 +2724,11 @@ using as configuration:
 # configurations/tekton/pack-builder-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: buildpack
 namespace:
 
 job:
-  # One of the supported resources: PipelineRun, Pipeline
-  resourceType: PipelineRun
   name: pack-builder-push
   description: "This Pipeline builds a builder image using the pack CLI."
   params:
@@ -2860,6 +2915,8 @@ spec:
           name: "gitea-creds"
 
 ```
+## tekton
+
 ### Demo
 
 #### Such a job will not work as the [*] "notation" with array param is not supported in a task's script
@@ -2873,11 +2930,11 @@ using as configuration:
 # configurations/tekton/basic3-issue-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: demo
 # Such a job will not work as the [*] "notation"
 # with array param is not supported in a task's script
 job:
-  resourceType: PipelineRun
   name: basic-job-3
   description: Such a job will not work as the [*] "notation" with array param is not supported in a task's script
   actions:
@@ -2946,9 +3003,9 @@ using as configuration:
 # configurations/tekton/basic1-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: demo
 job:
-  resourceType: PipelineRun
   name: basic-job-1
   description: Basic job echoing a message
   actions:
@@ -3000,9 +3057,9 @@ using as configuration:
 # configurations/tekton/basic2-cfg.yaml
 
 provider: tekton
+resourceType: PipelineRun
 domain: demo
 job:
-  resourceType: PipelineRun
   name: basic-job-2
   description: Basic job echoing a message using the param teamMember
   actions:
