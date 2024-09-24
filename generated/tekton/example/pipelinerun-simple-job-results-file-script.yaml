@@ -1,0 +1,30 @@
+apiVersion: "tekton.dev/v1"
+kind: "PipelineRun"
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.60.x"
+    tekton.dev/displayName: "Simple example of a Tekton pipeline echoing a message\
+      \ and pushing a result"
+    tekton.dev/platforms: "linux/amd64"
+  labels:
+    app.kubernetes.io/version: "0.1"
+  name: "simple-job-results-file-script"
+spec:
+  pipelineSpec:
+    tasks:
+    - name: "say-hello"
+      taskSpec:
+        results:
+        - description: "A Foo user"
+          name: "FOO"
+        stepTemplate: {}
+        steps:
+        - image: "registry.access.redhat.com/ubi9@sha256:1ee4d8c50d14d9c9e9229d9a039d793fcbc9aa803806d194c957a397cf1d2b17"
+          name: "run-script"
+          script: |-
+            #!/usr/bin/env bash
+
+            set -e
+            echo "Say Hello"
+  timeouts:
+    pipeline: "300000000000ns"
