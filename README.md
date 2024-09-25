@@ -44,6 +44,7 @@ job:
       
       set -e
       echo "Say Hello"
+EOF      
 ```
 and launch it:
 ```bash
