@@ -195,6 +195,34 @@ job:
         - image-url: "$(tasks.build-container.results.IMAGE_URL)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1
 
+    - name: apply-tags
+      runAfter:
+        - build-image-index
+      params:
+        - IMAGE: "$(tasks.build-image-index.results.IMAGE_URL)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.1
+
+    - name: push-dockerfile
+      runAfter:
+        - build-image-index
+      params:
+        - IMAGE: "$(tasks.build-image-index.results.IMAGE_URL)"
+        - IMAGE_DIGEST: "$(tasks.build-image-index.results.IMAGE_DIGEST)"
+        - DOCKERFILE: "$(params.dockerfile)"
+        - CONTEXT: "$(params.path-context)"
+        - SOURCE_ARTIFACT: "$(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-push-dockerfile-oci-ta:0.1
+
+    - name: rpms-signature-scan
+      runAfter:
+        - build-image-index
+      when:
+        - "$(params.skip-checks): false"
+      params:
+        - image-url: "$(tasks.build-image-index.results.IMAGE_URL)"
+        - image-digest: "$(tasks.build-image-index.results.IMAGE_DIGEST)"
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan:0.2
+
     # Deprecated since Sep 2024
     # - name: sbom-json-check
     #   runAfter: build-container
