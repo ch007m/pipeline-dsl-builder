@@ -45,10 +45,11 @@ job:
      - "pipelines.appstudio.openshift.io/type": "build"
 
   workspaces:
-    - name: workspace
-      volumeClaimTemplate:
-        storage: 1Gi
-        accessMode: ReadWriteOnce
+    # Not needed anymore as we use OCI (git clone -> tar oci -> etc)
+    # - name: workspace
+    #  volumeClaimTemplate:
+    #    storage: 1Gi
+    #    accessMode: ReadWriteOnce
     - name: git-auth
       secret:
         name: "{{ git_auth_secret }}"
@@ -80,18 +81,19 @@ job:
         - IMAGE_URL: "$(tasks.build-container.results.IMAGE_URL)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1
 
-    - name: summary # show-summary ! name of the task is summary while bundle name is task-summary.
-      finally: true
-      params:
-        - pipelinerun-name: "$(context.pipelineRun.name)"
-        - git-url: "$(tasks.git-clone.results.url)?rev=$(tasks.git-clone.results.commit)"
-        #- git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
-        - image-url: "$(params.output-image)"
-        - build-task-status: "$(tasks.build-container.status)"
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2
-      workspaces:
-        - name: workspace
-          workspace: workspace
+    #  Deprecated since Nov 2024
+    # - name: summary # show-summary ! name of the task is summary while bundle name is task-summary.
+    #   finally: true
+    #   params:
+    #     - pipelinerun-name: "$(context.pipelineRun.name)"
+    #     - git-url: "$(tasks.git-clone.results.url)?rev=$(tasks.git-clone.results.commit)"
+    #     #- git-url: "$(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)"
+    #     - image-url: "$(params.output-image)"
+    #     - build-task-status: "$(tasks.build-container.status)"
+    #   ref: bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2
+    #   workspaces:
+    #     - name: workspace
+    #       workspace: workspace
       
     # Tasks
     - name: init
@@ -107,23 +109,28 @@ job:
         - "$(tasks.init.results.build): true"
       params:
         - url: "$(params.git-url)"
+        - revision: "$(params.revision)"
+        - ociStorage: "$(params.output-image).git"
+        - ociArtifactExpiresAfter: "$(params.image-expires-after)"
+        - enableSymlinkCheck: "$(params.enableSymlinkCheck)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1
       workspaces:
-        - name: output
-          workspace: workspace
-        - name: basic-auth
+        - name: git-basic-auth
           workspace: git-auth
+        - name: netrc
+          workspace: netrc
 
     - name: prefetch-dependencies
-      runAfter: git-clone #clone-repository
-      when: # TODO: Do we support notin ?
-        - "$(params.prefetch-input): notin empty list"
+      runAfter: git-clone #vclone-repository
       params:
         - input: "$(params.prefetch-input)"
+        - SOURCE_ARTIFACT: "$(tasks.clone-repository.results.SOURCE_ARTIFACT)"
+        - ociStorage: "$(params.output-image).prefetch"
+        - ociArtifactExpiresAfter: "$(params.image-expires-after)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.1
       workspaces:
-        - name: source
-          workspace: workspace
+        - name: netrc
+          workspace: netrc
         - name: git-basic-auth
           workspace: git-auth
 
@@ -145,20 +152,18 @@ job:
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1
 
     - name: source-build # Konflux name is : build-source-image !!
-      runAfter: build-container
+      runAfter: build-image-index
       when:
         - "$(tasks.init.results.build): true"
         - "$(params.build-source-image): true"
       params:
         - BINARY_IMAGE: "$(params.output-image)"
-        - BASE_IMAGES: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
+        - SOURCE_ARTIFACT: "$(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)"
+        - CACHI2_ARTIFACT: "$(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-source-build-oci-ta:0.1
-      workspaces:
-        - name: workspace
-          workspace: workspace
 
     - name: clair-scan
-      runAfter: build-container
+      runAfter: build-image-index
       when:
         - "$(params.skip-checks): false"
       params:
@@ -167,7 +172,7 @@ job:
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.1
 
     - name: ecosystem-cert-preflight-checks
-      runAfter: build-container
+      runAfter: build-image-index
       when:
         - "$(params.skip-checks): false"
       params:
@@ -175,19 +180,18 @@ job:
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1
 
     - name: sast-snyk-check
-      runAfter: git-clone
+      runAfter: build-image-index
       when:
-        - "$(params.skip-checks): true"
+        - "$(params.skip-checks): false"
       params:
         - image-digest: "$(tasks.build-container.results.IMAGE_DIGEST)"
         - image-url: "$(tasks.build-container.results.IMAGE_URL)"
+        - SOURCE_ARTIFACT: "$(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)"
+        - CACHI2_ARTIFACT: "$(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check-oci-ta:0.2
-      workspaces:
-        - name: workspace
-          workspace: workspace
 
     - name: clamav-scan
-      runAfter: build-container
+      runAfter: build-image-index
       when:
         - "$(params.skip-checks): false"
       params:
@@ -222,6 +226,11 @@ job:
         - image-url: "$(tasks.build-image-index.results.IMAGE_URL)"
         - image-digest: "$(tasks.build-image-index.results.IMAGE_DIGEST)"
       ref: bundle://quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan:0.2
+      workspaces:
+        - name: git-auth
+          optional: true
+        - name: netrc
+          optional: true
 
     # Deprecated since Sep 2024
     # - name: sbom-json-check
