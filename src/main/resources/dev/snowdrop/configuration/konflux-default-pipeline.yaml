@@ -6,21 +6,26 @@ repository:
   url: https://github.com/konflux-ci/build-definitions.git # dummy as we will be override using user's configuration
 
 # List of OCI bundles used part of a task within the Pipeline
+# Updated the 27Nov 2024
 bundles:
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:092c113b614f6551113f17605ae9cb7e822aa704d07f0e37ed209da23ce392cc
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:0bb1be8363557e8e07ec34a3c5daaaaa23c9d533f0bb12f00dc604d00de50814
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:058a59f72997c9cf1be20978eb6a145d8d4d436c6098f2460bd96766bb363b20
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-source-build:0.1@sha256:21cb5ebaff7a9216903cf78933dc4ec4dd6283a52636b16590a5f52ceb278269
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:409ff39379c50d3c257229b4c6d6600e35eb53637504c47fb36ade262c70716e
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.4@sha256:d98fa9daf5ee12dfbf00880b83d092d01ce9994d79836548d2f82748bb0c64a2
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.1@sha256:baea4be429cf8d91f7c758378cea42819fe324f25a7f957bf9805409cab6d123
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check:0.2@sha256:82c42d27c9c59db6cf6c235e89f7b37f5cdfc75d0d361ca0ee91ae703ba72301
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1@sha256:7bb17b937c9342f305468e8a6d0a22493e3ecde58977bd2ffc8b50e2fa234d58
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:9bfc6b99ef038800fe131d7b45ff3cd4da3a415dd536f7c657b3527b01c4a13b
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1@sha256:2c5de51ec858fc8d47e41c65b20c83fdac249425d67ed6d1058f9f3e0b574500
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1@sha256:5131cce0f93d0b728c7bcc0d6cee4c61d4c9f67c6d619c627e41e3c9775b497d
-  - bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2@sha256:5d0bd592a8924451b6472696e398fa719773f819df6e8e040cd2fb2b550e0e74
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.1@sha256:87fd7fc0e937aad1a8db9b6e377d7e444f53394dafde512d68adbea6966a4702
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:ebc17bb22481160eec6eb7277df1e48b90f599bebe563cd4f046807f4e32ced3
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2@sha256:ea5f13f235f98e9f0da599439f0b62b729901a5b6ad8d673daf3821f3f9cb66f
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.2@sha256:0a5421111e7092740398691d5bd7c125cc0896f29531d19414bb5724ae41692a
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.1@sha256:b4f450f1447b166da671f1d5819ab5a1485083e5c27ab91f7d8b7a2ff994c8c2
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.4@sha256:5a1a165fa02270f0a947d8a2131ee9d8be0b8e9d34123828c2bef589e504ee84
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.1@sha256:df8a25a3431a70544172ed4844f9d0c6229d39130633960729f825a031a7dea9
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:4bf48d038ff12d25bdeb5ab3e98dc2271818056f454c83d7393ebbd413028147
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:0523b51c28375a3f222da91690e22eff11888ebc98a0c73c468af44762265c69
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.1@sha256:b1ac9124ad909a8d7dbac01b1a02ef9a973d448d4c94efcf3d1b29e2a5c9e76f
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-push-dockerfile-oci-ta:0.1@sha256:80d48a1b9d2707490309941ec9f79338533938f959ca9a207b481b0e8a5e7a93
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan:0.2@sha256:28aaf87d61078a0aeeeabcae455eda7d05c4f9b81d8995bdcf3dde95c1a7a77b
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check-oci-ta:0.2@sha256:22ca2db8d94c689dba03d2c257733743cd118759d7af9a68fb08f54a27fd8460
+  #- bundle://quay.io/konflux-ci/tekton-catalog/task-sbom-json-check:0.1@sha256:2c5de51ec858fc8d47e41c65b20c83fdac249425d67ed6d1058f9f3e0b574500
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:945a7c9066d3e0a95d3fddb7e8a6992e4d632a2a75d8f3a9bd2ff2fef0ec9aa0
+  - bundle://quay.io/konflux-ci/tekton-catalog/task-source-build-oci-ta:0.1@sha256:bd786bc1d33391bb169f98a1070d1a39e410b835f05fd0db0263754c65bd9bea
+  #- bundle://quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:d97c04ab42f277b1103eb6f3a053b247849f4f5b3237ea302a8ecada3b24e15b
+    
 
 job:
   name: default-konflux
@@ -102,7 +107,7 @@ job:
         - "$(tasks.init.results.build): true"
       params:
         - url: "$(params.git-url)"
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1
       workspaces:
         - name: output
           workspace: workspace
@@ -115,7 +120,7 @@ job:
         - "$(params.prefetch-input): notin empty list"
       params:
         - input: "$(params.prefetch-input)"
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.1
       workspaces:
         - name: source
           workspace: workspace
@@ -124,7 +129,7 @@ job:
 
     - name: build-container # dummy task to be replaced with the user's tasks
       runAfter: prefetch-dependencies
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-buildah:0.2
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2
 
     - name: build-image-index
       runAfter: build-container
@@ -147,7 +152,7 @@ job:
       params:
         - BINARY_IMAGE: "$(params.output-image)"
         - BASE_IMAGES: "$(tasks.build-container.results.BASE_IMAGES_DIGESTS)"
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-source-build:0.1
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-source-build-oci-ta:0.1
       workspaces:
         - name: workspace
           workspace: workspace
@@ -176,7 +181,7 @@ job:
       params:
         - image-digest: "$(tasks.build-container.results.IMAGE_DIGEST)"
         - image-url: "$(tasks.build-container.results.IMAGE_URL)"
-      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check:0.2
+      ref: bundle://quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check-oci-ta:0.2
       workspaces:
         - name: workspace
           workspace: workspace
